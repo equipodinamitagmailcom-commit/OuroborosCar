@@ -5,7 +5,7 @@ const ModalEdicionClientes = ({
     mostrarModalEdicion,
     setMostrarModalEdicion,
     clienteEditar,
-    manejoCambioInput,
+    manejoCambioInputEdicion,
     actualizarCliente,
 }) => {
  const [deshabilitado, setDeshabilitado] = useState(false);
@@ -35,7 +35,7 @@ const ModalEdicionClientes = ({
                         type="text"
                         name="nombre"
                         value={clienteEditar.nombre}
-                        onChange={manejoCambioInput}
+                        onChange={manejoCambioInputEdicion}
                         placeholder="Ingresa el nombre"
                     />
                 </Form.Group>
@@ -45,7 +45,7 @@ const ModalEdicionClientes = ({
                         type="text"
                         name="apellido"
                         value={clienteEditar.apellido}
-                        onChange={manejoCambioInput}
+                        onChange={manejoCambioInputEdicion}
                         placeholder="Ingresa el apellido"
                     />
                 </Form.Group>
