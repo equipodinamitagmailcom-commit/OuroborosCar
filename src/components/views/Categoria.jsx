@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
-import { supabase } from "../database/supabaseconfig";
-import ModalRegistroCategoria from "../components/categorias_vehiculo/ModalRegistroCategoria";
-import NotificacionOperacion from "../components/rutas/NotificacionOperacion";
-import TablaCategorias from "../components/categorias_vehiculo/TablaCategorias";
-import TarjetaCategoria from "../components/categorias_vehiculo/TarjetaCategoria";
-import ModalEdicionCategoria from "../components/categorias_vehiculo/ModalEdicionCategorias";
-import ModalEliminacionCategoria from "../components/categorias_vehiculo/ModalEliminacionCategoria";
-import CuadroBusquedas from "../components/busquedas/CuadroBusqueda";
-import Paginacion from "../components/ordenamiento/Paginacion";
+import { supabase } from "../database/supabaseconfig.js";
+import ModalRegistroCategoria from "../categorias_vehiculo/ModalRegistroCategoria";
+import NotificacionOperacion from "../rutas/NotificacionOperacion";
+import TablaCategorias from "../categorias_vehiculo/TablaCategorias";
+import TarjetaCategoria from "../categorias_vehiculo/TarjetaCategoria";
+import ModalEdicionCategoria from "../categorias_vehiculo/ModalEdicionCategorias";
+import ModalEliminacionCategoria from "../categorias_vehiculo/ModalEliminacionCategoria";
+import CuadroBusquedas from "../busquedas/CuadroBusqueda";
+import Paginacion from "../ordenamiento/Paginacion";
 
 const Categorias = () => {
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });

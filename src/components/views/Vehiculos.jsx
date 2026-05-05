@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
-import { supabase } from "../database/supabaseconfig";
-import ModalRegistroVehiculos from "../components/vehiculos/ModalRegistroVehiculos";
-import ModalEdicionVehiculos from "../components/vehiculos/ModalEdicionVehiculos";
-import NotificacionOperacion from "../components/rutas/NotificacionOperacion";
-import CuadroBusquedas from "../components/busquedas/CuadroBusqueda";
+import { supabase } from '../database/supabaseconfig.js';
+import ModalRegistroVehiculos from '../vehiculos/ModalRegistroVehiculos';
+import ModalEdicionVehiculos from '../vehiculos/ModalEdicionVehiculos';
+import NotificacionOperacion from '../rutas/NotificacionOperacion';
+import CuadroBusquedas from '../busquedas/CuadroBusqueda';
 
 const Vehiculos = () => {
 

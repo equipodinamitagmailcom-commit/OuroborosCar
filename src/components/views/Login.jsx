@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import FormularioLogin from "../components/login/FormularioLogin";
-import { supabase } from "../database/supabaseconfig";
+import FormularioLogin from "../login/FormularioLogin.jsx";
+import { supabase } from "../database/supabaseconfig.js";
 
 const Login = () => {
   const [usuario, setUsuario] = useState("");

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
-import Logo from "../../assets/logo.png";
-import { supabase } from "../../database/supabaseconfig";
+import Logo from "../../assets/Logo.png";
+import { supabase } from "../database/supabaseconfig.js";
 
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
@@ -67,12 +67,44 @@ const Encabezado = () => {
             <strong>Vehículos</strong>
           </Nav.Link>
 
-           <Nav.Link
-            onClick={() => manejarNavegacion("/categorias")}
+          <Nav.Link
+            onClick={() => manejarNavegacion("/categorias-vehiculo")}
             className={mostrarMenu ? "color-texto-marca" : "text-white"}
           >
             {mostrarMenu ? <i className="bi-bookmark-fill me-2"></i> : null}
-            <strong>Categorías</strong>
+            <strong>Categorías Vehículo</strong>
+          </Nav.Link>
+
+          <Nav.Link
+            onClick={() => manejarNavegacion("/categorias-repuestos")}
+            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+          >
+            {mostrarMenu ? <i className="bi-tags-fill me-2"></i> : null}
+            <strong>Categorías Repuestos</strong>
+          </Nav.Link>
+
+          <Nav.Link
+            onClick={() => manejarNavegacion("/repuestos")}
+            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+          >
+            {mostrarMenu ? <i className="bi-tools me-2"></i> : null}
+            <strong>Repuestos</strong>
+          </Nav.Link>
+
+          <Nav.Link
+            onClick={() => manejarNavegacion("/mecanicos")}
+            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+          >
+            {mostrarMenu ? <i className="bi-person-workspace me-2"></i> : null}
+            <strong>Mecánicos</strong>
+          </Nav.Link>
+
+          <Nav.Link
+            onClick={() => manejarNavegacion("/registro")}
+            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+          >
+            {mostrarMenu ? <i className="bi-journal-plus me-2"></i> : null}
+            <strong>Registro</strong>
           </Nav.Link>
 
           {/* Ícono cerrar sesión en barra superior */}

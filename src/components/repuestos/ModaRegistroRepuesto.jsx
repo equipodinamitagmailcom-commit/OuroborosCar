@@ -1,0 +1,139 @@
+import React, { useState, useEffect } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
+import { supabase } from '../database/supabaseconfig.js';
+
+const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar }) => {
+    // Estado inicial basado en las columnas reales de tu DDL
+    const [repuesto, setRepuesto] = useState({
+        nombre: '',
+        descripcion: '',
+        precio_repuesto: '', 
+        id_categoria: ''
+    });
+    
+    const [categorias, setCategorias] = useState([]);
+    const [cargando, setCargando] = useState(false);
+
+    // Cargar categorías desde la tabla categoriarepuesto
+    useEffect(() => {
+        const obtenerCategorias = async () => {
+            const { data, error } = await supabase
+                .from('categoriarepuesto') 
+                .select('id_categoria, nombre');
+            if (!error) setCategorias(data);
+        };
+        
+        if (mostrar) {
+            obtenerCategorias();
+        }
+    }, [mostrar]);
+
+    const manejarCambio = (e) => {
+        setRepuesto({ ...repuesto, [e.target.name]: e.target.value });
+    };
+
+    const registrarRepuesto = async (e) => {
+        e.preventDefault();
+        setCargando(true);
+        try {
+            // Inserción en la tabla repuestos según tu esquema
+            const { error } = await supabase
+                .from('repuestos')
+                .insert([repuesto]);
+
+            if (error) throw error;
+
+            alert('Repuesto registrado con éxito');
+            
+            // Limpieza de campos tras éxito
+            setRepuesto({ 
+                nombre: '', 
+                descripcion: '', 
+                precio_repuesto: '', 
+                id_categoria: '' 
+            });
+            
+            alGuardar(); // Refresca la lista en la vista principal
+            manejarCierre();
+        } catch (error) {
+            alert('Error al registrar: ' + error.message);
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    return (
+        <Modal show={mostrar} onHide={manejarCierre} centered>
+            <Modal.Header closeButton>
+                <Modal.Title className="color-texto-marca">Registrar Nuevo Repuesto</Modal.Title>
+            </Modal.Header>
+            <Form onSubmit={registrarRepuesto}>
+                <Modal.Body>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Nombre de la Pieza</Form.Label>
+                        <Form.Control 
+                            name="nombre" 
+                            type="text"
+                            placeholder="Ej: Kit de embrague"
+                            value={repuesto.nombre}
+                            onChange={manejarCambio} 
+                            required 
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Categoría</Form.Label>
+                        <Form.Select 
+                            name="id_categoria" 
+                            value={repuesto.id_categoria}
+                            onChange={manejarCambio} 
+                            required
+                        >
+                            <option value="">Seleccione una categoría...</option>
+                            {categorias.map((cat) => (
+                                <option key={cat.id_categoria} value={cat.id_categoria}>
+                                    {cat.nombre}
+                                </option>
+                            ))}
+                        </Form.Select>
+                    </Form.Group>
+                    
+                    <Form.Group className="mb-3">
+                        <Form.Label>Precio de Venta ($)</Form.Label>
+                        <Form.Control 
+                            type="number" 
+                            name="precio_repuesto" 
+                            step="0.01"
+                            placeholder="0.00"
+                            value={repuesto.precio_repuesto}
+                            onChange={manejarCambio} 
+                            required 
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Descripción Técnica</Form.Label>
+                        <Form.Control 
+                            as="textarea" 
+                            rows={3} 
+                            name="descripcion" 
+                            placeholder="Detalles sobre la marca, compatibilidad, etc."
+                            value={repuesto.descripcion}
+                            onChange={manejarCambio} 
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={manejarCierre}>
+                        Cancelar
+                    </Button>
+                    <Button type="submit" className="color-navbar" disabled={cargando}>
+                        {cargando ? 'Guardando...' : 'Guardar Repuesto'}
+                    </Button>
+                </Modal.Footer>
+            </Form>
+        </Modal>
+    );
+};
+
+export default ModalRegistroRepuesto;
