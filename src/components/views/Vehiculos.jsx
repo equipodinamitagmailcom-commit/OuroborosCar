@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Button, Spinner, InputGroup, Form } from "react-bootstrap";
 import { supabase } from '../database/supabaseconfig.js';
 import ModalRegistroVehiculos from '../vehiculos/ModalRegistroVehiculos';
 import ModalEdicionVehiculos from '../vehiculos/ModalEdicionVehiculos';
 import ModalVerCategorias from '../categorias_vehiculo/ModalVerCategorias';
 import NotificacionOperacion from '../rutas/NotificacionOperacion';
-import CuadroBusquedas from '../busquedas/CuadroBusqueda';
 import Paginacion from '../ordenamiento/Paginacion';
 
 const Vehiculos = () => {
@@ -64,7 +63,11 @@ const Vehiculos = () => {
     if (archivo && archivo.type.startsWith("image/")) {
       setNuevoVehiculo((prev) => ({ ...prev, archivo }));
     } else {
-      alert("Selecciona una imagen válida (JPG, PNG, etc.)");
+      setToast({
+        mostrar: true,
+        mensaje: "Selecciona una imagen válida (JPG, PNG, etc.)",
+        tipo: "advertencia",
+      });
     }
   };
 
@@ -78,7 +81,11 @@ const Vehiculos = () => {
     if (archivo && archivo.type.startsWith("image/")) {
       setVehiculoEditar((prev) => ({ ...prev, archivo }));
     } else {
-      alert("Selecciona una imagen válida (JPG, PNG, etc.)");
+      setToast({
+        mostrar: true,
+        mensaje: "Selecciona una imagen válida (JPG, PNG, etc.)",
+        tipo: "advertencia",
+      });
     }
   };
 
@@ -151,6 +158,7 @@ const Vehiculos = () => {
   }, []);
 
   const agregarVehiculo = async () => {
+    let nombreArchivoSubido = null;
     try {
       if (
         !nuevoVehiculo.marca.trim() ||
@@ -171,9 +179,24 @@ const Vehiculos = () => {
         return;
       }
 
-      setMostrarModal(false);
+      const patenteTrim = nuevoVehiculo.patente.trim();
+      const { data: existentesPatente, error: errConsultaPatente } = await supabase
+        .from("vehiculos")
+        .select("id_vehiculo")
+        .ilike("patente", patenteTrim);
+
+      if (errConsultaPatente) throw errConsultaPatente;
+      if (existentesPatente?.length > 0) {
+        setToast({
+          mostrar: true,
+          mensaje: "No puede haber dos vehículos con la misma patente.",
+          tipo: "advertencia",
+        });
+        return;
+      }
 
       const nombreArchivo = `${Date.now()}_${nuevoVehiculo.archivo.name}`;
+      nombreArchivoSubido = nombreArchivo;
 
       const { error: uploadError } = await supabase.storage
         .from("imagenes_vehiculo")
@@ -191,7 +214,7 @@ const Vehiculos = () => {
           id_categoria: nuevoVehiculo.id_categoria,
           marca: nuevoVehiculo.marca,
           modelo: nuevoVehiculo.modelo,
-          patente: nuevoVehiculo.patente,
+          patente: patenteTrim,
           anio: parseInt(nuevoVehiculo.anio),
           color: nuevoVehiculo.color,
           estado: nuevoVehiculo.estado,
@@ -201,8 +224,21 @@ const Vehiculos = () => {
         },
       ]);
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23505") {
+          await supabase.storage.from("imagenes_vehiculo").remove([nombreArchivo]).catch(() => {});
+          nombreArchivoSubido = null;
+          setToast({
+            mostrar: true,
+            mensaje: "No puede haber dos vehículos con la misma patente.",
+            tipo: "advertencia",
+          });
+          return;
+        }
+        throw error;
+      }
 
+      setMostrarModal(false);
       setNuevoVehiculo({
         id_categoria: "",
         marca: "",
@@ -217,96 +253,159 @@ const Vehiculos = () => {
       });
       setToast({ mostrar: true, mensaje: "Vehículo registrado correctamente", tipo: "exito" });
       await cargarVehiculos();
-
+      nombreArchivoSubido = null;
     } catch (err) {
       console.error("Error al agregar vehículo:", err);
+      if (nombreArchivoSubido) {
+        await supabase.storage.from("imagenes_vehiculo").remove([nombreArchivoSubido]).catch(() => {});
+      }
+      if (err?.code === "23505") {
+        setToast({
+          mostrar: true,
+          mensaje: "No puede haber dos vehículos con la misma patente.",
+          tipo: "advertencia",
+        });
+        return;
+      }
       setToast({ mostrar: true, mensaje: "Error al registrar vehículo", tipo: "error" });
     }
   };
 
- const actualizarVehiculo = async () => {
-  try {
-    if (
-      !vehiculoEditar.marca.trim() ||
-      !vehiculoEditar.modelo.trim() ||
-      !vehiculoEditar.patente.trim() ||
-      !vehiculoEditar.anio ||
-      !vehiculoEditar.color.trim() ||
-      !vehiculoEditar.estado.trim() ||
-      !vehiculoEditar.precio ||
-      !vehiculoEditar.stock
-    ) {
+  const actualizarVehiculo = async () => {
+    let nombreNuevoSubido = null;
+    let nombreAnteriorBorrado = null;
+    try {
+      if (
+        !vehiculoEditar.marca.trim() ||
+        !vehiculoEditar.modelo.trim() ||
+        !vehiculoEditar.patente.trim() ||
+        !vehiculoEditar.anio ||
+        !vehiculoEditar.color.trim() ||
+        !vehiculoEditar.estado.trim() ||
+        !vehiculoEditar.precio ||
+        !vehiculoEditar.stock
+      ) {
+        setToast({
+          mostrar: true,
+          mensaje: "Completa los campos obligatorios",
+          tipo: "advertencia",
+        });
+        return;
+      }
+
+      const patenteTrim = vehiculoEditar.patente.trim();
+      const { data: otrosConPatente, error: errPatente } = await supabase
+        .from("vehiculos")
+        .select("id_vehiculo")
+        .ilike("patente", patenteTrim)
+        .neq("id_vehiculo", vehiculoEditar.id_vehiculo);
+
+      if (errPatente) throw errPatente;
+      if (otrosConPatente?.length > 0) {
+        setToast({
+          mostrar: true,
+          mensaje: "No puede haber dos vehículos con la misma patente.",
+          tipo: "advertencia",
+        });
+        return;
+      }
+
+      let datosActualizados = {
+        id_categoria: vehiculoEditar.id_categoria,
+        marca: vehiculoEditar.marca,
+        modelo: vehiculoEditar.modelo,
+        patente: patenteTrim,
+        anio: parseInt(vehiculoEditar.anio),
+        color: vehiculoEditar.color,
+        estado: vehiculoEditar.estado,
+        precio: parseFloat(vehiculoEditar.precio),
+        stock: parseInt(vehiculoEditar.stock),
+        url_imagen: vehiculoEditar.url_imagen,
+      };
+
+      if (vehiculoEditar.archivo) {
+        const nombreArchivo = `${Date.now()}_${vehiculoEditar.archivo.name}`;
+        nombreNuevoSubido = nombreArchivo;
+
+        const { error: uploadError } = await supabase.storage
+          .from("imagenes_vehiculo")
+          .upload(nombreArchivo, vehiculoEditar.archivo);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from("imagenes_vehiculo")
+          .getPublicUrl(nombreArchivo);
+        datosActualizados.url_imagen = urlData.publicUrl;
+
+        if (vehiculoEditar.url_imagen) {
+          nombreAnteriorBorrado = vehiculoEditar.url_imagen.split("/").pop().split("?")[0];
+        }
+      }
+
+      const { error } = await supabase
+        .from("vehiculos")
+        .update(datosActualizados)
+        .eq("id_vehiculo", vehiculoEditar.id_vehiculo);
+
+      if (error) {
+        if (error.code === "23505") {
+          if (nombreNuevoSubido) {
+            await supabase.storage.from("imagenes_vehiculo").remove([nombreNuevoSubido]).catch(() => {});
+          }
+          setToast({
+            mostrar: true,
+            mensaje: "No puede haber dos vehículos con la misma patente.",
+            tipo: "advertencia",
+          });
+          return;
+        }
+        throw error;
+      }
+
+      if (nombreAnteriorBorrado && vehiculoEditar.archivo) {
+        await supabase.storage.from("imagenes_vehiculo").remove([nombreAnteriorBorrado]).catch(() => {});
+      }
+
+      await cargarVehiculos();
+
+      setMostrarModalEdicion(false);
+      setVehiculoEditar({
+        id_vehiculo: "",
+        id_categoria: "",
+        marca: "",
+        modelo: "",
+        patente: "",
+        anio: "",
+        color: "",
+        estado: "",
+        precio: "",
+        stock: "",
+        url_imagen: "",
+        archivo: null,
+      });
+
+      setToast({ mostrar: true, mensaje: "Vehículo actualizado correctamente", tipo: "exito" });
+    } catch (err) {
+      console.error("Error al actualizar:", err);
+      if (nombreNuevoSubido && err?.code !== "23505") {
+        await supabase.storage.from("imagenes_vehiculo").remove([nombreNuevoSubido]).catch(() => {});
+      }
+      if (err?.code === "23505") {
+        setToast({
+          mostrar: true,
+          mensaje: "No puede haber dos vehículos con la misma patente.",
+          tipo: "advertencia",
+        });
+        return;
+      }
       setToast({
         mostrar: true,
-        mensaje: "Completa los campos obligatorios",
-        tipo: "advertencia",
+        mensaje: "Error al actualizar vehículo",
+        tipo: "error",
       });
-      return;
     }
-
-    setMostrarModalEdicion(false);
-
-    let datosActualizados = {
-      id_categoria: vehiculoEditar.id_categoria,
-      marca: vehiculoEditar.marca,
-      modelo: vehiculoEditar.modelo,
-      patente: vehiculoEditar.patente,
-      anio: parseInt(vehiculoEditar.anio),
-      color: vehiculoEditar.color,
-      estado: vehiculoEditar.estado,
-      precio: parseFloat(vehiculoEditar.precio),
-      stock: parseInt(vehiculoEditar.stock),
-      url_imagen: vehiculoEditar.url_imagen,
-    };
-
-    if (vehiculoEditar.archivo) {
-      const nombreArchivo = `${Date.now()}_${vehiculoEditar.archivo.name}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("imagenes_vehiculo")
-        .upload(nombreArchivo, vehiculoEditar.archivo);
-
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from("imagenes_vehiculo")
-        .getPublicUrl(nombreArchivo);
-      datosActualizados.url_imagen = urlData.publicUrl;
-
-      if (vehiculoEditar.url_imagen) {
-        const nombreAnterior = vehiculoEditar.url_imagen.split("/").pop().split("?")[0];
-        await supabase.storage.from("imagenes_vehiculo").remove([nombreAnterior]).catch(() => {});
-      }
-    }
-
-    const { error } = await supabase
-      .from("vehiculos")
-      .update(datosActualizados)
-      .eq("id_vehiculo", vehiculoEditar.id_vehiculo);
-
-    if (error) throw error;
-
-    await cargarVehiculos();
-
-    setVehiculoEditar({
-      id_vehiculo: "",
-      id_categoria: "",
-      marca: "",
-      modelo: "",
-      patente: "",
-      anio: "",
-      color: "",
-      estado: "",
-      precio: "",
-      stock: "",
-      url_imagen: "",
-      archivo: null,
-    });
-
-    setToast({ mostrar: true, mensaje: "Vehículo actualizado correctamente", tipo: "exito" });    await cargarVehiculos();  } catch (err) {
-    console.error("Error al actualizar:", err);
-  }
-};
+  };
 
   const eliminarVehiculo = async () => {
     try {
@@ -335,38 +434,44 @@ const Vehiculos = () => {
   };
 
   return (
-    <Container fluid className="p-4">
-      <Row className="mb-4">
-        <Col>
-          <h2 className="text-center">Gestión de Vehículos</h2>
+    <Container className="py-4 mt-2">
+      <Row className="mb-4 align-items-center">
+        <Col xs={12} md={6}>
+          <h2 className="color-texto-marca fw-bold">Gestión de Vehículos</h2>
+          <p className="text-muted small">Inventario de unidades Ouroboros Car</p>
         </Col>
-      </Row>
-
-      <Row className="mb-3">
-        <Col md={6}>
-          <CuadroBusquedas
-            textoBusqueda={textoBusqueda}
-            manejarCambioBusqueda={manejarBusqueda}
-            placeholder="Buscar por marca, modelo o patente..."
-          />
-        </Col>
-        <Col md={6} className="text-end d-flex gap-2 justify-content-end">
+        <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
           <Button
             variant="outline-primary"
+            className="me-2 shadow-sm"
             onClick={() => setMostrarModalCategorias(true)}
-            size="lg"
           >
             <i className="bi bi-tags-fill me-2"></i>
             Ver Categorías
           </Button>
           <Button
-            variant="success"
+            className="color-navbar border-0 shadow-sm"
             onClick={() => setMostrarModal(true)}
-            size="lg"
           >
-            <i className="bi bi-plus-circle me-2"></i>
+            <i className="bi bi-plus-circle-fill me-2"></i>
             Nuevo Vehículo
           </Button>
+        </Col>
+      </Row>
+
+      <Row className="mb-4 align-items-center">
+        <Col md={8}>
+          <InputGroup className="shadow-sm">
+            <InputGroup.Text className="bg-white border-end-0">
+              <i className="bi bi-search text-secondary"></i>
+            </InputGroup.Text>
+            <Form.Control
+              placeholder="Buscar por marca, modelo o patente..."
+              className="border-start-0 ps-0"
+              value={textoBusqueda}
+              onChange={manejarBusqueda}
+            />
+          </InputGroup>
         </Col>
       </Row>
 
@@ -374,8 +479,10 @@ const Vehiculos = () => {
         {/* Spinner de carga de vehículos */}
         {cargando && (
           <div className="text-center my-5">
-            <Spinner animation="border" variant="success" size="lg" />
-            <p className="mt-3 text-muted">Cargando vehículos...</p>
+            <Spinner animation="border" variant="primary" role="status">
+              <span className="visually-hidden">Cargando vehículos...</span>
+            </Spinner>
+            <p className="mt-2 text-muted">Sincronizando con la base de datos...</p>
           </div>
         )}
 
@@ -404,26 +511,28 @@ const Vehiculos = () => {
                       <strong>Precio:</strong> ${vehiculo.precio}<br />
                       <strong>Stock:</strong> {vehiculo.stock}
                     </p>
-                    <div className="d-flex justify-content-between">
+                    <div className="d-flex justify-content-center gap-2">
                       <Button
                         variant="outline-primary"
                         size="sm"
+                        title="Editar"
                         onClick={() => {
                           setVehiculoEditar(vehiculo);
                           setMostrarModalEdicion(true);
                         }}
                       >
-                        <i className="bi bi-pencil"></i> Editar
+                        <i className="bi bi-pencil"></i>
                       </Button>
                       <Button
                         variant="outline-danger"
                         size="sm"
+                        title="Eliminar"
                         onClick={() => {
                           setVehiculoAEliminar(vehiculo);
                           setMostrarModalEliminacion(true);
                         }}
                       >
-                        <i className="bi bi-trash"></i> Eliminar
+                        <i className="bi bi-trash"></i>
                       </Button>
                     </div>
                   </div>
@@ -503,6 +612,7 @@ const Vehiculos = () => {
       <ModalVerCategorias
         mostrar={mostrarModalCategorias}
         manejarCierre={() => setMostrarModalCategorias(false)}
+        onCategoriasActualizadas={cargarCategorias}
       />
     </Container>
   );

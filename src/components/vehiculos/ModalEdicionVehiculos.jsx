@@ -215,7 +215,7 @@ const ModalEdicionVehiculo = ({
           Cancelar
         </Button>
         <Button
-          variant="primary"
+          className="color-navbar"
           onClick={handleActualizar}
           disabled={deshabilitado}
         >

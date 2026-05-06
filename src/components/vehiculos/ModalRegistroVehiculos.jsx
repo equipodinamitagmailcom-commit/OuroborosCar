@@ -189,7 +189,7 @@ const ModalRegistroVehiculos = ({
           Cancelar
         </Button>
         <Button
-          variant="primary"
+          className="color-navbar"
           onClick={handleRegistrar}
           disabled={deshabilitado}
         >

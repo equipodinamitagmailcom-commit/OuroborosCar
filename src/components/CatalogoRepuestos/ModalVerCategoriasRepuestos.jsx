@@ -1,22 +1,20 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Modal, Table, Button, Spinner, Row, Col, InputGroup, Form, Alert } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
-import ModalEdicionCategoria from './ModalEdicionCategorias';
-import ModalEliminacionCategoria from './ModalEliminacionCategoria';
-import ModalRegistroCategoria from './ModalRegistroCategoria';
-import NotificacionOperacion from '../rutas/NotificacionOperacion';
-import Paginacion from '../ordenamiento/Paginacion';
+import ModalRegistroCategoria from './ModalRegistroCategoria.jsx';
+import ModalEditarCategoria from './ModalEditarCategoria.jsx';
+import ModalEliminarCategoria from './ModalEliminarCategoria.jsx';
+import NotificacionOperacion from '../rutas/NotificacionOperacion.jsx';
+import Paginacion from '../ordenamiento/Paginacion.jsx';
 
-const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }) => {
+const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActualizadas }) => {
     const [categorias, setCategorias] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [toast, setToast] = useState({ mostrar: false, mensaje: '', tipo: '' });
-    const [mostrarModalRegistro, setMostrarModalRegistro] = useState(false);
-    const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
-    const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
-    const [nuevaCategoria, setNuevaCategoria] = useState({ nombrecat: '' });
-    const [categoriaEditar, setCategoriaEditar] = useState({ id_categoria: '', nombrecat: '' });
-    const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
+    const [mostrarRegistro, setMostrarRegistro] = useState(false);
+    const [mostrarEdicion, setMostrarEdicion] = useState(false);
+    const [mostrarEliminacion, setMostrarEliminacion] = useState(false);
+    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
     const [busqueda, setBusqueda] = useState('');
     const [registrosPorPagina, setRegistrosPorPagina] = useState(5);
     const [paginaActual, setPaginaActual] = useState(1);
@@ -24,13 +22,31 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
     const categoriasFiltradas = useMemo(() => {
         if (!busqueda.trim()) return categorias;
         const q = busqueda.toLowerCase().trim();
-        return categorias.filter((c) => c.nombrecat?.toLowerCase().includes(q));
+        return categorias.filter((c) => c.nombre?.toLowerCase().includes(q));
     }, [categorias, busqueda]);
 
     const categoriasPaginadas = useMemo(() => {
         const inicio = (paginaActual - 1) * registrosPorPagina;
         return categoriasFiltradas.slice(inicio, inicio + registrosPorPagina);
     }, [categoriasFiltradas, paginaActual, registrosPorPagina]);
+
+    const cargarCategorias = async () => {
+        setCargando(true);
+        try {
+            const { data, error } = await supabase
+                .from('categoriarepuesto')
+                .select('*')
+                .order('id_categoria', { ascending: true });
+
+            if (error) throw error;
+            setCategorias(data || []);
+        } catch (error) {
+            console.error('Error al cargar categorías de repuestos:', error.message);
+            setCategorias([]);
+        } finally {
+            setCargando(false);
+        }
+    };
 
     useEffect(() => {
         if (mostrar) {
@@ -47,130 +63,47 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
         }
     }, [categoriasFiltradas.length, registrosPorPagina, paginaActual]);
 
-    const cargarCategorias = async () => {
-        setCargando(true);
-        try {
-            const { data, error } = await supabase
-                .from('categoriavehiculos')
-                .select('*')
-                .order('id_categoria', { ascending: true });
-
-            if (error) throw error;
-            setCategorias(data || []);
-        } catch (error) {
-            console.error('Error al cargar categorías:', error.message);
-            setCategorias([]);
-        } finally {
-            setCargando(false);
+    const refrescarCategorias = async () => {
+        await cargarCategorias();
+        if (onCategoriasActualizadas) {
+            await onCategoriasActualizadas();
         }
     };
 
-    const abrirModalEdicion = (categoria) => {
-        setCategoriaEditar({
-            id_categoria: categoria.id_categoria,
-            nombrecat: categoria.nombrecat,
-        });
-        setMostrarModalEdicion(true);
+    const notificar = (mensaje, tipo = 'exito') => {
+        setToast({ mostrar: true, mensaje, tipo });
     };
 
-    const abrirModalEliminacion = (categoria) => {
-        setCategoriaAEliminar(categoria);
-        setMostrarModalEliminacion(true);
+    const trasRegistroCategoria = async () => {
+        await refrescarCategorias();
+        notificar('Categoría agregada con éxito.');
     };
 
-    const manejoCambioInputEdicion = (e) => {
-        const { name, value } = e.target;
-        setCategoriaEditar((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+    const trasActualizarCategoria = async () => {
+        await refrescarCategorias();
+        notificar('Categoría actualizada con éxito.');
     };
 
-    const actualizarCategoria = async () => {
-        try {
-            if (!categoriaEditar.nombrecat.trim()) {
-                setToast({ mostrar: true, mensaje: 'Debe llenar el campo de nombre.', tipo: 'advertencia' });
-                return;
-            }
-
-            const { error } = await supabase
-                .from('categoriavehiculos')
-                .update({
-                    nombrecat: categoriaEditar.nombrecat,
-                })
-                .eq('id_categoria', categoriaEditar.id_categoria);
-
-            if (error) throw error;
-
-            await cargarCategorias();
-            if (onCategoriasActualizadas) {
-                await onCategoriasActualizadas();
-            }
-            setMostrarModalEdicion(false);
-            setToast({ mostrar: true, mensaje: 'Categoría actualizada con éxito.', tipo: 'exito' });
-        } catch (error) {
-            console.error('Error al actualizar categoría:', error.message);
-            setToast({ mostrar: true, mensaje: 'Error al actualizar la categoría.', tipo: 'error' });
-        }
+    const trasEliminarCategoria = async () => {
+        await refrescarCategorias();
+        notificar('Categoría eliminada con éxito.');
     };
 
-    const manejoCambioInputRegistro = (e) => {
-        const { name, value } = e.target;
-        setNuevaCategoria((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+    const cerrarModalesInternos = () => {
+        setMostrarRegistro(false);
+        setMostrarEdicion(false);
+        setMostrarEliminacion(false);
+        setCategoriaSeleccionada(null);
     };
 
-    const agregarCategoria = async () => {
-        try {
-            if (!nuevaCategoria.nombrecat.trim()) {
-                setToast({ mostrar: true, mensaje: 'Debe llenar el campo de nombre.', tipo: 'advertencia' });
-                return;
-            }
-
-            const { error } = await supabase.from('categoriavehiculos').insert([
-                {
-                    nombrecat: nuevaCategoria.nombrecat,
-                },
-            ]);
-
-            if (error) throw error;
-
-            setNuevaCategoria({ nombrecat: '' });
-            setMostrarModalRegistro(false);
-            await cargarCategorias();
-            if (onCategoriasActualizadas) {
-                await onCategoriasActualizadas();
-            }
-            setToast({ mostrar: true, mensaje: 'Categoría agregada con éxito.', tipo: 'exito' });
-        } catch (error) {
-            console.error('Error al agregar categoría:', error.message);
-            setToast({ mostrar: true, mensaje: 'Error al agregar la categoría.', tipo: 'error' });
-        }
+    const abrirEdicion = (categoria) => {
+        setCategoriaSeleccionada(categoria);
+        setMostrarEdicion(true);
     };
 
-    const eliminarCategoria = async () => {
-        if (!categoriaAEliminar) return;
-        try {
-            const { error } = await supabase
-                .from('categoriavehiculos')
-                .delete()
-                .eq('id_categoria', categoriaAEliminar.id_categoria);
-
-            if (error) throw error;
-
-            await cargarCategorias();
-            if (onCategoriasActualizadas) {
-                await onCategoriasActualizadas();
-            }
-            setMostrarModalEliminacion(false);
-            setCategoriaAEliminar(null);
-            setToast({ mostrar: true, mensaje: 'Categoría eliminada con éxito.', tipo: 'exito' });
-        } catch (error) {
-            console.error('Error al eliminar categoría:', error.message);
-            setToast({ mostrar: true, mensaje: 'Error al eliminar la categoría.', tipo: 'error' });
-        }
+    const abrirEliminacion = (categoria) => {
+        setCategoriaSeleccionada(categoria);
+        setMostrarEliminacion(true);
     };
 
     return (
@@ -180,16 +113,16 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                     <div>
                         <Modal.Title as="h5" className="color-texto-marca fw-bold mb-1">
                             <i className="bi bi-tags-fill me-2"></i>
-                            Categorías de vehículos
+                            Categorías de repuestos
                         </Modal.Title>
                         <p className="text-muted small mb-0">
-                            Inventario técnico de Ouroboros Car — categorías de vehículo.
+                            Inventario técnico de Ouroboros Car — categorías de piezas.
                         </p>
                     </div>
                     <Button
                         type="button"
                         className="color-navbar border-0 shadow-sm flex-shrink-0"
-                        onClick={() => setMostrarModalRegistro(true)}
+                        onClick={() => setMostrarRegistro(true)}
                     >
                         <i className="bi bi-plus-circle-fill me-2"></i>
                         Agregar categoría
@@ -224,7 +157,7 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                     </div>
                 ) : categorias.length === 0 ? (
                     <div className="text-center py-5">
-                        <i className="bi bi-bookmark-plus display-1 text-light"></i>
+                        <i className="bi bi-tools display-1 text-light"></i>
                         <p className="mt-3 text-muted">No hay categorías registradas.</p>
                     </div>
                 ) : categoriasFiltradas.length === 0 ? (
@@ -247,13 +180,13 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                                     {categoriasPaginadas.map((cat) => (
                                         <tr key={cat.id_categoria}>
                                             <td className="fw-bold text-muted">#{cat.id_categoria}</td>
-                                            <td className="fw-semibold">{cat.nombrecat}</td>
+                                            <td className="fw-semibold">{cat.nombre}</td>
                                             <td className="text-center text-nowrap">
                                                 <Button
                                                     variant="outline-primary"
                                                     size="sm"
                                                     className="me-2"
-                                                    onClick={() => abrirModalEdicion(cat)}
+                                                    onClick={() => abrirEdicion(cat)}
                                                     title="Editar"
                                                 >
                                                     <i className="bi bi-pencil"></i>
@@ -261,7 +194,7 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                                                 <Button
                                                     variant="outline-danger"
                                                     size="sm"
-                                                    onClick={() => abrirModalEliminacion(cat)}
+                                                    onClick={() => abrirEliminacion(cat)}
                                                     title="Eliminar"
                                                 >
                                                     <i className="bi bi-trash"></i>
@@ -292,27 +225,23 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
             </Modal.Footer>
 
             <ModalRegistroCategoria
-                mostrarModal={mostrarModalRegistro}
-                setMostrarModal={setMostrarModalRegistro}
-                nuevaCategoria={nuevaCategoria}
-                manejoCambioInput={manejoCambioInputRegistro}
-                agregarCategoria={agregarCategoria}
+                mostrar={mostrarRegistro}
+                manejarCierre={cerrarModalesInternos}
+                alGuardar={trasRegistroCategoria}
             />
 
-            {/* Modales de edición y eliminación */}
-            <ModalEdicionCategoria
-                mostrarModalEdicion={mostrarModalEdicion}
-                setMostrarModalEdicion={setMostrarModalEdicion}
-                categoriaEditar={categoriaEditar}
-                manejoCambioInputEdicion={manejoCambioInputEdicion}
-                actualizarCategoria={actualizarCategoria}
+            <ModalEditarCategoria
+                mostrar={mostrarEdicion}
+                manejarCierre={cerrarModalesInternos}
+                categoria={categoriaSeleccionada}
+                alActualizar={trasActualizarCategoria}
             />
 
-            <ModalEliminacionCategoria
-                mostrarModalEliminacion={mostrarModalEliminacion}
-                setMostrarModalEliminacion={setMostrarModalEliminacion}
-                eliminarCategoria={eliminarCategoria}
-                categoria={categoriaAEliminar}
+            <ModalEliminarCategoria
+                mostrar={mostrarEliminacion}
+                manejarCierre={cerrarModalesInternos}
+                categoria={categoriaSeleccionada}
+                alEliminar={trasEliminarCategoria}
             />
 
             <NotificacionOperacion
@@ -325,4 +254,4 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
     );
 };
 
-export default ModalVerCategorias;
+export default ModalVerCategoriasRepuestos;

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Table, Button } from 'react-bootstrap';
 
-const TablaRepuestos = ({ repuestos }) => {
+const TablaRepuestos = ({ repuestos, onEditar, onEliminar }) => {
     return (
         <div className="table-responsive shadow-sm rounded">
             <Table hover className="align-middle mb-0 bg-white">
@@ -12,6 +12,7 @@ const TablaRepuestos = ({ repuestos }) => {
                         <th>Categoría</th>
                         <th>Precio ($)</th>
                         <th>Descripción</th>
+                        <th className="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,6 +30,25 @@ const TablaRepuestos = ({ repuestos }) => {
                             </td>
                             <td className="text-truncate" style={{ maxWidth: '200px' }}>
                                 {repuesto.descripcion || '---'}
+                            </td>
+                            <td className="text-center text-nowrap">
+                                <Button
+                                    variant="outline-primary"
+                                    size="sm"
+                                    className="me-2"
+                                    title="Editar"
+                                    onClick={() => onEditar?.(repuesto)}
+                                >
+                                    <i className="bi bi-pencil"></i>
+                                </Button>
+                                <Button
+                                    variant="outline-danger"
+                                    size="sm"
+                                    title="Eliminar"
+                                    onClick={() => onEliminar?.(repuesto)}
+                                >
+                                    <i className="bi bi-trash"></i>
+                                </Button>
                             </td>
                         </tr>
                     ))}

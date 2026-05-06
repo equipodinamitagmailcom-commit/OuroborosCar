@@ -7,7 +7,9 @@ import TablaRepuestos from '../repuestos/TablaRepuestos.jsx';
 import ModalRegistroRepuesto from '../repuestos/ModaRegistroRepuesto.jsx';
 import ModalEdicionRepuesto from '../repuestos/ModalEdicionRepuesto.jsx';
 import ModalEliminacionRepuesto from '../repuestos/ModalEliminacionRepuesto.jsx';
+import ModalVerCategoriasRepuestos from '../CatalogoRepuestos/ModalVerCategoriasRepuestos.jsx';
 import Paginacion from '../ordenamiento/Paginacion';
+import NotificacionOperacion from '../rutas/NotificacionOperacion.jsx';
 
 const Repuestos = () => {
     // --- ESTADOS ---
@@ -22,6 +24,12 @@ const Repuestos = () => {
     const [mostrarRegistro, setMostrarRegistro] = useState(false);
     const [mostrarEdicion, setMostrarEdicion] = useState(false);
     const [mostrarEliminacion, setMostrarEliminacion] = useState(false);
+    const [mostrarCategorias, setMostrarCategorias] = useState(false);
+    const [toast, setToast] = useState({ mostrar: false, mensaje: '', tipo: '' });
+
+    const notificar = (mensaje, tipo = 'exito') => {
+        setToast({ mostrar: true, mensaje, tipo });
+    };
 
     const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
     const [paginaActual, establecerPaginaActual] = useState(1);
@@ -103,6 +111,13 @@ const Repuestos = () => {
                     <p className="text-muted small">Inventario técnico de Ouroboros Car</p>
                 </Col>
                 <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
+                    <Button
+                        variant="outline-primary"
+                        className="me-2 shadow-sm"
+                        onClick={() => setMostrarCategorias(true)}
+                    >
+                        <i className="bi bi-tags-fill me-2"></i>Ver Categorías
+                    </Button>
                     <Button 
                         className="color-navbar border-0 shadow-sm" 
                         onClick={() => setMostrarRegistro(true)}
@@ -139,8 +154,10 @@ const Repuestos = () => {
                 </div>
             ) : repuestosFiltrados.length > 0 ? (
                 <>
-                    <TablaRepuestos 
-                        repuestos={repuestosPaginados} 
+                    <TablaRepuestos
+                        repuestos={repuestosPaginados}
+                        onEditar={abrirEdicion}
+                        onEliminar={abrirEliminacion}
                     />
                     <div className="mt-3">
                         <Paginacion
@@ -165,6 +182,7 @@ const Repuestos = () => {
                 mostrar={mostrarRegistro} 
                 manejarCierre={cerrarModales} 
                 alGuardar={obtenerRepuestos} 
+                notificar={notificar}
             />
 
             <ModalEdicionRepuesto 
@@ -172,6 +190,7 @@ const Repuestos = () => {
                 manejarCierre={cerrarModales} 
                 repuesto={repuestoSeleccionado} 
                 alActualizar={obtenerRepuestos} 
+                notificar={notificar}
             />
 
             <ModalEliminacionRepuesto 
@@ -179,6 +198,20 @@ const Repuestos = () => {
                 manejarCierre={cerrarModales} 
                 repuesto={repuestoSeleccionado} 
                 alEliminar={obtenerRepuestos} 
+                notificar={notificar}
+            />
+
+            <ModalVerCategoriasRepuestos
+                mostrar={mostrarCategorias}
+                manejarCierre={() => setMostrarCategorias(false)}
+                onCategoriasActualizadas={obtenerRepuestos}
+            />
+
+            <NotificacionOperacion
+                mostrar={toast.mostrar}
+                mensaje={toast.mensaje}
+                tipo={toast.tipo}
+                onClose={() => setToast({ mostrar: false, mensaje: '', tipo: '' })}
             />
 
         </Container>

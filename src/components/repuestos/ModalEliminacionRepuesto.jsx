@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
 
-const ModalEliminacionRepuesto = ({ mostrar, manejarCierre, repuesto, alEliminar }) => {
+const ModalEliminacionRepuesto = ({ mostrar, manejarCierre, repuesto, alEliminar, notificar }) => {
     const [cargando, setCargando] = useState(false);
 
     const ejecutarEliminacion = async () => {
@@ -18,11 +18,20 @@ const ModalEliminacionRepuesto = ({ mostrar, manejarCierre, repuesto, alEliminar
 
             if (error) throw error;
 
-            alert('Repuesto eliminado con éxito del sistema');
-            alEliminar(); // Refresca la lista en la vista Repuestos.jsx
+            await Promise.resolve(alEliminar?.());
             manejarCierre();
+
+            if (notificar) {
+                notificar('Repuesto eliminado con éxito del sistema', 'exito');
+            } else {
+                alert('Repuesto eliminado con éxito del sistema');
+            }
         } catch (error) {
-            alert('Error al eliminar: ' + error.message);
+            if (notificar) {
+                notificar('Error al eliminar: ' + error.message, 'error');
+            } else {
+                alert('Error al eliminar: ' + error.message);
+            }
         } finally {
             setCargando(false);
         }

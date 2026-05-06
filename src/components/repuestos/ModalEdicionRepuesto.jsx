@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
 
-const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar }) => {
+const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, notificar }) => {
     const [editado, setEditado] = useState({
         nombre: '',
         descripcion: '',
@@ -54,11 +54,20 @@ const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar }
 
             if (error) throw error;
 
-            alert('Repuesto actualizado con éxito');
-            alActualizar(); 
+            await Promise.resolve(alActualizar?.());
             manejarCierre();
+
+            if (notificar) {
+                notificar('Repuesto actualizado con éxito', 'exito');
+            } else {
+                alert('Repuesto actualizado con éxito');
+            }
         } catch (error) {
-            alert('Error al actualizar: ' + error.message);
+            if (notificar) {
+                notificar('Error al actualizar: ' + error.message, 'error');
+            } else {
+                alert('Error al actualizar: ' + error.message);
+            }
         } finally {
             setCargando(false);
         }

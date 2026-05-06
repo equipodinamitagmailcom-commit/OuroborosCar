@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
 
-const NotificacionOperacion = ({ mostrar, mensaje, tipo, onCerrar }) => {
+const NotificacionOperacion = ({ mostrar, mensaje, tipo, onCerrar, onClose }) => {
   const [visible, setVisible] = useState(mostrar);
+
+  const finalizar = onCerrar ?? onClose ?? (() => {});
 
   useEffect(() => {
     setVisible(mostrar);
@@ -22,7 +24,7 @@ const NotificacionOperacion = ({ mostrar, mensaje, tipo, onCerrar }) => {
       <Toast
         onClose={() => {
           setVisible(false);
-          onCerrar();
+          finalizar();
         }}
         show={visible}
         delay={2500}

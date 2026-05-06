@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
 
-const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar }) => {
+const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar }) => {
     // Estado inicial basado en las columnas reales de tu DDL
     const [repuesto, setRepuesto] = useState({
         nombre: '',
@@ -43,20 +43,28 @@ const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar }) => {
 
             if (error) throw error;
 
-            alert('Repuesto registrado con éxito');
-            
             // Limpieza de campos tras éxito
-            setRepuesto({ 
-                nombre: '', 
-                descripcion: '', 
-                precio_repuesto: '', 
-                id_categoria: '' 
+            setRepuesto({
+                nombre: '',
+                descripcion: '',
+                precio_repuesto: '',
+                id_categoria: ''
             });
-            
-            alGuardar(); // Refresca la lista en la vista principal
+
+            await Promise.resolve(alGuardar?.());
             manejarCierre();
+
+            if (notificar) {
+                notificar('Repuesto registrado con éxito', 'exito');
+            } else {
+                alert('Repuesto registrado con éxito');
+            }
         } catch (error) {
-            alert('Error al registrar: ' + error.message);
+            if (notificar) {
+                notificar('Error al registrar: ' + error.message, 'error');
+            } else {
+                alert('Error al registrar: ' + error.message);
+            }
         } finally {
             setCargando(false);
         }

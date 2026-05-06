@@ -68,22 +68,6 @@ const Encabezado = () => {
           </Nav.Link>
 
           <Nav.Link
-            onClick={() => manejarNavegacion("/categorias-vehiculo")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
-          >
-            {mostrarMenu ? <i className="bi-bookmark-fill me-2"></i> : null}
-            <strong>Categorías Vehículo</strong>
-          </Nav.Link>
-
-          <Nav.Link
-            onClick={() => manejarNavegacion("/categorias-repuestos")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
-          >
-            {mostrarMenu ? <i className="bi-tags-fill me-2"></i> : null}
-            <strong>Categorías Repuestos</strong>
-          </Nav.Link>
-
-          <Nav.Link
             onClick={() => manejarNavegacion("/repuestos")}
             className={mostrarMenu ? "color-texto-marca" : "text-white"}
           >

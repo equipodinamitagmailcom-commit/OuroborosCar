@@ -1,11 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import Encabezado from "./components/navegacion/Encabezado";
 
 import Inicio from "./components/views/Inicio";
 import Vehiculos from "./components/views/Vehiculos";
-import CategoriasVehiculo from "./components/views/Categoria";
-import CategoriasRepuestos from "./components/views/CategoriaRespuestos";
 import Repuestos from "./components/views/Repuestos";
 import Mecanicos from "./components/views/Mecanicos";
 import RegistroGeneral from "./components/views/RegistroGeneral";
@@ -26,8 +24,10 @@ const App = () => {
 
           <Route path="/" element={<RutaProtegida><Inicio /></RutaProtegida>} />
           <Route path="/vehiculos" element={<RutaProtegida><Vehiculos /></RutaProtegida>} />
-          <Route path="/categorias-vehiculo" element={<RutaProtegida><CategoriasVehiculo /></RutaProtegida>} />
-          <Route path="/categorias-repuestos" element={<RutaProtegida><CategoriasRepuestos /></RutaProtegida>} />
+          <Route
+            path="/categorias-vehiculo"
+            element={<RutaProtegida><Navigate to="/vehiculos" replace /></RutaProtegida>}
+          />
           <Route path="/repuestos" element={<RutaProtegida><Repuestos /></RutaProtegida>} />
           <Route path="/mecanicos" element={<RutaProtegida><Mecanicos /></RutaProtegida>} />
           <Route path="/registro" element={<RutaProtegida><RegistroGeneral /></RutaProtegida>} />
