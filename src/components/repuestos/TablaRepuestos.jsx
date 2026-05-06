@@ -1,7 +1,7 @@
 import React from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 
-const TablaRepuestos = ({ repuestos, alEditar, alEliminar }) => {
+const TablaRepuestos = ({ repuestos }) => {
     return (
         <div className="table-responsive shadow-sm rounded">
             <Table hover className="align-middle mb-0 bg-white">
@@ -12,7 +12,6 @@ const TablaRepuestos = ({ repuestos, alEditar, alEliminar }) => {
                         <th>Categoría</th>
                         <th>Precio ($)</th>
                         <th>Descripción</th>
-                        <th className="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,26 +29,6 @@ const TablaRepuestos = ({ repuestos, alEditar, alEliminar }) => {
                             </td>
                             <td className="text-truncate" style={{ maxWidth: '200px' }}>
                                 {repuesto.descripcion || '---'}
-                            </td>
-                            <td>
-                                <div className="d-flex justify-content-center gap-2">
-                                    <Button 
-                                        variant="outline-primary" 
-                                        size="sm"
-                                        onClick={() => alEditar(repuesto)}
-                                        title="Editar pieza"
-                                    >
-                                        <i className="bi bi-pencil-square"></i>
-                                    </Button>
-                                    <Button 
-                                        variant="outline-danger" 
-                                        size="sm"
-                                        onClick={() => alEliminar(repuesto)}
-                                        title="Eliminar registro"
-                                    >
-                                        <i className="bi bi-trash"></i>
-                                    </Button>
-                                </div>
                             </td>
                         </tr>
                     ))}

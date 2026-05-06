@@ -5,6 +5,7 @@ import ModalRegistroVehiculos from '../vehiculos/ModalRegistroVehiculos';
 import ModalEdicionVehiculos from '../vehiculos/ModalEdicionVehiculos';
 import NotificacionOperacion from '../rutas/NotificacionOperacion';
 import CuadroBusquedas from '../busquedas/CuadroBusqueda';
+import Paginacion from '../ordenamiento/Paginacion';
 
 const Vehiculos = () => {
 
@@ -29,6 +30,9 @@ const Vehiculos = () => {
     stock: "",
     archivo: null,
   });
+
+  const [registrosPorPagina, setRegistrosPorPagina] = useState(5);
+  const [paginaActual, setPaginaActual] = useState(1);
 
   const [vehiculoEditar, setVehiculoEditar] = useState({
     id_vehiculo: "",
@@ -95,6 +99,18 @@ const Vehiculos = () => {
       );
     });
   }, [textoBusqueda, vehiculos]);
+
+  const vehiculosPaginados = useMemo(() => {
+    const inicio = (paginaActual - 1) * registrosPorPagina;
+    return vehiculosFiltrados.slice(inicio, inicio + registrosPorPagina);
+  }, [vehiculosFiltrados, paginaActual, registrosPorPagina]);
+
+  useEffect(() => {
+    const totalPaginas = Math.max(1, Math.ceil(vehiculosFiltrados.length / registrosPorPagina));
+    if (paginaActual > totalPaginas) {
+      setPaginaActual(totalPaginas);
+    }
+  }, [vehiculosFiltrados, registrosPorPagina, paginaActual]);
 
   const cargarVehiculos = async () => {
     try {
@@ -355,8 +371,9 @@ const Vehiculos = () => {
 
         {/* Tarjetas con vehículos cargados */}
         {!cargando && vehiculosFiltrados.length > 0 && (
-          <Row>
-            {vehiculosFiltrados.map((vehiculo) => (
+          <>
+            <Row>
+              {vehiculosPaginados.map((vehiculo) => (
               <Col key={vehiculo.id_vehiculo} md={6} lg={4} className="mb-4">
                 <div className="card h-100 shadow-sm">
                   <div className="card-body">
@@ -404,6 +421,16 @@ const Vehiculos = () => {
               </Col>
             ))}
           </Row>
+            <div className="mt-3">
+              <Paginacion
+                registrosPorPagina={registrosPorPagina}
+                totalRegistros={vehiculosFiltrados.length}
+                paginaActual={paginaActual}
+                establecerPaginaActual={setPaginaActual}
+                establecerRegistrosPorPagina={setRegistrosPorPagina}
+              />
+            </div>
+          </>
         )}
       </Col>
 

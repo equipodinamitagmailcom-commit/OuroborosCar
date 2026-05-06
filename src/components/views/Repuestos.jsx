@@ -3,11 +3,11 @@ import { supabase } from '../database/supabaseconfig.js';
 import { Button, Container, Row, Col, InputGroup, Form, Spinner } from 'react-bootstrap';
 
 // Importación de Componentes (Features)
-import TarjetasRepuestos from '../repuestos/TarjetasRepuestos.jsx';
 import TablaRepuestos from '../repuestos/TablaRepuestos.jsx';
 import ModalRegistroRepuesto from '../repuestos/ModaRegistroRepuesto.jsx';
 import ModalEdicionRepuesto from '../repuestos/ModalEdicionRepuesto.jsx';
 import ModalEliminacionRepuesto from '../repuestos/ModalEliminacionRepuesto.jsx';
+import Paginacion from '../ordenamiento/Paginacion';
 
 const Repuestos = () => {
     // --- ESTADOS ---
@@ -23,8 +23,8 @@ const Repuestos = () => {
     const [mostrarEdicion, setMostrarEdicion] = useState(false);
     const [mostrarEliminacion, setMostrarEliminacion] = useState(false);
 
-    // Estado para el tipo de vista (Tarjetas o Tabla)
-    const [vistaTabla, setVistaTabla] = useState(false);
+    const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
+    const [paginaActual, establecerPaginaActual] = useState(1);
 
     // --- LÓGICA DE DATOS (Basada en tu DDL) ---
     const obtenerRepuestos = async () => {
@@ -82,6 +82,18 @@ const Repuestos = () => {
         r.categoriarepuesto?.nombre.toLowerCase().includes(busqueda.toLowerCase())
     );
 
+    const repuestosPaginados = repuestosFiltrados.slice(
+        (paginaActual - 1) * registrosPorPagina,
+        paginaActual * registrosPorPagina
+    );
+
+    useEffect(() => {
+        const totalPaginas = Math.max(1, Math.ceil(repuestosFiltrados.length / registrosPorPagina));
+        if (paginaActual > totalPaginas) {
+            establecerPaginaActual(totalPaginas);
+        }
+    }, [repuestosFiltrados, registrosPorPagina, paginaActual]);
+
     return (
         <Container className="py-4 mt-2">
             {/* Cabecera Responsiva */}
@@ -115,24 +127,6 @@ const Repuestos = () => {
                         />
                     </InputGroup>
                 </Col>
-                <Col md={4} className="text-md-end mt-3 mt-md-0">
-                    <div className="btn-group shadow-sm" role="group">
-                        <Button 
-                            variant={!vistaTabla ? "primary" : "outline-primary"}
-                            onClick={() => setVistaTabla(false)}
-                            title="Vista de Tarjetas"
-                        >
-                            <i className="bi bi-grid-3x3-gap-fill"></i>
-                        </Button>
-                        <Button 
-                            variant={vistaTabla ? "primary" : "outline-primary"}
-                            onClick={() => setVistaTabla(true)}
-                            title="Vista de Tabla"
-                        >
-                            <i className="bi bi-table"></i>
-                        </Button>
-                    </div>
-                </Col>
             </Row>
 
             {/* Área Principal de Contenido */}
@@ -144,19 +138,20 @@ const Repuestos = () => {
                     <p className="mt-2 text-muted">Sincronizando con la base de datos...</p>
                 </div>
             ) : repuestosFiltrados.length > 0 ? (
-                vistaTabla ? (
+                <>
                     <TablaRepuestos 
-                        repuestos={repuestosFiltrados} 
-                        alEditar={abrirEdicion}
-                        alEliminar={abrirEliminacion}
+                        repuestos={repuestosPaginados} 
                     />
-                ) : (
-                    <TarjetasRepuestos 
-                        repuestos={repuestosFiltrados} 
-                        alEditar={abrirEdicion}
-                        alEliminar={abrirEliminacion}
-                    />
-                )
+                    <div className="mt-3">
+                        <Paginacion
+                            registrosPorPagina={registrosPorPagina}
+                            totalRegistros={repuestosFiltrados.length}
+                            paginaActual={paginaActual}
+                            establecerPaginaActual={establecerPaginaActual}
+                            establecerRegistrosPorPagina={establecerRegistrosPorPagina}
+                        />
+                    </div>
+                </>
             ) : (
                 <div className="text-center py-5">
                     <i className="bi bi-tools display-1 text-light"></i>

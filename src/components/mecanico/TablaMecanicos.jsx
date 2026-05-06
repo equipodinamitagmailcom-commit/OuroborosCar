@@ -3,11 +3,15 @@ import { Table, Button, Card, Badge, Spinner, InputGroup, Form } from 'react-boo
 import { supabase } from '../database/supabaseconfig.js';
 import ModalActualizarMecanico from './ModalActualizarMecanico.jsx';
 import ModalEliminarMecanico from './ModalEliminarMecanico.jsx';
+import Paginacion from '../ordenamiento/Paginacion';
 
 const TablaMecanicos = () => {
     const [mecanicos, setMecanicos] = useState([]);
     const [busqueda, setBusqueda] = useState("");
     const [cargando, setCargando] = useState(true);
+
+    const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
+    const [paginaActual, establecerPaginaActual] = useState(1);
     
     // Estados para modales
     const [mecanicoSeleccionado, setMecanicoSeleccionado] = useState(null);
@@ -40,6 +44,18 @@ const TablaMecanicos = () => {
         m.nombres.toLowerCase().includes(busqueda.toLowerCase()) || 
         m.cedula.includes(busqueda)
     );
+
+    const mecanicosPaginados = mecanicosFiltrados.slice(
+        (paginaActual - 1) * registrosPorPagina,
+        paginaActual * registrosPorPagina
+    );
+
+    useEffect(() => {
+        const totalPaginas = Math.max(1, Math.ceil(mecanicosFiltrados.length / registrosPorPagina));
+        if (paginaActual > totalPaginas) {
+            establecerPaginaActual(totalPaginas);
+        }
+    }, [mecanicosFiltrados, registrosPorPagina, paginaActual]);
 
     const prepararEdicion = (meca) => {
         setMecanicoSeleccionado(meca);
@@ -90,7 +106,7 @@ const TablaMecanicos = () => {
                                 </td>
                             </tr>
                         ) : mecanicosFiltrados.length > 0 ? (
-                            mecanicosFiltrados.map((m) => (
+                            mecanicosPaginados.map((m) => (
                                 <tr key={m.id_mecanico}>
                                     <td className="ps-4">
                                         <div className="fw-bold">{m.nombres} {m.apellidos}</div>
@@ -133,6 +149,18 @@ const TablaMecanicos = () => {
                     </tbody>
                 </Table>
             </Card.Body>
+
+            {!cargando && mecanicosFiltrados.length > 0 && (
+                <div className="p-3">
+                    <Paginacion
+                        registrosPorPagina={registrosPorPagina}
+                        totalRegistros={mecanicosFiltrados.length}
+                        paginaActual={paginaActual}
+                        establecerPaginaActual={establecerPaginaActual}
+                        establecerRegistrosPorPagina={establecerRegistrosPorPagina}
+                    />
+                </div>
+            )}
 
             {/* Modales integrados */}
             <ModalActualizarMecanico 
