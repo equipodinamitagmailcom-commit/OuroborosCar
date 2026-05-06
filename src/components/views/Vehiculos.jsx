@@ -3,6 +3,7 @@ import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import { supabase } from '../database/supabaseconfig.js';
 import ModalRegistroVehiculos from '../vehiculos/ModalRegistroVehiculos';
 import ModalEdicionVehiculos from '../vehiculos/ModalEdicionVehiculos';
+import ModalVerCategorias from '../categorias_vehiculo/ModalVerCategorias';
 import NotificacionOperacion from '../rutas/NotificacionOperacion';
 import CuadroBusquedas from '../busquedas/CuadroBusqueda';
 import Paginacion from '../ordenamiento/Paginacion';
@@ -17,6 +18,7 @@ const Vehiculos = () => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
   const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
+  const [mostrarModalCategorias, setMostrarModalCategorias] = useState(false);
 
   const [nuevoVehiculo, setNuevoVehiculo] = useState({
     id_categoria: "",
@@ -348,7 +350,15 @@ const Vehiculos = () => {
             placeholder="Buscar por marca, modelo o patente..."
           />
         </Col>
-        <Col md={6} className="text-end">
+        <Col md={6} className="text-end d-flex gap-2 justify-content-end">
+          <Button
+            variant="outline-primary"
+            onClick={() => setMostrarModalCategorias(true)}
+            size="lg"
+          >
+            <i className="bi bi-tags-fill me-2"></i>
+            Ver Categorías
+          </Button>
           <Button
             variant="success"
             onClick={() => setMostrarModal(true)}
@@ -488,6 +498,11 @@ const Vehiculos = () => {
         mensaje={toast.mensaje}
         tipo={toast.tipo}
         onClose={() => setToast({ mostrar: false, mensaje: "", tipo: "" })}
+      />
+
+      <ModalVerCategorias
+        mostrar={mostrarModalCategorias}
+        manejarCierre={() => setMostrarModalCategorias(false)}
       />
     </Container>
   );
