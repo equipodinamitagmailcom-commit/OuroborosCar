@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import TablaMecanicos from '../mecanico/TablaMecanicos.jsx';
 
 const VistaMecanico = () => {
+    useEffect(() => {
+        document.body.style.backgroundColor = '#121212';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     return (
-        <Container fluid className="px-4 py-4">
+        <Container fluid className="px-4 py-4" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
             {/* Encabezado de la Vista */}
             <Row className="mb-4 align-items-center">
                 <Col>
-                    <h2 className="fw-bold mb-1">Panel de Mecánicos</h2>
+                    <h2 className="fw-bold mb-1" style={{ color: '#A4841C' }}>Panel de Mecánicos</h2>
                     <p className="text-muted">
                         Gestiona, edita y supervisa el personal técnico de <strong>Ouroboros Car</strong>.
                     </p>
@@ -31,7 +36,7 @@ const VistaMecanico = () => {
             {/* Fila de Estadísticas Rápidas (Opcional pero recomendado para UX) */}
             <Row className="mb-4">
                 <Col md={3}>
-                    <div className="p-3 shadow-sm rounded bg-white border-start border-primary border-4">
+                    <div className="p-3 shadow-sm rounded border-start border-4" style={{ backgroundColor: '#1e1e1e', borderColor: '#A4841C' }}>
                         <small className="text-uppercase fw-bold text-muted" style={{ fontSize: '12px' }}>
                             Total Técnicos
                         </small>

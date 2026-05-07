@@ -4,8 +4,8 @@ import { Table, Button } from 'react-bootstrap';
 const TablaRepuestos = ({ repuestos, onEditar, onEliminar }) => {
     return (
         <div className="table-responsive shadow-sm rounded">
-            <Table hover className="align-middle mb-0 bg-white">
-                <thead className="color-navbar text-white">
+            <Table hover variant="dark" className="align-middle mb-0">
+                <thead>
                     <tr>
                         <th>ID</th>
                         <th>Nombre del Repuesto</th>
@@ -18,14 +18,14 @@ const TablaRepuestos = ({ repuestos, onEditar, onEliminar }) => {
                 <tbody>
                     {repuestos.map((repuesto) => (
                         <tr key={repuesto.id_repuesto}>
-                            <td className="fw-bold text-muted">#{repuesto.id_repuesto}</td>
+                            <td className="fw-bold text-secondary">#{repuesto.id_repuesto}</td>
                             <td className="fw-semibold">{repuesto.nombre}</td>
                             <td>
-                                <span className="badge bg-light text-dark border">
+                                <span className="badge bg-dark text-white border border-secondary">
                                     {repuesto.categoriarepuesto?.nombre || 'General'}
                                 </span>
                             </td>
-                            <td className="fw-bold color-texto-marca">
+                            <td className="fw-bold" style={{ color: '#A4841C' }}>
                                 ${parseFloat(repuesto.precio_repuesto).toFixed(2)}
                             </td>
                             <td className="text-truncate" style={{ maxWidth: '200px' }}>

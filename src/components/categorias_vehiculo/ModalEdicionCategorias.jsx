@@ -25,6 +25,7 @@ const ModalEdicionCategoria = ({
       backdrop="static"
       keyboard={false}
       centered
+      contentClassName="bg-dark text-white"
     >
       <Modal.Header closeButton>
         <Modal.Title>Editar Categoría</Modal.Title>

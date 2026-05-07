@@ -23,7 +23,6 @@ const Vehiculos = () => {
     id_categoria: "",
     marca: "",
     modelo: "",
-    patente: "",
     anio: "",
     color: "",
     estado: "",
@@ -40,7 +39,6 @@ const Vehiculos = () => {
     id_categoria: "",
     marca: "",
     modelo: "",
-    patente: "",
     anio: "",
     color: "",
     estado: "",
@@ -100,11 +98,9 @@ const Vehiculos = () => {
     return vehiculos.filter((veh) => {
       const marca = veh.marca?.toLowerCase() || "";
       const modelo = veh.modelo?.toLowerCase() || "";
-      const patente = veh.patente?.toLowerCase() || "";
       return (
         marca.includes(textoLower) ||
-        modelo.includes(textoLower) ||
-        patente.includes(textoLower)
+        modelo.includes(textoLower)
       );
     });
   }, [textoBusqueda, vehiculos]);
@@ -163,7 +159,6 @@ const Vehiculos = () => {
       if (
         !nuevoVehiculo.marca.trim() ||
         !nuevoVehiculo.modelo.trim() ||
-        !nuevoVehiculo.patente.trim() ||
         !nuevoVehiculo.anio ||
         !nuevoVehiculo.color.trim() ||
         !nuevoVehiculo.estado.trim() ||
@@ -173,23 +168,7 @@ const Vehiculos = () => {
       ) {
         setToast({
           mostrar: true,
-          mensaje: "Completa los campos obligatorios (marca, modelo, patente, año, color, estado, precio, stock e imagen)",
-          tipo: "advertencia",
-        });
-        return;
-      }
-
-      const patenteTrim = nuevoVehiculo.patente.trim();
-      const { data: existentesPatente, error: errConsultaPatente } = await supabase
-        .from("vehiculos")
-        .select("id_vehiculo")
-        .ilike("patente", patenteTrim);
-
-      if (errConsultaPatente) throw errConsultaPatente;
-      if (existentesPatente?.length > 0) {
-        setToast({
-          mostrar: true,
-          mensaje: "No puede haber dos vehículos con la misma patente.",
+          mensaje: "Completa los campos obligatorios (marca, modelo, año, color, estado, precio, stock e imagen)",
           tipo: "advertencia",
         });
         return;
@@ -214,7 +193,6 @@ const Vehiculos = () => {
           id_categoria: nuevoVehiculo.id_categoria,
           marca: nuevoVehiculo.marca,
           modelo: nuevoVehiculo.modelo,
-          patente: patenteTrim,
           anio: parseInt(nuevoVehiculo.anio),
           color: nuevoVehiculo.color,
           estado: nuevoVehiculo.estado,
@@ -225,16 +203,6 @@ const Vehiculos = () => {
       ]);
 
       if (error) {
-        if (error.code === "23505") {
-          await supabase.storage.from("imagenes_vehiculo").remove([nombreArchivo]).catch(() => {});
-          nombreArchivoSubido = null;
-          setToast({
-            mostrar: true,
-            mensaje: "No puede haber dos vehículos con la misma patente.",
-            tipo: "advertencia",
-          });
-          return;
-        }
         throw error;
       }
 
@@ -243,7 +211,6 @@ const Vehiculos = () => {
         id_categoria: "",
         marca: "",
         modelo: "",
-        patente: "",
         anio: "",
         color: "",
         estado: "",
@@ -259,14 +226,6 @@ const Vehiculos = () => {
       if (nombreArchivoSubido) {
         await supabase.storage.from("imagenes_vehiculo").remove([nombreArchivoSubido]).catch(() => {});
       }
-      if (err?.code === "23505") {
-        setToast({
-          mostrar: true,
-          mensaje: "No puede haber dos vehículos con la misma patente.",
-          tipo: "advertencia",
-        });
-        return;
-      }
       setToast({ mostrar: true, mensaje: "Error al registrar vehículo", tipo: "error" });
     }
   };
@@ -278,7 +237,6 @@ const Vehiculos = () => {
       if (
         !vehiculoEditar.marca.trim() ||
         !vehiculoEditar.modelo.trim() ||
-        !vehiculoEditar.patente.trim() ||
         !vehiculoEditar.anio ||
         !vehiculoEditar.color.trim() ||
         !vehiculoEditar.estado.trim() ||
@@ -293,28 +251,10 @@ const Vehiculos = () => {
         return;
       }
 
-      const patenteTrim = vehiculoEditar.patente.trim();
-      const { data: otrosConPatente, error: errPatente } = await supabase
-        .from("vehiculos")
-        .select("id_vehiculo")
-        .ilike("patente", patenteTrim)
-        .neq("id_vehiculo", vehiculoEditar.id_vehiculo);
-
-      if (errPatente) throw errPatente;
-      if (otrosConPatente?.length > 0) {
-        setToast({
-          mostrar: true,
-          mensaje: "No puede haber dos vehículos con la misma patente.",
-          tipo: "advertencia",
-        });
-        return;
-      }
-
       let datosActualizados = {
         id_categoria: vehiculoEditar.id_categoria,
         marca: vehiculoEditar.marca,
         modelo: vehiculoEditar.modelo,
-        patente: patenteTrim,
         anio: parseInt(vehiculoEditar.anio),
         color: vehiculoEditar.color,
         estado: vehiculoEditar.estado,
@@ -349,17 +289,6 @@ const Vehiculos = () => {
         .eq("id_vehiculo", vehiculoEditar.id_vehiculo);
 
       if (error) {
-        if (error.code === "23505") {
-          if (nombreNuevoSubido) {
-            await supabase.storage.from("imagenes_vehiculo").remove([nombreNuevoSubido]).catch(() => {});
-          }
-          setToast({
-            mostrar: true,
-            mensaje: "No puede haber dos vehículos con la misma patente.",
-            tipo: "advertencia",
-          });
-          return;
-        }
         throw error;
       }
 
@@ -375,7 +304,6 @@ const Vehiculos = () => {
         id_categoria: "",
         marca: "",
         modelo: "",
-        patente: "",
         anio: "",
         color: "",
         estado: "",
@@ -388,16 +316,8 @@ const Vehiculos = () => {
       setToast({ mostrar: true, mensaje: "Vehículo actualizado correctamente", tipo: "exito" });
     } catch (err) {
       console.error("Error al actualizar:", err);
-      if (nombreNuevoSubido && err?.code !== "23505") {
+      if (nombreNuevoSubido) {
         await supabase.storage.from("imagenes_vehiculo").remove([nombreNuevoSubido]).catch(() => {});
-      }
-      if (err?.code === "23505") {
-        setToast({
-          mostrar: true,
-          mensaje: "No puede haber dos vehículos con la misma patente.",
-          tipo: "advertencia",
-        });
-        return;
       }
       setToast({
         mostrar: true,
@@ -434,15 +354,16 @@ const Vehiculos = () => {
   };
 
   return (
-    <Container className="py-4 mt-2">
+    <Container fluid className="py-4 mt-5" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
       <Row className="mb-4 align-items-center">
         <Col xs={12} md={6}>
-          <h2 className="color-texto-marca fw-bold">Gestión de Vehículos</h2>
-          <p className="text-muted small">Inventario de unidades Ouroboros Car</p>
+          <h2 className="fw-bold" style={{ color: '#A4841C' }}>Gestión de Vehículos</h2>
+          <p className="text-white small">Inventario de unidades Ouroboros Car</p>
         </Col>
         <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
           <Button
-            variant="outline-primary"
+            variant="outline-warning"
+            style={{ borderColor: '#A4841C', color: '#A4841C' }}
             className="me-2 shadow-sm"
             onClick={() => setMostrarModalCategorias(true)}
           >
@@ -450,7 +371,8 @@ const Vehiculos = () => {
             Ver Categorías
           </Button>
           <Button
-            className="color-navbar border-0 shadow-sm"
+            className="border-0 shadow-sm"
+            style={{ backgroundColor: '#A4841C' }}
             onClick={() => setMostrarModal(true)}
           >
             <i className="bi bi-plus-circle-fill me-2"></i>
@@ -462,12 +384,13 @@ const Vehiculos = () => {
       <Row className="mb-4 align-items-center">
         <Col md={8}>
           <InputGroup className="shadow-sm">
-            <InputGroup.Text className="bg-white border-end-0">
+            <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
               <i className="bi bi-search text-secondary"></i>
             </InputGroup.Text>
             <Form.Control
-              placeholder="Buscar por marca, modelo o patente..."
-              className="border-start-0 ps-0"
+              placeholder="Buscar por marca o modelo..."
+              className="border-start-0 ps-0 text-white"
+              style={{ backgroundColor: '#2b2b2b', borderColor: '#A4841C' }}
               value={textoBusqueda}
               onChange={manejarBusqueda}
             />
@@ -479,8 +402,8 @@ const Vehiculos = () => {
         {/* Spinner de carga de vehículos */}
         {cargando && (
           <div className="text-center my-5">
-            <Spinner animation="border" variant="primary" role="status">
-              <span className="visually-hidden">Cargando vehículos...</span>
+            <Spinner animation="border" variant="warning" role="status">
+              <span className="visually-hidden">Cargando...</span>
             </Spinner>
             <p className="mt-2 text-muted">Sincronizando con la base de datos...</p>
           </div>
@@ -492,8 +415,8 @@ const Vehiculos = () => {
             <Row>
               {vehiculosPaginados.map((vehiculo) => (
               <Col key={vehiculo.id_vehiculo} md={6} lg={4} className="mb-4">
-                <div className="card h-100 shadow-sm">
-                  <div className="card-body">
+                <div className="card h-100 shadow-sm text-white" style={{ backgroundColor: '#1e1e1e' }}>
+                  <div className="card-body d-flex flex-column">
                     {vehiculo.url_imagen && (
                       <img
                         src={vehiculo.url_imagen}
@@ -503,15 +426,14 @@ const Vehiculos = () => {
                       />
                     )}
                     <h5 className="card-title">{vehiculo.marca} {vehiculo.modelo}</h5>
-                    <p className="card-text">
-                      <strong>Patente:</strong> {vehiculo.patente}<br />
+                    <p className="card-text flex-grow-1">
                       <strong>Año:</strong> {vehiculo.anio}<br />
                       <strong>Color:</strong> {vehiculo.color}<br />
                       <strong>Estado:</strong> {vehiculo.estado}<br />
-                      <strong>Precio:</strong> ${vehiculo.precio}<br />
+                      <strong style={{ color: '#A4841C' }}>Precio:</strong> ${vehiculo.precio}<br />
                       <strong>Stock:</strong> {vehiculo.stock}
                     </p>
-                    <div className="d-flex justify-content-center gap-2">
+                    <div className="d-flex justify-content-center gap-2 mt-auto">
                       <Button
                         variant="outline-primary"
                         size="sm"
@@ -576,21 +498,21 @@ const Vehiculos = () => {
       {mostrarModalEliminacion && vehiculoAEliminar && (
         <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
+            <div className="modal-content bg-dark text-white border-secondary">
+              <div className="modal-header border-secondary">
                 <h5 className="modal-title">Confirmar Eliminación</h5>
                 <button
                   type="button"
-                  className="btn-close"
+                  className="btn-close btn-close-white"
                   onClick={() => setMostrarModalEliminacion(false)}
                 ></button>
               </div>
               <div className="modal-body">
                 <p>¿Estás seguro de que deseas eliminar el vehículo <strong>{vehiculoAEliminar.marca} {vehiculoAEliminar.modelo}</strong>?</p>
-                <p className="text-danger">Esta acción no se puede deshacer.</p>
+                <p style={{ color: '#ff6b6b' }}>Esta acción no se puede deshacer.</p>
               </div>
-              <div className="modal-footer">
-                <Button variant="secondary" onClick={() => setMostrarModalEliminacion(false)}>
+              <div className="modal-footer border-secondary">
+                <Button variant="outline-light" onClick={() => setMostrarModalEliminacion(false)}>
                   Cancelar
                 </Button>
                 <Button variant="danger" onClick={eliminarVehiculo}>

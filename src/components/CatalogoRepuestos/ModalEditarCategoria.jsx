@@ -32,7 +32,7 @@ const ModalEditarCategoria = ({ mostrar, manejarCierre, categoria, alActualizar 
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} centered>
+        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
             <Modal.Header closeButton>
                 <Modal.Title className="color-texto-marca">Editar Categoría</Modal.Title>
             </Modal.Header>

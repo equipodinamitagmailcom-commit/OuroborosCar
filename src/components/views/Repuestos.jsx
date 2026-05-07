@@ -63,6 +63,11 @@ const Repuestos = () => {
     };
 
     useEffect(() => {
+        document.body.style.backgroundColor = '#121212';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
+    useEffect(() => {
         obtenerRepuestos();
     }, []);
 
@@ -103,23 +108,25 @@ const Repuestos = () => {
     }, [repuestosFiltrados, registrosPorPagina, paginaActual]);
 
     return (
-        <Container className="py-4 mt-2">
+        <Container className="py-4 mt-2" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
             {/* Cabecera Responsiva */}
             <Row className="mb-4 align-items-center">
                 <Col xs={12} md={6}>
-                    <h2 className="color-texto-marca fw-bold">Gestión de Repuestos</h2>
+                    <h2 className="fw-bold" style={{ color: '#A4841C' }}>Gestión de Repuestos</h2>
                     <p className="text-muted small">Inventario técnico de Ouroboros Car</p>
                 </Col>
                 <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
                     <Button
-                        variant="outline-primary"
+                        variant="outline-warning"
+                        style={{ borderColor: '#A4841C', color: '#A4841C' }}
                         className="me-2 shadow-sm"
                         onClick={() => setMostrarCategorias(true)}
                     >
                         <i className="bi bi-tags-fill me-2"></i>Ver Categorías
                     </Button>
-                    <Button 
-                        className="color-navbar border-0 shadow-sm" 
+                    <Button
+                        style={{ backgroundColor: '#A4841C' }}
+                        className="border-0 shadow-sm" 
                         onClick={() => setMostrarRegistro(true)}
                     >
                         <i className="bi bi-plus-circle-fill me-2"></i>Agregar Repuesto
@@ -131,12 +138,13 @@ const Repuestos = () => {
             <Row className="mb-4 align-items-center">
                 <Col md={8}>
                     <InputGroup className="shadow-sm">
-                        <InputGroup.Text className="bg-white border-end-0">
+                        <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
                             <i className="bi bi-search text-secondary"></i>
                         </InputGroup.Text>
                         <Form.Control
                             placeholder="Buscar por nombre o categoría..."
-                            className="border-start-0 ps-0"
+                            className="border-start-0 ps-0 text-white"
+                            style={{ backgroundColor: '#2b2b2b', borderColor: '#A4841C' }}
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
                         />
@@ -147,7 +155,7 @@ const Repuestos = () => {
             {/* Área Principal de Contenido */}
             {cargando ? (
                 <div className="text-center py-5">
-                    <Spinner animation="border" variant="primary" role="status">
+                    <Spinner animation="border" variant="warning" role="status">
                         <span className="visually-hidden">Cargando repuestos...</span>
                     </Spinner>
                     <p className="mt-2 text-muted">Sincronizando con la base de datos...</p>

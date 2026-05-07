@@ -71,8 +71,8 @@ const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar })
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} centered>
-            <Modal.Header closeButton>
+        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
+            <Modal.Header closeButton className="border-secondary">
                 <Modal.Title className="color-texto-marca">Registrar Nuevo Repuesto</Modal.Title>
             </Modal.Header>
             <Form onSubmit={registrarRepuesto}>
@@ -83,6 +83,7 @@ const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar })
                             name="nombre" 
                             type="text"
                             placeholder="Ej: Kit de embrague"
+                            className="bg-secondary text-white border-0"
                             value={repuesto.nombre}
                             onChange={manejarCambio} 
                             required 
@@ -93,6 +94,7 @@ const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar })
                         <Form.Label>Categoría</Form.Label>
                         <Form.Select 
                             name="id_categoria" 
+                            className="bg-secondary text-white border-0"
                             value={repuesto.id_categoria}
                             onChange={manejarCambio} 
                             required
@@ -113,6 +115,7 @@ const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar })
                             name="precio_repuesto" 
                             step="0.01"
                             placeholder="0.00"
+                            className="bg-secondary text-white border-0"
                             value={repuesto.precio_repuesto}
                             onChange={manejarCambio} 
                             required 
@@ -125,17 +128,18 @@ const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar })
                             as="textarea" 
                             rows={3} 
                             name="descripcion" 
+                            className="bg-secondary text-white border-0"
                             placeholder="Detalles sobre la marca, compatibilidad, etc."
                             value={repuesto.descripcion}
                             onChange={manejarCambio} 
                         />
                     </Form.Group>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer className="border-secondary">
                     <Button variant="secondary" onClick={manejarCierre}>
                         Cancelar
                     </Button>
-                    <Button type="submit" className="color-navbar" disabled={cargando}>
+                    <Button type="submit" style={{ backgroundColor: '#A4841C', border: 'none' }} disabled={cargando}>
                         {cargando ? 'Guardando...' : 'Guardar Repuesto'}
                     </Button>
                 </Modal.Footer>

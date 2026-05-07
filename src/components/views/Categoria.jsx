@@ -90,6 +90,11 @@ const categoriasPaginadas = categoriasFiltradas.slice(
 
   // 👉 Ejecutar la carga al montar el componente
   useEffect(() => {
+    document.body.style.backgroundColor = '#121212';
+    return () => { document.body.style.backgroundColor = ''; };
+  }, []);
+
+  useEffect(() => {
     cargarCategorias();
   }, []);
 
@@ -267,31 +272,33 @@ useEffect(() => {
   };
 
   return (
-    <Container className="mt-3">
+    <Container className="py-4 mt-2" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
       <Row className="align-items-center mb-3">
         <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
-          <h3 className="mb-0">
-            <i className="bi-bookmark-plus-fill me-2"></i>categorias
+          <h3 className="mb-0 fw-bold" style={{ color: '#A4841C' }}>
+            <i className="bi-bookmark-plus-fill me-2"></i>Categorías
           </h3>
         </Col>
         <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)} size="md">
+          <Button onClick={() => setMostrarModal(true)} size="md" style={{ backgroundColor: '#A4841C', borderColor: '#A4841C' }}>
             <i className="bi-plus-lg"></i>
             <span className="d-none d-sm-inline ms-2">Nueva Categoria</span>
           </Button>
         </Col>
       </Row>
 
-<hr />
+      <hr style={{ borderColor: '#A4841C' }} />
 
 {/* Cuadro de búsqueda debajo de la línea divisoria */}
 <Row className="mb-4">
   <Col md={6} lg={5}>
-    <CuadroBusquedas
-      textoBusqueda={textoBusqueda}
-      manejarCambioBusqueda={manejarBusqueda}
-      placeholder="Buscar por nombre..."
-    />
+    <div className="p-1 rounded" style={{ border: '1px solid #A4841C', backgroundColor: '#2b2b2b' }}>
+      <CuadroBusquedas
+        textoBusqueda={textoBusqueda}
+        manejarCambioBusqueda={manejarBusqueda}
+        placeholder="Buscar por nombre..."
+      />
+    </div>
   </Col>
 </Row>
 
@@ -311,7 +318,7 @@ useEffect(() => {
 {cargando && (
   <Row className="text-center my-5">
     <Col>
-      <Spinner animation="border" variant="success" size="lg" />
+      <Spinner animation="border" variant="warning" size="lg" />
       <p className="mt-3 text-muted">Cargando categorías...</p>
     </Col>
   </Row>

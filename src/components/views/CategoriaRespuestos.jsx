@@ -39,6 +39,11 @@ const Categorias = () => {
     };
 
     useEffect(() => {
+        document.body.style.backgroundColor = '#121212';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
+    useEffect(() => {
         obtenerCategorias();
     }, []);
 
@@ -66,16 +71,17 @@ const Categorias = () => {
     );
 
     return (
-        <Container className="py-4">
+        <Container className="py-4 mt-2" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
             {/* Encabezado */}
             <Row className="mb-4 align-items-center">
                 <Col xs={12} md={6}>
-                    <h2 className="color-texto-marca fw-bold">Categorías de Repuestos</h2>
+                    <h2 className="fw-bold" style={{ color: '#A4841C' }}>Categorías de Repuestos</h2>
                     <p className="text-muted small">Clasificaciones para el inventario de Ouroboros Car</p>
                 </Col>
                 <Col xs={12} md={6} className="text-md-end">
                     <Button 
-                        className="color-navbar border-0 px-4 shadow-sm" 
+                        className="border-0 px-4 shadow-sm" 
+                        style={{ backgroundColor: '#A4841C' }}
                         onClick={() => setMostrarRegistro(true)}
                     >
                         <i className="bi bi-plus-circle me-2"></i>Nueva Categoría
@@ -85,12 +91,13 @@ const Categorias = () => {
 
             {/* Buscador */}
             <InputGroup className="mb-4 shadow-sm">
-                <InputGroup.Text className="bg-white border-end-0 text-muted">
-                    <i className="bi bi-search"></i>
+                <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+                    <i className="bi bi-search text-secondary"></i>
                 </InputGroup.Text>
                 <Form.Control
                     placeholder="Buscar categoría..."
-                    className="border-start-0 ps-0"
+                    className="border-start-0 ps-0 text-white"
+                    style={{ backgroundColor: '#2b2b2b', borderColor: '#A4841C' }}
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                 />
@@ -99,7 +106,7 @@ const Categorias = () => {
             {/* Contenido Principal */}
             {cargando ? (
                 <div className="text-center py-5">
-                    <Spinner animation="border" variant="primary" />
+                    <Spinner animation="border" variant="warning" />
                     <p className="mt-2 text-muted">Cargando categorías...</p>
                 </div>
             ) : filtradas.length > 0 ? (
@@ -109,8 +116,8 @@ const Categorias = () => {
                     alEliminar={abrirEliminacion}
                 />
             ) : (
-                <div className="text-center py-5 border rounded bg-light">
-                    <i className="bi bi-tags display-4 text-muted"></i>
+                <div className="text-center py-5 border rounded border-secondary" style={{ backgroundColor: '#1e1e1e' }}>
+                    <i className="bi bi-tags display-4 text-secondary"></i>
                     <p className="mt-2 text-muted">No se encontraron categorías.</p>
                 </div>
             )}

@@ -40,7 +40,8 @@ const Encabezado = () => {
       <Nav className="ms-auto pe-2">
         <Nav.Link
           onClick={() => manejarNavegacion("/login")}
-          className={mostrarMenu ? "color-texto-marca" : "text-white"}
+          className="text-white"
+          style={mostrarMenu ? { color: '#A4841C' } : {}}
         >
           <i className="bi-person-fill-lock me-2"></i>
           Iniciar sesión
@@ -53,7 +54,8 @@ const Encabezado = () => {
         <Nav className="ms-auto pe-2">
           <Nav.Link
             onClick={() => manejarNavegacion("/")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className="text-white"
+            style={mostrarMenu ? { color: '#A4841C' } : {}}
           >
             {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
             <strong>Inicio</strong>
@@ -61,7 +63,8 @@ const Encabezado = () => {
 
           <Nav.Link
             onClick={() => manejarNavegacion("/vehiculos")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className="text-white"
+            style={mostrarMenu ? { color: '#A4841C' } : {}}
           >
             {mostrarMenu ? <i className="bi-car-front-fill me-2"></i> : null}
             <strong>Vehículos</strong>
@@ -69,7 +72,8 @@ const Encabezado = () => {
 
           <Nav.Link
             onClick={() => manejarNavegacion("/repuestos")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className="text-white"
+            style={mostrarMenu ? { color: '#A4841C' } : {}}
           >
             {mostrarMenu ? <i className="bi-tools me-2"></i> : null}
             <strong>Repuestos</strong>
@@ -77,7 +81,8 @@ const Encabezado = () => {
 
           <Nav.Link
             onClick={() => manejarNavegacion("/mecanicos")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className="text-white"
+            style={mostrarMenu ? { color: '#A4841C' } : {}}
           >
             {mostrarMenu ? <i className="bi-person-workspace me-2"></i> : null}
             <strong>Mecánicos</strong>
@@ -85,7 +90,8 @@ const Encabezado = () => {
 
           <Nav.Link
             onClick={() => manejarNavegacion("/registro")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+            className="text-white"
+            style={mostrarMenu ? { color: '#A4841C' } : {}}
           >
             {mostrarMenu ? <i className="bi-journal-plus me-2"></i> : null}
             <strong>Registro</strong>
@@ -95,7 +101,8 @@ const Encabezado = () => {
           {mostrarMenu ? null : (
             <Nav.Link
               onClick={cerrarSesion}
-              className={mostrarMenu ? "color-texto-marca" : "text-white"}
+              className="text-white"
+              style={mostrarMenu ? { color: '#A4841C' } : {}}
             >
               <i className="bi-box-arrow-right me-2"></i>
             </Nav.Link>
@@ -106,7 +113,7 @@ const Encabezado = () => {
 
         {/* Información de usuario y botón cerrar sesión */}
         {mostrarMenu && (
-          <div className="mt-3 p-3 rounded bg-light text-dark">
+          <div className="mt-3 p-3 rounded" style={{ backgroundColor: '#1a1a1a', border: '1px solid #A4841C', color: '#e0e0e0' }}>
             <p className="mb-2">
               <i className="bi-envelope-fill me-2"></i>
               {localStorage.getItem("usuario-supabase")?.toLowerCase() ||
@@ -130,8 +137,9 @@ const Encabezado = () => {
     <Navbar
       expand="md"
       fixed="top"
-      className="color-navbar shadow-lg"
+      className="shadow-lg"
       variant="dark"
+      style={{ backgroundColor: '#1a1a1a', borderBottom: '2px solid #A4841C' }}
     >
       <Container>
         <Navbar.Brand
@@ -142,13 +150,10 @@ const Encabezado = () => {
           <img
             alt=""
             src={Logo}
-            width="45"
-            height="45"
+            width=""
+            height="80"
             className="d-inline-block me-2"
           />
-          <strong>
-            <h4 className="mb-0">Ouroboros</h4>
-          </strong>
         </Navbar.Brand>
 
         {/* Botón del menú */}
@@ -165,9 +170,10 @@ const Encabezado = () => {
           placement="end"
           show={mostrarMenu}
           onHide={() => setMostrarMenu(false)}
+          style={{ backgroundColor: '#121212', color: '#e0e0e0' }}
         >
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Menú Ouroboros</Offcanvas.Title>
+          <Offcanvas.Header closeButton className="border-bottom border-secondary">
+            <Offcanvas.Title style={{ color: '#A4841C' }}>Menú Ouroboros</Offcanvas.Title>
           </Offcanvas.Header>
 
           <Offcanvas.Body>{contenidoMenu}</Offcanvas.Body>

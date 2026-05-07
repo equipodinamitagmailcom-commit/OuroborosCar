@@ -174,8 +174,8 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable>
-            <Modal.Header closeButton className="border-bottom">
+        <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable contentClassName="bg-dark text-white">
+            <Modal.Header closeButton className="border-bottom border-secondary">
                 <div className="d-flex flex-column flex-md-row w-100 justify-content-between align-items-start align-items-md-center gap-3 pe-2">
                     <div>
                         <Modal.Title as="h5" className="color-texto-marca fw-bold mb-1">
@@ -201,12 +201,13 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                 <Row className="mb-4 align-items-center">
                     <Col md={8}>
                         <InputGroup className="shadow-sm">
-                            <InputGroup.Text className="bg-white border-end-0">
+                            <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
                                 <i className="bi bi-search text-secondary"></i>
                             </InputGroup.Text>
                             <Form.Control
                                 placeholder="Buscar por nombre..."
-                                className="border-start-0 ps-0"
+                                className="border-start-0 ps-0 text-white"
+                                style={{ backgroundColor: '#2b2b2b', borderColor: '#A4841C' }}
                                 value={busqueda}
                                 onChange={(e) => setBusqueda(e.target.value)}
                                 disabled={cargando}
@@ -235,18 +236,18 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                 ) : (
                     <>
                         <div className="table-responsive shadow-sm rounded">
-                            <Table hover className="align-middle mb-0 bg-white">
-                                <thead className="color-navbar text-white">
+                            <Table hover variant="dark" className="align-middle mb-0">
+                                <thead>
                                     <tr>
                                         <th>ID</th>
                                         <th>Nombre</th>
                                         <th className="text-center">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="border-secondary">
                                     {categoriasPaginadas.map((cat) => (
                                         <tr key={cat.id_categoria}>
-                                            <td className="fw-bold text-muted">#{cat.id_categoria}</td>
+                                            <td className="fw-bold text-secondary">#{cat.id_categoria}</td>
                                             <td className="fw-semibold">{cat.nombrecat}</td>
                                             <td className="text-center text-nowrap">
                                                 <Button

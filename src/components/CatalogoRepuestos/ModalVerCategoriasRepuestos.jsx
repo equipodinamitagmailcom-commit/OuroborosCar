@@ -107,7 +107,7 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable>
+        <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable contentClassName="bg-dark text-white">
             <Modal.Header closeButton className="border-bottom">
                 <div className="d-flex flex-column flex-md-row w-100 justify-content-between align-items-start align-items-md-center gap-3 pe-2">
                     <div>

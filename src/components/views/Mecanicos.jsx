@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import TablaMecanicos from '../mecanico/TablaMecanicos.jsx';
 
 const Mecanicos = () => {
+    useEffect(() => {
+        document.body.style.backgroundColor = '#121212';
+        return () => { document.body.style.backgroundColor = ''; };
+    }, []);
+
     return (
-        <Container fluid className="px-4 py-4">
+        <Container fluid className="px-4 py-4" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
             {/* Encabezado de la Vista */}
             <Row className="mb-4 align-items-center">
                 <Col>
-                    <h2 className="fw-bold mb-1">Panel de Mecánicos</h2>
+                    <h2 className="fw-bold mb-1" style={{ color: '#A4841C' }}>Panel de Mecánicos</h2>
                     <p className="text-muted">
                         Gestiona, edita y supervisa el personal técnico de <strong>Ouroboros Car</strong>.
                     </p>

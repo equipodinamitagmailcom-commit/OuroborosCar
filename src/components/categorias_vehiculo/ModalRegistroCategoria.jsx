@@ -24,6 +24,7 @@ const ModalRegistroCategoria = ({
       backdrop="static"
       keyboard={false}
       centered
+      contentClassName="bg-dark text-white"
     >
       <Modal.Header closeButton>
         <Modal.Title>Agregar Categoria</Modal.Title>

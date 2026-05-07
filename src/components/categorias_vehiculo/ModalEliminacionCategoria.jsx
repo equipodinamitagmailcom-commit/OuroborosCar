@@ -24,6 +24,7 @@ const ModalEliminacionCategoria = ({
       backdrop="static"
       keyboard={false}
       centered
+      contentClassName="bg-dark text-white"
     >
       <Modal.Header closeButton>
         <Modal.Title>Confirmar Eliminación</Modal.Title>
