@@ -150,9 +150,8 @@ const Encabezado = () => {
           <img
             alt=""
             src={Logo}
-            width=""
-            height="80"
             className="d-inline-block me-2"
+            style={{ height: "110px", width: "auto", marginTop: "-15px", marginBottom: "-15px" }}
           />
         </Navbar.Brand>
 

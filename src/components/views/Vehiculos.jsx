@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import { Container, Row, Col, Button, Spinner, InputGroup, Form } from "react-bootstrap";
-import { supabase } from '../database/supabaseconfig.js';
-import ModalRegistroVehiculos from '../vehiculos/ModalRegistroVehiculos';
-import ModalEdicionVehiculos from '../vehiculos/ModalEdicionVehiculos';
-import ModalVerCategorias from '../categorias_vehiculo/ModalVerCategorias';
-import NotificacionOperacion from '../rutas/NotificacionOperacion';
-import Paginacion from '../ordenamiento/Paginacion';
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Spinner,
+  InputGroup,
+  Form,
+} from "react-bootstrap";
+import { supabase } from "../database/supabaseconfig.js";
+import ModalRegistroVehiculos from "../vehiculos/ModalRegistroVehiculos";
+import ModalEdicionVehiculos from "../vehiculos/ModalEdicionVehiculos";
+import ModalVerCategorias from "../categorias_vehiculo/ModalVerCategorias";
+import NotificacionOperacion from "../rutas/NotificacionOperacion";
+import Paginacion from "../ordenamiento/Paginacion";
 
 const Vehiculos = () => {
-
   const [vehiculos, setVehiculos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [textoBusqueda, setTextoBusqueda] = useState("");
@@ -98,10 +105,7 @@ const Vehiculos = () => {
     return vehiculos.filter((veh) => {
       const marca = veh.marca?.toLowerCase() || "";
       const modelo = veh.modelo?.toLowerCase() || "";
-      return (
-        marca.includes(textoLower) ||
-        modelo.includes(textoLower)
-      );
+      return marca.includes(textoLower) || modelo.includes(textoLower);
     });
   }, [textoBusqueda, vehiculos]);
 
@@ -111,7 +115,10 @@ const Vehiculos = () => {
   }, [vehiculosFiltrados, paginaActual, registrosPorPagina]);
 
   useEffect(() => {
-    const totalPaginas = Math.max(1, Math.ceil(vehiculosFiltrados.length / registrosPorPagina));
+    const totalPaginas = Math.max(
+      1,
+      Math.ceil(vehiculosFiltrados.length / registrosPorPagina),
+    );
     if (paginaActual > totalPaginas) {
       setPaginaActual(totalPaginas);
     }
@@ -128,7 +135,11 @@ const Vehiculos = () => {
       setVehiculos(data || []);
     } catch (err) {
       console.error("Error al cargar vehículos:", err);
-      setToast({ mostrar: true, mensaje: "Error al cargar vehículos", tipo: "error" });
+      setToast({
+        mostrar: true,
+        mensaje: "Error al cargar vehículos",
+        tipo: "error",
+      });
     } finally {
       setCargando(false);
     }
@@ -144,14 +155,68 @@ const Vehiculos = () => {
       setCategorias(data || []);
     } catch (err) {
       console.error("Error al cargar categorías:", err);
-      setToast({ mostrar: true, mensaje: "Error al cargar categorías", tipo: "error" });
+      setToast({
+        mostrar: true,
+        mensaje: "Error al cargar categorías",
+        tipo: "error",
+      });
     }
   };
+
+  useEffect(() => {
+    document.body.style.backgroundColor = '#121212';
+    return () => { document.body.style.backgroundColor = ''; };
+  }, []);
 
   useEffect(() => {
     cargarVehiculos();
     cargarCategorias();
   }, []);
+
+  const toggleEstadoCatalogo = async (vehiculo) => {
+    try {
+      const nuevoEstado = !vehiculo.en_catalogo;
+
+      // Actualización optimista del estado local para una respuesta inmediata
+      setVehiculos((prev) =>
+        prev.map((v) =>
+          v.id_vehiculo === vehiculo.id_vehiculo
+            ? { ...v, en_catalogo: nuevoEstado }
+            : v
+        )
+      );
+
+      const { error } = await supabase
+        .from("vehiculos")
+        .update({ en_catalogo: nuevoEstado })
+        .eq("id_vehiculo", vehiculo.id_vehiculo);
+
+      if (error) {
+        // Si falla la base de datos, revertimos el cambio local
+        setVehiculos((prev) =>
+          prev.map((v) =>
+            v.id_vehiculo === vehiculo.id_vehiculo
+              ? { ...v, en_catalogo: !nuevoEstado }
+              : v
+          )
+        );
+        throw error;
+      }
+
+      setToast({
+        mostrar: true,
+        mensaje: nuevoEstado ? "Vehículo visible en el catálogo" : "Vehículo oculto del catálogo",
+        tipo: "exito",
+      });
+    } catch (err) {
+      console.error("Error al actualizar catálogo:", err.message || err);
+      setToast({
+        mostrar: true,
+        mensaje: `Error: ${err.message || "No se pudo cambiar el estado del catálogo"}`,
+        tipo: "error",
+      });
+    }
+  };
 
   const agregarVehiculo = async () => {
     let nombreArchivoSubido = null;
@@ -168,7 +233,8 @@ const Vehiculos = () => {
       ) {
         setToast({
           mostrar: true,
-          mensaje: "Completa los campos obligatorios (marca, modelo, año, color, estado, precio, stock e imagen)",
+          mensaje:
+            "Completa los campos obligatorios (marca, modelo, año, color, estado, precio, stock e imagen)",
           tipo: "advertencia",
         });
         return;
@@ -199,6 +265,7 @@ const Vehiculos = () => {
           precio: parseFloat(nuevoVehiculo.precio),
           stock: parseInt(nuevoVehiculo.stock),
           url_imagen: urlPublica,
+          en_catalogo: false,
         },
       ]);
 
@@ -218,15 +285,26 @@ const Vehiculos = () => {
         stock: "",
         archivo: null,
       });
-      setToast({ mostrar: true, mensaje: "Vehículo registrado correctamente", tipo: "exito" });
+      setToast({
+        mostrar: true,
+        mensaje: "Vehículo registrado correctamente",
+        tipo: "exito",
+      });
       await cargarVehiculos();
       nombreArchivoSubido = null;
     } catch (err) {
       console.error("Error al agregar vehículo:", err);
       if (nombreArchivoSubido) {
-        await supabase.storage.from("imagenes_vehiculo").remove([nombreArchivoSubido]).catch(() => {});
+        await supabase.storage
+          .from("imagenes_vehiculo")
+          .remove([nombreArchivoSubido])
+          .catch(() => {});
       }
-      setToast({ mostrar: true, mensaje: "Error al registrar vehículo", tipo: "error" });
+      setToast({
+        mostrar: true,
+        mensaje: "Error al registrar vehículo",
+        tipo: "error",
+      });
     }
   };
 
@@ -279,7 +357,10 @@ const Vehiculos = () => {
         datosActualizados.url_imagen = urlData.publicUrl;
 
         if (vehiculoEditar.url_imagen) {
-          nombreAnteriorBorrado = vehiculoEditar.url_imagen.split("/").pop().split("?")[0];
+          nombreAnteriorBorrado = vehiculoEditar.url_imagen
+            .split("/")
+            .pop()
+            .split("?")[0];
         }
       }
 
@@ -293,7 +374,10 @@ const Vehiculos = () => {
       }
 
       if (nombreAnteriorBorrado && vehiculoEditar.archivo) {
-        await supabase.storage.from("imagenes_vehiculo").remove([nombreAnteriorBorrado]).catch(() => {});
+        await supabase.storage
+          .from("imagenes_vehiculo")
+          .remove([nombreAnteriorBorrado])
+          .catch(() => {});
       }
 
       await cargarVehiculos();
@@ -313,11 +397,18 @@ const Vehiculos = () => {
         archivo: null,
       });
 
-      setToast({ mostrar: true, mensaje: "Vehículo actualizado correctamente", tipo: "exito" });
+      setToast({
+        mostrar: true,
+        mensaje: "Vehículo actualizado correctamente",
+        tipo: "exito",
+      });
     } catch (err) {
       console.error("Error al actualizar:", err);
       if (nombreNuevoSubido) {
-        await supabase.storage.from("imagenes_vehiculo").remove([nombreNuevoSubido]).catch(() => {});
+        await supabase.storage
+          .from("imagenes_vehiculo")
+          .remove([nombreNuevoSubido])
+          .catch(() => {});
       }
       setToast({
         mostrar: true,
@@ -339,31 +430,54 @@ const Vehiculos = () => {
       if (error) throw error;
 
       if (vehiculoAEliminar.url_imagen) {
-        const nombreArchivo = vehiculoAEliminar.url_imagen.split("/").pop().split("?")[0];
-        await supabase.storage.from("imagenes_vehiculo").remove([nombreArchivo]).catch(() => {});
+        const nombreArchivo = vehiculoAEliminar.url_imagen
+          .split("/")
+          .pop()
+          .split("?")[0];
+        await supabase.storage
+          .from("imagenes_vehiculo")
+          .remove([nombreArchivo])
+          .catch(() => {});
       }
 
       await cargarVehiculos();
       setMostrarModalEliminacion(false);
       setVehiculoAEliminar(null);
-      setToast({ mostrar: true, mensaje: "Vehículo eliminado correctamente", tipo: "exito" });
+      setToast({
+        mostrar: true,
+        mensaje: "Vehículo eliminado correctamente",
+        tipo: "exito",
+      });
     } catch (err) {
       console.error("Error al eliminar:", err);
-      setToast({ mostrar: true, mensaje: "Error al eliminar vehículo", tipo: "error" });
+      setToast({
+        mostrar: true,
+        mensaje: "Error al eliminar vehículo",
+        tipo: "error",
+      });
     }
   };
 
   return (
-    <Container fluid className="py-4 mt-5" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
+    <Container
+      fluid
+      className="py-4 mt-2"
+      style={{
+        backgroundColor: "#121212",
+        minHeight: "100vh",
+        color: "#e0e0e0",
+      }}
+    >
       <Row className="mb-4 align-items-center">
         <Col xs={12} md={6}>
-          <h2 className="fw-bold" style={{ color: '#A4841C' }}>Gestión de Vehículos</h2>
-          <p className="text-white small">Inventario de unidades Ouroboros Car</p>
+          <h2 className="fw-bold" style={{ color: "#A4841C" }}>
+            Inventario de Vehículos
+          </h2>
         </Col>
         <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
           <Button
             variant="outline-warning"
-            style={{ borderColor: '#A4841C', color: '#A4841C' }}
+            style={{ borderColor: "#A4841C", color: "#A4841C" }}
             className="me-2 shadow-sm"
             onClick={() => setMostrarModalCategorias(true)}
           >
@@ -372,7 +486,7 @@ const Vehiculos = () => {
           </Button>
           <Button
             className="border-0 shadow-sm"
-            style={{ backgroundColor: '#A4841C' }}
+            style={{ backgroundColor: "#A4841C" }}
             onClick={() => setMostrarModal(true)}
           >
             <i className="bi bi-plus-circle-fill me-2"></i>
@@ -384,13 +498,20 @@ const Vehiculos = () => {
       <Row className="mb-4 align-items-center">
         <Col md={8}>
           <InputGroup className="shadow-sm">
-            <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+            <InputGroup.Text
+              className="border-end-0"
+              style={{
+                backgroundColor: "#2b2b2b",
+                color: "#A4841C",
+                borderColor: "#A4841C",
+              }}
+            >
               <i className="bi bi-search text-secondary"></i>
             </InputGroup.Text>
             <Form.Control
               placeholder="Buscar por marca o modelo..."
               className="border-start-0 ps-0 text-white"
-              style={{ backgroundColor: '#2b2b2b', borderColor: '#A4841C' }}
+              style={{ backgroundColor: "#2b2b2b", borderColor: "#A4841C" }}
               value={textoBusqueda}
               onChange={manejarBusqueda}
             />
@@ -405,7 +526,9 @@ const Vehiculos = () => {
             <Spinner animation="border" variant="warning" role="status">
               <span className="visually-hidden">Cargando...</span>
             </Spinner>
-            <p className="mt-2 text-muted">Sincronizando con la base de datos...</p>
+            <p className="mt-2 text-muted">
+              Sincronizando con la base de datos...
+            </p>
           </div>
         )}
 
@@ -414,54 +537,75 @@ const Vehiculos = () => {
           <>
             <Row>
               {vehiculosPaginados.map((vehiculo) => (
-              <Col key={vehiculo.id_vehiculo} md={6} lg={4} className="mb-4">
-                <div className="card h-100 shadow-sm text-white" style={{ backgroundColor: '#1e1e1e' }}>
-                  <div className="card-body d-flex flex-column">
-                    {vehiculo.url_imagen && (
-                      <img
-                        src={vehiculo.url_imagen}
-                        alt={`${vehiculo.marca} ${vehiculo.modelo}`}
-                        className="card-img-top mb-3"
-                        style={{ height: "200px", objectFit: "cover" }}
-                      />
-                    )}
-                    <h5 className="card-title">{vehiculo.marca} {vehiculo.modelo}</h5>
-                    <p className="card-text flex-grow-1">
-                      <strong>Año:</strong> {vehiculo.anio}<br />
-                      <strong>Color:</strong> {vehiculo.color}<br />
-                      <strong>Estado:</strong> {vehiculo.estado}<br />
-                      <strong style={{ color: '#A4841C' }}>Precio:</strong> ${vehiculo.precio}<br />
-                      <strong>Stock:</strong> {vehiculo.stock}
-                    </p>
-                    <div className="d-flex justify-content-center gap-2 mt-auto">
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        title="Editar"
-                        onClick={() => {
-                          setVehiculoEditar(vehiculo);
-                          setMostrarModalEdicion(true);
-                        }}
-                      >
-                        <i className="bi bi-pencil"></i>
-                      </Button>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        title="Eliminar"
-                        onClick={() => {
-                          setVehiculoAEliminar(vehiculo);
-                          setMostrarModalEliminacion(true);
-                        }}
-                      >
-                        <i className="bi bi-trash"></i>
-                      </Button>
+                <Col key={vehiculo.id_vehiculo} md={6} lg={4} className="mb-4">
+                  <div
+                    className="card h-100 shadow-sm text-white"
+                    style={{ backgroundColor: "#1e1e1e" }}
+                  >
+                    <div className="card-body d-flex flex-column">
+                      {vehiculo.url_imagen && (
+                        <img
+                          src={vehiculo.url_imagen}
+                          alt={`${vehiculo.marca} ${vehiculo.modelo}`}
+                          className="card-img-top mb-3"
+                          style={{ height: "200px", objectFit: "cover" }}
+                        />
+                      )}
+                      <h5 className="card-title d-flex justify-content-between align-items-center">
+                        {vehiculo.marca} {vehiculo.modelo}
+                        {vehiculo.en_catalogo && (
+                          <span className="badge bg-success" style={{ fontSize: '10px' }}>En Catálogo</span>
+                        )}
+                      </h5>
+                      <p className="card-text flex-grow-1">
+                        <strong>Año:</strong> {vehiculo.anio}
+                        <br />
+                        <strong>Color:</strong> {vehiculo.color}
+                        <br />
+                        <strong>Estado:</strong> {vehiculo.estado}
+                        <br />
+                        <strong style={{ color: "#A4841C" }}>Precio:</strong> $
+                        {vehiculo.precio}
+                        <br />
+                        <strong>Stock:</strong> {vehiculo.stock}
+                      </p>
+                      <div className="d-flex justify-content-center gap-2 mt-auto">
+                        <Button
+                          variant={vehiculo.en_catalogo ? "success" : "outline-warning"}
+                          size="sm"
+                          title={vehiculo.en_catalogo ? "Quitar del catálogo" : "Publicar auto"}
+                          onClick={() => toggleEstadoCatalogo(vehiculo)}
+                        >
+                          {vehiculo.en_catalogo ? 'Publicado' : 'Publicar auto'}
+                        </Button>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          title="Editar"
+                          onClick={() => {
+                            setVehiculoEditar(vehiculo);
+                            setMostrarModalEdicion(true);
+                          }}
+                        >
+                          <i className="bi bi-pencil"></i>
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          title="Eliminar"
+                          onClick={() => {
+                            setVehiculoAEliminar(vehiculo);
+                            setMostrarModalEliminacion(true);
+                          }}
+                        >
+                          <i className="bi bi-trash"></i>
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Col>
-            ))}
-          </Row>
+                </Col>
+              ))}
+            </Row>
             <div className="mt-3">
               <Paginacion
                 registrosPorPagina={registrosPorPagina}
@@ -508,11 +652,22 @@ const Vehiculos = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <p>¿Estás seguro de que deseas eliminar el vehículo <strong>{vehiculoAEliminar.marca} {vehiculoAEliminar.modelo}</strong>?</p>
-                <p style={{ color: '#ff6b6b' }}>Esta acción no se puede deshacer.</p>
+                <p>
+                  ¿Estás seguro de que deseas eliminar el vehículo{" "}
+                  <strong>
+                    {vehiculoAEliminar.marca} {vehiculoAEliminar.modelo}
+                  </strong>
+                  ?
+                </p>
+                <p style={{ color: "#ff6b6b" }}>
+                  Esta acción no se puede deshacer.
+                </p>
               </div>
               <div className="modal-footer border-secondary">
-                <Button variant="outline-light" onClick={() => setMostrarModalEliminacion(false)}>
+                <Button
+                  variant="outline-light"
+                  onClick={() => setMostrarModalEliminacion(false)}
+                >
                   Cancelar
                 </Button>
                 <Button variant="danger" onClick={eliminarVehiculo}>
@@ -541,3 +696,4 @@ const Vehiculos = () => {
 };
 
 export default Vehiculos;
+  

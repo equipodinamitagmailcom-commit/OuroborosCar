@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Container, Row, Col, Button, Card, Spinner, Form, InputGroup, Modal, ListGroup } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig.js";
-import { useNavigate } from "react-router-dom";
 
 const Inicio = () => {
   const [vehiculos, setVehiculos] = useState([]);
@@ -9,10 +8,6 @@ const Inicio = () => {
   const [searchTerm, setSearchTerm] = useState(""); // Nuevo estado para el término de búsqueda
   const [mostrarDetalles, setMostrarDetalles] = useState(false);
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState(null);
-  const navegar = useNavigate();
-
-  // Detectamos si el usuario ya está autenticado para el botón dinámico
-  const usuarioAutenticado = localStorage.getItem("usuario-supabase");
 
   const cargarVehiculos = async () => {
     try {
@@ -21,6 +16,7 @@ const Inicio = () => {
       const { data, error } = await supabase
         .from("vehiculos")
         .select("*")
+        .eq("en_catalogo", true)
         .order("id_vehiculo", { ascending: false });
 
       if (error) throw error;
@@ -60,39 +56,6 @@ const Inicio = () => {
 
   return (
     <Container className="py-5" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
-      {/* Cabecera del Catálogo Público */}
-      <Row className="mb-5 align-items-center p-4 rounded shadow-sm border-start border-5" style={{ backgroundColor: '#1a1a1a', borderColor: '#A4841C' }}>
-        <Col xs={12} md={8}>
-          <h1 className="fw-bold mb-0" style={{ color: '#A4841C' }}>
-            <i className="bi bi-car-front-fill me-2" style={{ color: '#A4841C' }}></i>
-            Catálogo Ouroboros Car
-          </h1>
-          <p className="text-white lead mt-2 mb-0 fw-bold">
-            Explora nuestra flota de vehículos disponibles para ti.
-          </p>
-        </Col>
-        <Col xs={12} md={4} className="text-md-end mt-3 mt-md-0">
-          {usuarioAutenticado ? (
-            <Button 
-              style={{ borderColor: '#A4841C', color: '#A4841C' }}
-              variant="outline-warning"
-              onClick={() => navegar("/vehiculos")} 
-              className="shadow-sm"
-            >
-              <i className="bi bi-speedometer2 me-2"></i>Ir al Panel de Gestión
-            </Button>
-          ) : (
-            <Button 
-              onClick={() => navegar("/login")} 
-              className="border-0 shadow-sm"
-              style={{ backgroundColor: '#A4841C', color: 'white' }}
-            >
-              <i className="bi bi-person-lock me-2"></i>Acceso Staff
-            </Button>
-          )}
-        </Col>
-      </Row>
-
       {/* Barra de búsqueda */}
       <Row className="mb-4">
         <Col md={8}>

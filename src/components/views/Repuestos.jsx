@@ -112,8 +112,8 @@ const Repuestos = () => {
             {/* Cabecera Responsiva */}
             <Row className="mb-4 align-items-center">
                 <Col xs={12} md={6}>
-                    <h2 className="fw-bold" style={{ color: '#A4841C' }}>Gestión de Repuestos</h2>
-                    <p className="text-muted small">Inventario técnico de Ouroboros Car</p>
+                    <h2 className="fw-bold" style={{ color: '#A4841C' }}>Inventario de Repuestos</h2>
+                
                 </Col>
                 <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
                     <Button
