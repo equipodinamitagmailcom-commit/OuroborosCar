@@ -22,6 +22,7 @@ const Encabezado = () => {
       if (error) throw error;
 
       localStorage.removeItem("usuario-supabase");
+      localStorage.removeItem("rol-supabase");
       setMostrarMenu(false);
       navigate("/login");
     } catch (err) {
@@ -49,6 +50,8 @@ const Encabezado = () => {
       </Nav>
     );
   } else {
+    const rol = localStorage.getItem("rol-supabase")?.toLowerCase();
+
     contenidoMenu = (
       <>
         <Nav className="ms-auto pe-2">
@@ -61,41 +64,45 @@ const Encabezado = () => {
             <strong>Inicio</strong>
           </Nav.Link>
 
-          <Nav.Link
-            onClick={() => manejarNavegacion("/vehiculos")}
-            className="text-white"
-            style={mostrarMenu ? { color: '#A4841C' } : {}}
-          >
-            {mostrarMenu ? <i className="bi-car-front-fill me-2"></i> : null}
-            <strong>Vehículos</strong>
-          </Nav.Link>
+          {rol === 'admin' && (
+            <>
+              <Nav.Link
+                onClick={() => manejarNavegacion("/vehiculos")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-car-front-fill me-2"></i> : null}
+                <strong>Vehículos</strong>
+              </Nav.Link>
 
-          <Nav.Link
-            onClick={() => manejarNavegacion("/repuestos")}
-            className="text-white"
-            style={mostrarMenu ? { color: '#A4841C' } : {}}
-          >
-            {mostrarMenu ? <i className="bi-tools me-2"></i> : null}
-            <strong>Repuestos</strong>
-          </Nav.Link>
+              <Nav.Link
+                onClick={() => manejarNavegacion("/repuestos")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-tools me-2"></i> : null}
+                <strong>Repuestos</strong>
+              </Nav.Link>
 
-          <Nav.Link
-            onClick={() => manejarNavegacion("/mecanicos")}
-            className="text-white"
-            style={mostrarMenu ? { color: '#A4841C' } : {}}
-          >
-            {mostrarMenu ? <i className="bi-person-workspace me-2"></i> : null}
-            <strong>Mecánicos</strong>
-          </Nav.Link>
+              <Nav.Link
+                onClick={() => manejarNavegacion("/mecanicos")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-person-workspace me-2"></i> : null}
+                <strong>Mecánicos</strong>
+              </Nav.Link>
 
-          <Nav.Link
-            onClick={() => manejarNavegacion("/registro")}
-            className="text-white"
-            style={mostrarMenu ? { color: '#A4841C' } : {}}
-          >
-            {mostrarMenu ? <i className="bi-journal-plus me-2"></i> : null}
-            <strong>Registro</strong>
-          </Nav.Link>
+              <Nav.Link
+                onClick={() => manejarNavegacion("/registro")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-journal-plus me-2"></i> : null}
+                <strong>Registro</strong>
+              </Nav.Link>
+            </>
+          )}
 
           {/* Ícono cerrar sesión en barra superior */}
           {mostrarMenu ? null : (

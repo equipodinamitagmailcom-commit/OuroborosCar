@@ -1,13 +1,19 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-const RutaProtegida = ({ children }) => {
-  // Verifica si el usuario está autenticado usando localStorage
+const RutaProtegida = ({ children, allowedRoles = [] }) => {
   const estaLogueado = !!localStorage.getItem("usuario-supabase");
-  // Log para depuración
-  console.log("Usuario autenticado:", estaLogueado);
-  // Si está autenticado,redirige a la página de login
-  return estaLogueado ? children : <Navigate to="/login" replace />;
+  const rol = localStorage.getItem("rol-supabase")?.toLowerCase();
+
+  if (!estaLogueado) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(rol)) {
+    return <Navigate to="/no-autorizado" replace />;
+  }
+
+  return children;
 };
 
 export default RutaProtegida;

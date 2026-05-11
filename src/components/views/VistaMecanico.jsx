@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import TablaMecanicos from '../mecanico/TablaMecanicos.jsx';
 

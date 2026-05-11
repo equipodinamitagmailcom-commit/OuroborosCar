@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../database/supabaseconfig.js';
 import { Button, Container, Row, Col, InputGroup, Form, Spinner } from 'react-bootstrap';
 

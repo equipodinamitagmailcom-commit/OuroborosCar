@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Card, Form, Alert } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
 
@@ -13,8 +13,24 @@ const RegistroGeneral = () => {
         apellidos: '',
         cedula: '',
         telefono: '',
-        direccion: ''
+        direccion: '',
+        email: '',
+        password: ''
     });
+
+    const obtenerRoleId = async (roleName) => {
+      const { data, error } = await supabase
+        .from('roles')
+        .select('id')
+        .eq('name', roleName)
+        .single();
+
+      if (error || !data) {
+        throw new Error('No se pudo obtener el id del rol');
+      }
+
+      return data.id;
+    };
 
     useEffect(() => {
         document.body.style.backgroundColor = '#121212';
@@ -30,27 +46,69 @@ const RegistroGeneral = () => {
         setCargando(true);
         setMensaje({ tipo: '', texto: '' });
 
-        // Definir la tabla destino según la elección del botón
-        const tablaDestino = tipoRegistro === 'cliente' ? 'clientes' : 'mecanicos';
+        if (!formData.email.trim() || !formData.password.trim()) {
+            setMensaje({ tipo: 'danger', texto: 'Debe ingresar email y contraseña.' });
+            setCargando(false);
+            return;
+        }
 
         try {
-            const { error } = await supabase
-                .from(tablaDestino)
-                .insert([formData]);
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+            });
 
-            if (error) throw error;
+            if (signUpError) {
+                throw signUpError;
+            }
+
+            if (!signUpData?.user?.id) {
+                throw new Error('No se pudo crear el usuario de autenticación.');
+            }
+
+            const roleName = tipoRegistro === 'cliente' ? 'cliente' : 'mecanico';
+            const roleId = await obtenerRoleId(roleName);
+
+            const profileData = {
+                id: signUpData.user.id,
+                email: formData.email,
+                nombre: `${formData.nombres} ${formData.apellidos}`.trim(),
+                role_id: roleId
+            };
+
+            const { error: profileError } = await supabase.from('profiles').insert([profileData]);
+            if (profileError) {
+                throw profileError;
+            }
+
+            const tablaDestino = tipoRegistro === 'cliente' ? 'clientes' : 'mecanicos';
+            const registroNegocio = {
+                profile_id: signUpData.user.id,
+                nombres: formData.nombres,
+                apellidos: formData.apellidos,
+                cedula: formData.cedula,
+                telefono: formData.telefono,
+                direccion: formData.direccion,
+            };
+
+            const { error: negocioError } = await supabase
+                .from(tablaDestino)
+                .insert([registroNegocio]);
+
+            if (negocioError) {
+                throw negocioError;
+            }
 
             setMensaje({ 
                 tipo: 'success', 
                 texto: `${tipoRegistro === 'cliente' ? 'Cliente' : 'Mecánico'} registrado correctamente.` 
             });
-            
-            // Limpiar formulario y regresar a botones
-            setFormData({ nombres: '', apellidos: '', cedula: '', telefono: '', direccion: '' });
+
+            setFormData({ nombres: '', apellidos: '', cedula: '', telefono: '', direccion: '', email: '', password: '' });
             setTimeout(() => setTipoRegistro(null), 2000);
 
         } catch (error) {
-            setMensaje({ tipo: 'danger', texto: error.message });
+            setMensaje({ tipo: 'danger', texto: error.message || 'Error al registrar usuario.' });
         } finally {
             setCargando(false);
         }
@@ -152,9 +210,31 @@ const RegistroGeneral = () => {
                                         <Form.Control name="telefono" value={formData.telefono} onChange={manejarCambio} />
                                     </Form.Group>
 
-                                    <Form.Group className="mb-4">
+                                    <Form.Group className="mb-3">
                                         <Form.Label className="small fw-bold">Dirección</Form.Label>
                                         <Form.Control as="textarea" rows={2} name="direccion" value={formData.direccion} onChange={manejarCambio} />
+                                    </Form.Group>
+
+                                    <Form.Group className="mb-3">
+                                        <Form.Label className="small fw-bold">Correo electrónico</Form.Label>
+                                        <Form.Control
+                                            type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={manejarCambio}
+                                            required
+                                        />
+                                    </Form.Group>
+
+                                    <Form.Group className="mb-4">
+                                        <Form.Label className="small fw-bold">Contraseña</Form.Label>
+                                        <Form.Control
+                                            type="password"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={manejarCambio}
+                                            required
+                                        />
                                     </Form.Group>
 
                                     <Button 

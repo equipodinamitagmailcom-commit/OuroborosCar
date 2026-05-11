@@ -21,10 +21,10 @@ const FormularioLogin = ({
 
         <Form>
           <Form.Group className="mb-3" controlId="usuario">
-            <Form.Label>Usuario</Form.Label>
+            <Form.Label>Correo electrónico</Form.Label>
             <Form.Control
-              type="text"
-              placeholder="Ingresa tu usuario"
+              type="email"
+              placeholder="Ingresa tu correo electrónico"
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
               required

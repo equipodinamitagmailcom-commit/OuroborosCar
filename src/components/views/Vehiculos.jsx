@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Spinner,
-  InputGroup,
-  Form,
-} from "react-bootstrap";
+Container,Row, Col, Button,Spinner,InputGroup, Form,} from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig.js";
 import ModalRegistroVehiculos from "../vehiculos/ModalRegistroVehiculos";
 import ModalEdicionVehiculos from "../vehiculos/ModalEdicionVehiculos";
