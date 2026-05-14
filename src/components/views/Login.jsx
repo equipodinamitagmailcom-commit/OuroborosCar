@@ -60,6 +60,7 @@ const obtenerRolUsuario = async (userId) => {
 const Login = () => {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
+  const [verContrasena, setVerContrasena] = useState(false);
   const [error, setError] = useState(null);
   const navegar = useNavigate();
 
@@ -107,7 +108,13 @@ const Login = () => {
         localStorage.setItem("usuario-supabase", usuario);
         localStorage.setItem("rol-supabase", rol);
         console.log("💾 Datos guardados en localStorage");
-        navegar("/");
+        
+        // Redirección por Rol
+        if (rol === 'admin') navegar("/vehiculos");
+        else if (rol === 'mecanico') navegar("/repuestos");
+        else if (rol === 'cliente') navegar("/perfil-cliente");
+        else navegar("/");
+
       }
     } catch (err) {
       console.error("❌ Error en la solicitud:", err);
@@ -116,7 +123,79 @@ const Login = () => {
   };
 
   return (
-    <div className="estilo-contenedor-login">
+    <div className="estilo-contenedor-login py-5">
+      <style>
+        {`
+          .estilo-contenedor-login {
+            background-color: #1e1e1e !important; /* Fondo general de la página, negro menos oscuro */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          /* Estilo para el cuadro (Card/Formulario) */
+          .estilo-contenedor-login .card, 
+          .estilo-contenedor-login form {
+            background: linear-gradient(to bottom, #A4841C 0%, #121212 70%) !important; /* Degradado dorado a negro para el cuadro */
+            background-size: 100% 200% !important; /* Hacemos el fondo más alto para poder moverlo */
+            animation: moverDegradado 8s ease infinite; /* Aplicamos la animación de movimiento */
+            color: #ffffff !important;
+            padding: 2.5rem;
+            border-radius: 15px;
+            border: 2px solid #000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+          }
+          /* Definición de la animación para el movimiento suave */
+          @keyframes moverDegradado {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 0% 100%; }
+            100% { background-position: 0% 0%; }
+          }
+          .estilo-contenedor-login h2, 
+          .estilo-contenedor-login label {
+            color: white !important;
+          }
+          .estilo-contenedor-login .form-control {
+            background-color: #2b2b2b !important;
+            color: white !important;
+            border: 1px solid #A4841C !important;
+          }
+          .estilo-contenedor-login .input-group .form-control {
+            border-right: none !important;
+          }
+          .estilo-contenedor-login .btn-outline-secondary {
+            background-color: #2b2b2b !important;
+            color: #A4841C !important;
+            border: 1px solid #A4841C !important;
+            border-left: none !important;
+          }
+          .estilo-contenedor-login .btn-primary {
+            background-color: #A4841C !important;
+            border: 1px solid #A4841C !important;
+            transition: all 0.3s ease-in-out !important;
+            box-shadow: 0 0 0 rgba(164, 132, 28, 0);
+          }
+          .estilo-contenedor-login .btn-primary:hover {
+            background-color: #8c7018 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(164, 132, 28, 0.4);
+            border-color: #ffffff !important;
+          }
+          /* Animación para que el cambio de ícono sea fluido */
+          @keyframes eyePop {
+            from { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+            to { transform: scale(1) rotate(0deg); opacity: 1; }
+          }
+          .estilo-contenedor-login .input-group .btn i {
+            display: inline-block;
+            animation: eyePop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          }
+          .estilo-contenedor-login .input-group .btn:active i {
+            transform: scale(0.8);
+            transition: transform 0.1s;
+          }
+        `}
+      </style>
       <FormularioLogin
         usuario={usuario}
         contrasena={contrasena}
@@ -124,6 +203,8 @@ const Login = () => {
         setUsuario={setUsuario}
         setContrasena={setContrasena}
         iniciarSesion={iniciarSesion}
+        verContrasena={verContrasena}
+        setVerContrasena={setVerContrasena}
       />
     </div>
   );
