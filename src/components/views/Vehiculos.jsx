@@ -461,6 +461,13 @@ const Vehiculos = () => {
         color: "#e0e0e0",
       }}
     >
+      <style>
+        {`
+          .card-hover-custom:hover .imagen-zoom {
+            transform: scale(1.1);
+          }
+        `}
+      </style>
       <Row className="mb-4 align-items-center">
         <Col xs={12} md={6}>
           <h2 className="fw-bold" style={{ color: "#A4841C" }}>
@@ -532,17 +539,19 @@ const Vehiculos = () => {
               {vehiculosPaginados.map((vehiculo) => (
                 <Col key={vehiculo.id_vehiculo} md={6} lg={4} className="mb-4">
                   <div
-                    className="card h-100 shadow-sm text-white"
+                    className="card h-100 shadow-sm text-white card-hover-custom"
                     style={{ backgroundColor: "#1e1e1e" }}
                   >
                     <div className="card-body d-flex flex-column">
                       {vehiculo.url_imagen && (
-                        <img
-                          src={vehiculo.url_imagen}
-                          alt={`${vehiculo.marca} ${vehiculo.modelo}`}
-                          className="card-img-top mb-3"
-                          style={{ height: "200px", objectFit: "cover" }}
-                        />
+                        <div style={{ overflow: 'hidden', borderRadius: '4px' }} className="mb-3">
+                          <img
+                            src={vehiculo.url_imagen}
+                            alt={`${vehiculo.marca} ${vehiculo.modelo}`}
+                            className="card-img-top imagen-zoom"
+                            style={{ height: "200px", objectFit: "cover", transition: 'transform 0.4s ease-in-out' }}
+                          />
+                        </div>
                       )}
                       <h5 className="card-title d-flex justify-content-between align-items-center">
                         {vehiculo.marca} {vehiculo.modelo}

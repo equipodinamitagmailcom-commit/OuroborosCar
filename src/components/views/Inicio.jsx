@@ -56,6 +56,13 @@ const Inicio = () => {
 
   return (
     <Container className="py-5" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
+      <style>
+        {`
+          .card-hover-custom:hover .imagen-zoom {
+            transform: scale(1.1);
+          }
+        `}
+      </style>
       {/* Barra de búsqueda */}
       <Row className="mb-4">
         <Col md={8}>
@@ -84,14 +91,15 @@ const Inicio = () => {
         <Row>
           {vehiculosFiltrados.map((item) => ( // Usar vehiculosFiltrados aquí
             <Col key={item.id_vehiculo} xs={12} sm={6} lg={4} className="mb-4">
-              <Card className="h-100 shadow-sm border-0 text-white" style={{ backgroundColor: '#1e1e1e' }}>
-                <div style={{ position: 'relative' }}>
+              <Card className="h-100 shadow-sm border-0 text-white card-hover-custom" style={{ backgroundColor: '#1e1e1e' }}>
+                <div style={{ position: 'relative', overflow: 'hidden' }}>
                   {item.url_imagen && (
                     <Card.Img
                       variant="top"
                       src={item.url_imagen}
                       alt={item.modelo}
-                      style={{ height: "220px", objectFit: "cover" }}
+                      className="imagen-zoom"
+                      style={{ height: "220px", objectFit: "cover", transition: 'transform 0.4s ease-in-out' }}
                     />
                   )}
                   <div className="position-absolute top-0 end-0 m-2">
