@@ -4,6 +4,7 @@ import Encabezado from "./components/navegacion/Encabezado";
 
 import Inicio from "./components/views/Inicio";
 import Vehiculos from "./components/views/Vehiculos";
+import ClientesAdmin from "./components/views/ClientesAdmin";
 import Repuestos from "./components/views/Repuestos";
 import CatalogoPublico from "./components/views/CatalogoPublico";
 import Mecanicos from "./components/views/Mecanicos";
@@ -46,6 +47,7 @@ const App = () => {
 
           {/* Rutas Administrativas y Técnicas */}
           <Route path="/vehiculos" element={<RutaProtegida allowedRoles={['admin']}><Vehiculos /></RutaProtegida>} />
+          <Route path="/clientes" element={<RutaProtegida allowedRoles={['admin']}><ClientesAdmin /></RutaProtegida>} />
           <Route
             path="/categorias-vehiculo"
             element={<RutaProtegida allowedRoles={['admin']}><Navigate to="/vehiculos" replace /></RutaProtegida>}

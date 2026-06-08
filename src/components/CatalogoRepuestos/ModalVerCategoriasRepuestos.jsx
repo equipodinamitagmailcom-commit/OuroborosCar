@@ -108,20 +108,21 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
 
     return (
         <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable contentClassName="bg-dark text-white">
-            <Modal.Header closeButton className="border-bottom">
+            <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
                 <div className="d-flex flex-column flex-md-row w-100 justify-content-between align-items-start align-items-md-center gap-3 pe-2">
                     <div>
-                        <Modal.Title as="h5" className="color-texto-marca fw-bold mb-1">
+                        <Modal.Title as="h5" className="fw-bold mb-1" style={{ color: '#A4841C' }}>
                             <i className="bi bi-tags-fill me-2"></i>
                             Categorías de repuestos
                         </Modal.Title>
-                        <p className="text-muted small mb-0">
+                        <p className="text-white-50 small mb-0">
                             Inventario técnico de Ouroboros Car — categorías de piezas.
                         </p>
                     </div>
                     <Button
                         type="button"
-                        className="color-navbar border-0 shadow-sm flex-shrink-0"
+                        className="border-0 shadow-sm flex-shrink-0 text-white"
+                        style={{ backgroundColor: '#A4841C' }}
                         onClick={() => setMostrarRegistro(true)}
                     >
                         <i className="bi bi-plus-circle-fill me-2"></i>
@@ -134,12 +135,12 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
                 <Row className="mb-4 align-items-center">
                     <Col md={8}>
                         <InputGroup className="shadow-sm">
-                            <InputGroup.Text className="bg-white border-end-0">
-                                <i className="bi bi-search text-secondary"></i>
+                            <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+                                <i className="bi bi-search"></i>
                             </InputGroup.Text>
                             <Form.Control
                                 placeholder="Buscar por nombre..."
-                                className="border-start-0 ps-0"
+                                className="border-start-0 ps-0 text-white input-premium"
                                 value={busqueda}
                                 onChange={(e) => setBusqueda(e.target.value)}
                                 disabled={cargando}
@@ -150,15 +151,15 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
 
                 {cargando ? (
                     <div className="text-center py-5">
-                        <Spinner animation="border" variant="primary" role="status">
+                        <Spinner animation="border" variant="warning" role="status">
                             <span className="visually-hidden">Cargando categorías...</span>
                         </Spinner>
-                        <p className="mt-2 text-muted">Sincronizando con la base de datos...</p>
+                        <p className="mt-2 text-white-50">Sincronizando con la base de datos...</p>
                     </div>
                 ) : categorias.length === 0 ? (
                     <div className="text-center py-5">
                         <i className="bi bi-tools display-1 text-light"></i>
-                        <p className="mt-3 text-muted">No hay categorías registradas.</p>
+                        <p className="mt-3 text-white">No hay categorías registradas.</p>
                     </div>
                 ) : categoriasFiltradas.length === 0 ? (
                     <Alert variant="info" className="text-center mb-0">
@@ -168,8 +169,8 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
                 ) : (
                     <>
                         <div className="table-responsive shadow-sm rounded">
-                            <Table hover className="align-middle mb-0 bg-white">
-                                <thead className="color-navbar text-white">
+                            <Table hover variant="dark" responsive className="align-middle mb-0">
+                                <thead style={{ borderBottom: '2px solid rgba(164, 132, 28, 0.3)' }}>
                                     <tr>
                                         <th>ID</th>
                                         <th>Nombre</th>
@@ -178,13 +179,14 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
                                 </thead>
                                 <tbody>
                                     {categoriasPaginadas.map((cat) => (
-                                        <tr key={cat.id_categoria}>
-                                            <td className="fw-bold text-muted">#{cat.id_categoria}</td>
+                                        <tr key={cat.id_categoria} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                            <td className="fw-bold text-white">#{cat.id_categoria}</td>
                                             <td className="fw-semibold">{cat.nombre}</td>
                                             <td className="text-center text-nowrap">
                                                 <Button
-                                                    variant="outline-primary"
+                                                    variant="outline-warning"
                                                     size="sm"
+                                                    style={{ borderColor: '#A4841C', color: '#A4841C' }}
                                                     className="me-2"
                                                     onClick={() => abrirEdicion(cat)}
                                                     title="Editar"
@@ -218,7 +220,7 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
                 )}
             </Modal.Body>
 
-            <Modal.Footer>
+            <Modal.Footer className="border-top border-secondary">
                 <Button variant="secondary" onClick={manejarCierre}>
                     Cerrar
                 </Button>

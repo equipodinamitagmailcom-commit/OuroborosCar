@@ -27,31 +27,33 @@ const ModalEdicionCategoria = ({
       centered
       contentClassName="bg-dark text-white"
     >
-      <Modal.Header closeButton>
-        <Modal.Title>Editar Categoría</Modal.Title>
+      <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
+        <Modal.Title style={{ color: '#A4841C' }} className="fw-bold">Editar Categoría</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group className="mb-3">
-            <Form.Label>Nombre</Form.Label>
+            <Form.Label className="small fw-bold">Nombre</Form.Label>
             <Form.Control
               type="text"
               name="nombrecat"
               value={categoriaEditar.nombrecat}
               onChange={manejoCambioInputEdicion}
+              className="input-premium"
               placeholder="Ingresa el nombre"
             />
           </Form.Group>
         </Form>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className="border-top border-secondary">
         <Button variant="secondary" onClick={() => setMostrarModalEdicion(false)}>
           Cancelar
         </Button>
         <Button
-          variant="primary"
           onClick={handleActualizar}
           disabled={categoriaEditar.nombrecat.trim() === "" || deshabilitado}
+          className="fw-bold text-white border-0"
+          style={{ backgroundColor: '#A4841C' }}
         >
           {deshabilitado ? "Actualizando..." : "Actualizar"}
         </Button>

@@ -76,7 +76,7 @@ const Categorias = () => {
             <Row className="mb-4 align-items-center">
                 <Col xs={12} md={6}>
                     <h2 className="fw-bold" style={{ color: '#A4841C' }}>Categorías de Repuestos</h2>
-                    <p className="text-muted small">Clasificaciones para el inventario de Ouroboros Car</p>
+                    <p className="text-white-50 small">Clasificaciones para el inventario de Ouroboros Car</p>
                 </Col>
                 <Col xs={12} md={6} className="text-md-end">
                     <Button 
@@ -92,7 +92,7 @@ const Categorias = () => {
             {/* Buscador */}
             <InputGroup className="mb-4 shadow-sm">
                 <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
-                    <i className="bi bi-search text-secondary"></i>
+                    <i className="bi bi-search" style={{ color: '#A4841C' }}></i>
                 </InputGroup.Text>
                 <Form.Control
                     placeholder="Buscar categoría..."
@@ -107,7 +107,7 @@ const Categorias = () => {
             {cargando ? (
                 <div className="text-center py-5">
                     <Spinner animation="border" variant="warning" />
-                    <p className="mt-2 text-muted">Cargando categorías...</p>
+                    <p className="mt-2 text-white-50">Cargando categorías...</p>
                 </div>
             ) : filtradas.length > 0 ? (
                 <TablaCategorias 
@@ -116,9 +116,9 @@ const Categorias = () => {
                     alEliminar={abrirEliminacion}
                 />
             ) : (
-                <div className="text-center py-5 border rounded border-secondary" style={{ backgroundColor: '#1e1e1e' }}>
-                    <i className="bi bi-tags display-4 text-secondary"></i>
-                    <p className="mt-2 text-muted">No se encontraron categorías.</p>
+                <div className="text-center py-5 border rounded" style={{ backgroundColor: '#1e1e1e', borderColor: 'rgba(164,132,28,0.4)' }}>
+                    <i className="bi bi-tags display-4" style={{ color: '#A4841C' }}></i>
+                    <p className="mt-2 text-white">No se encontraron categorías.</p>
                 </div>
             )}
 

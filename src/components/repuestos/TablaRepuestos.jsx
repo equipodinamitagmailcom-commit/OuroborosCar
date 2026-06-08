@@ -18,10 +18,10 @@ const TablaRepuestos = ({ repuestos, onEditar, onEliminar }) => {
                 <tbody>
                     {repuestos.map((repuesto) => (
                         <tr key={repuesto.id_repuesto}>
-                            <td className="fw-bold text-secondary">#{repuesto.id_repuesto}</td>
+                            <td className="fw-bold text-white">#{repuesto.id_repuesto}</td>
                             <td className="fw-semibold">{repuesto.nombre}</td>
                             <td>
-                                <span className="badge bg-dark text-white border border-secondary">
+                                <span className="badge text-white border" style={{ backgroundColor: '#1e1e1e', borderColor: 'rgba(164,132,28,0.5)' }}>
                                     {repuesto.categoriarepuesto?.nombre || 'General'}
                                 </span>
                             </td>

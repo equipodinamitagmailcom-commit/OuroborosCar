@@ -174,7 +174,7 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable contentClassName="bg-dark text-white">
+        <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable contentClassName="text-white" style={{ '--bs-modal-bg': '#000', '--bs-modal-border-color': '#333' }}>
             <Modal.Header closeButton className="border-bottom border-secondary">
                 <div className="d-flex flex-column flex-md-row w-100 justify-content-between align-items-start align-items-md-center gap-3 pe-2">
                     <div>
@@ -182,13 +182,14 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                             <i className="bi bi-tags-fill me-2"></i>
                             Categorías de vehículos
                         </Modal.Title>
-                        <p className="text-muted small mb-0">
+                        <p className="text-white opacity-75 small mb-0">
                             Inventario técnico de Ouroboros Car — categorías de vehículo.
                         </p>
                     </div>
                     <Button
                         type="button"
-                        className="color-navbar border-0 shadow-sm flex-shrink-0"
+                        className="border-0 shadow-sm flex-shrink-0 text-white"
+                        style={{ backgroundColor: '#A4841C' }}
                         onClick={() => setMostrarModalRegistro(true)}
                     >
                         <i className="bi bi-plus-circle-fill me-2"></i>
@@ -202,7 +203,7 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                     <Col md={8}>
                         <InputGroup className="shadow-sm">
                             <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
-                                <i className="bi bi-search text-secondary"></i>
+                                <i className="bi bi-search text-white"></i>
                             </InputGroup.Text>
                             <Form.Control
                                 placeholder="Buscar por nombre..."
@@ -218,15 +219,15 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
 
                 {cargando ? (
                     <div className="text-center py-5">
-                        <Spinner animation="border" variant="primary" role="status">
+                        <Spinner animation="border" variant="warning" role="status">
                             <span className="visually-hidden">Cargando categorías...</span>
                         </Spinner>
-                        <p className="mt-2 text-muted">Sincronizando con la base de datos...</p>
+                        <p className="mt-2 text-white-50">Sincronizando con la base de datos...</p>
                     </div>
                 ) : categorias.length === 0 ? (
                     <div className="text-center py-5">
                         <i className="bi bi-bookmark-plus display-1 text-light"></i>
-                        <p className="mt-3 text-muted">No hay categorías registradas.</p>
+                        <p className="mt-3 text-white">No hay categorías registradas.</p>
                     </div>
                 ) : categoriasFiltradas.length === 0 ? (
                     <Alert variant="info" className="text-center mb-0">
@@ -239,7 +240,7 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                             <Table hover variant="dark" className="align-middle mb-0">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <th className="text-white">ID</th>
                                         <th>Nombre</th>
                                         <th className="text-center">Acciones</th>
                                     </tr>
@@ -247,7 +248,7 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                                 <tbody className="border-secondary">
                                     {categoriasPaginadas.map((cat) => (
                                         <tr key={cat.id_categoria}>
-                                            <td className="fw-bold text-secondary">#{cat.id_categoria}</td>
+                                            <td className="fw-bold text-white">#{cat.id_categoria}</td>
                                             <td className="fw-semibold">{cat.nombrecat}</td>
                                             <td className="text-center text-nowrap">
                                                 <Button

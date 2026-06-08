@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-Container,Row, Col, Button,Spinner,InputGroup, Form,} from "react-bootstrap";
+Container,Row, Col, Button,Spinner,InputGroup, Form} from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig.js";
 import ModalRegistroVehiculos from "../vehiculos/ModalRegistroVehiculos";
 import ModalEdicionVehiculos from "../vehiculos/ModalEdicionVehiculos";
@@ -398,10 +398,7 @@ const Vehiculos = () => {
     } catch (err) {
       console.error("Error al actualizar:", err);
       if (nombreNuevoSubido) {
-        await supabase.storage
-          .from("imagenes_vehiculo")
-          .remove([nombreNuevoSubido])
-          .catch(() => {});
+        await supabase.storage.from("imagenes_vehiculo").remove([nombreNuevoSubido]).catch(() => {});
       }
       setToast({
         mostrar: true,
@@ -454,7 +451,7 @@ const Vehiculos = () => {
   return (
     <Container
       fluid
-      className="py-4 mt-2"
+      className="py-4 mt-5 pt-4"
       style={{
         backgroundColor: "#121212",
         minHeight: "100vh",
@@ -506,7 +503,7 @@ const Vehiculos = () => {
                 borderColor: "#A4841C",
               }}
             >
-              <i className="bi bi-search text-secondary"></i>
+              <i className="bi bi-search" style={{ color: '#A4841C' }}></i>
             </InputGroup.Text>
             <Form.Control
               placeholder="Buscar por marca o modelo..."
@@ -526,7 +523,7 @@ const Vehiculos = () => {
             <Spinner animation="border" variant="warning" role="status">
               <span className="visually-hidden">Cargando...</span>
             </Spinner>
-            <p className="mt-2 text-muted">
+            <p className="mt-2 text-white-50">
               Sincronizando con la base de datos...
             </p>
           </div>

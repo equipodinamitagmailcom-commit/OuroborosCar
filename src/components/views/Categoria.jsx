@@ -272,7 +272,7 @@ useEffect(() => {
   };
 
   return (
-    <Container className="py-4 mt-2" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
+    <Container className="py-4 mt-5 pt-4" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
       <Row className="align-items-center mb-3">
         <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
           <h3 className="mb-0 fw-bold" style={{ color: '#A4841C' }}>

@@ -26,8 +26,9 @@ const ModalEdicionVehiculo = ({
       backdrop="static"
       centered
       size="lg"
+      contentClassName="bg-dark text-white"
     >
-      <Modal.Header closeButton>
+      <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
         <Modal.Title>Editar Vehículo</Modal.Title>
       </Modal.Header>
 
@@ -36,11 +37,12 @@ const ModalEdicionVehiculo = ({
           <Row>
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Categoría</Form.Label>
+                <Form.Label className="text-white">Categoría</Form.Label>
                 <Form.Select
                   name="id_categoria"
                   value={vehiculoEditar.id_categoria || ""}
                   onChange={manejoCambioInputEdicion}
+                  className="bg-secondary text-white border-0"
                   required
                 >
                   <option value="">Seleccione...</option>
@@ -55,40 +57,28 @@ const ModalEdicionVehiculo = ({
 
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Marca</Form.Label>
+                <Form.Label className="text-white">Marca</Form.Label>
                 <Form.Control
                   type="text"
                   name="marca"
                   value={vehiculoEditar.marca || ""}
                   onChange={manejoCambioInputEdicion}
                   placeholder="Marca"
+                  className="bg-secondary text-white border-0"
                 />
               </Form.Group>
             </Col>
 
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Modelo</Form.Label>
+                <Form.Label className="text-white">Modelo</Form.Label>
                 <Form.Control
                   type="text"
                   name="modelo"
                   value={vehiculoEditar.modelo || ""}
                   onChange={manejoCambioInputEdicion}
                   placeholder="Modelo"
-                  required
-                />
-              </Form.Group>
-            </Col>
-
-            <Col xs={12} md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Patente</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="patente"
-                  value={vehiculoEditar.patente || ""}
-                  onChange={manejoCambioInputEdicion}
-                  placeholder="Patente"
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>
@@ -96,13 +86,14 @@ const ModalEdicionVehiculo = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Año</Form.Label>
+                <Form.Label className="text-white">Año</Form.Label>
                 <Form.Control
                   type="number"
                   name="anio"
                   value={vehiculoEditar.anio || ""}
                   onChange={manejoCambioInputEdicion}
                   placeholder="Año"
+                  className="bg-secondary text-white border-0"
                   min="1900"
                   required
                 />
@@ -111,13 +102,14 @@ const ModalEdicionVehiculo = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Color</Form.Label>
+                <Form.Label className="text-white">Color</Form.Label>
                 <Form.Control
                   type="text"
                   name="color"
                   value={vehiculoEditar.color || ""}
                   onChange={manejoCambioInputEdicion}
                   placeholder="Color"
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>
@@ -125,13 +117,14 @@ const ModalEdicionVehiculo = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Estado</Form.Label>
+                <Form.Label className="text-white">Estado</Form.Label>
                 <Form.Control
                   type="text"
                   name="estado"
                   value={vehiculoEditar.estado || ""}
                   onChange={manejoCambioInputEdicion}
                   placeholder="Estado"
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>
@@ -139,13 +132,14 @@ const ModalEdicionVehiculo = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Precio</Form.Label>
+                <Form.Label className="text-white">Precio</Form.Label>
                 <Form.Control
                   type="number"
                   name="precio"
                   value={vehiculoEditar.precio || ""}
                   onChange={manejoCambioInputEdicion}
                   placeholder="Precio"
+                  className="bg-secondary text-white border-0"
                   min="0"
                   step="0.01"
                   required
@@ -155,13 +149,14 @@ const ModalEdicionVehiculo = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Stock</Form.Label>
+                <Form.Label className="text-white">Stock</Form.Label>
                 <Form.Control
                   type="number"
                   name="stock"
                   value={vehiculoEditar.stock || ""}
                   onChange={manejoCambioInputEdicion}
                   placeholder="Stock"
+                  className="bg-secondary text-white border-0"
                   min="0"
                   required
                 />
@@ -170,7 +165,7 @@ const ModalEdicionVehiculo = ({
 
             <Col xs={12}>
               <Form.Group className="mb-3 text-center">
-                <Form.Label>Imagen actual</Form.Label>
+                <Form.Label className="text-white">Imagen actual</Form.Label>
                 {vehiculoEditar.url_imagen ? (
                   <div className="mb-2">
                     <img
@@ -192,11 +187,12 @@ const ModalEdicionVehiculo = ({
 
             <Col xs={12}>
               <Form.Group className="mb-3">
-                <Form.Label>Nueva imagen (opcional)</Form.Label>
+                <Form.Label className="text-white">Nueva imagen (opcional)</Form.Label>
                 <Form.Control
                   type="file"
                   accept="image/*"
                   onChange={manejoCambioArchivoActualizar}
+                  className="bg-secondary text-white border-0"
                 />
                 <Form.Text className="text-muted">
                   Si seleccionas una nueva imagen, reemplazará la actual

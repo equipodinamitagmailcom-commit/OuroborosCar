@@ -53,9 +53,16 @@ const ModalEditarMecanico = ({ show, onHide, mecanico, onActualizar }) => {
     };
 
     return (
-        <Modal show={show} onHide={onHide} size="lg" centered>
-            <Modal.Header closeButton className="bg-light">
-                <Modal.Title className="fw-bold">
+        <Modal 
+            show={show} 
+            onHide={onHide} 
+            size="lg" 
+            centered
+            contentClassName="bg-dark text-white"
+            style={{ border: '1px solid rgba(164, 132, 28, 0.5)' }}
+        >
+            <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
+                <Modal.Title className="fw-bold" style={{ color: '#A4841C' }}>
                     <i className="bi bi-pencil-square me-2"></i>
                     Editar Información del Mecánico
                 </Modal.Title>
@@ -70,6 +77,7 @@ const ModalEditarMecanico = ({ show, onHide, mecanico, onActualizar }) => {
                                     name="nombres"
                                     value={datos.nombres}
                                     onChange={manejarCambio}
+                                    className="input-premium"
                                     required
                                 />
                             </Form.Group>
@@ -81,6 +89,7 @@ const ModalEditarMecanico = ({ show, onHide, mecanico, onActualizar }) => {
                                     name="apellidos"
                                     value={datos.apellidos}
                                     onChange={manejarCambio}
+                                    className="input-premium"
                                     required
                                 />
                             </Form.Group>
@@ -93,6 +102,7 @@ const ModalEditarMecanico = ({ show, onHide, mecanico, onActualizar }) => {
                             name="cedula"
                             value={datos.cedula}
                             onChange={manejarCambio}
+                            className="input-premium"
                             required
                         />
                     </Form.Group>
@@ -103,6 +113,7 @@ const ModalEditarMecanico = ({ show, onHide, mecanico, onActualizar }) => {
                             name="telefono"
                             value={datos.telefono}
                             onChange={manejarCambio}
+                            className="input-premium"
                         />
                     </Form.Group>
 
@@ -114,14 +125,19 @@ const ModalEditarMecanico = ({ show, onHide, mecanico, onActualizar }) => {
                             name="direccion"
                             value={datos.direccion}
                             onChange={manejarCambio}
+                            className="input-premium"
                         />
                     </Form.Group>
                 </Modal.Body>
-                <Modal.Footer className="border-0">
+                <Modal.Footer className="border-top border-secondary">
                     <Button variant="secondary" onClick={onHide}>
                         Cancelar
                     </Button>
-                    <Button type="submit" className="color-navbar border-0 px-4">
+                    <Button 
+                        type="submit" 
+                        className="fw-bold text-white px-4 border-0"
+                        style={{ backgroundColor: '#A4841C' }}
+                    >
                         Actualizar Datos
                     </Button>
                 </Modal.Footer>

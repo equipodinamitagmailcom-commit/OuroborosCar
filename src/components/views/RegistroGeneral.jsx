@@ -41,6 +41,59 @@ const RegistroGeneral = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const manejarCambioCedula = (e) => {
+        let valor = e.target.value.toUpperCase();
+        // Eliminar guiones
+        valor = valor.replace(/-/g, '');
+        // Extraer números y letras por separado
+        let numeros = valor.replace(/[^0-9]/g, '').substring(0, 14);
+        let letra = valor.replace(/[^A-Z]/g, '').substring(0, 1);
+        
+        // Construir el formato correcto: XXX-XXXXXX-XXXXX[A-Z]
+        let formateado = '';
+        if (numeros.length > 0) {
+            formateado = numeros.substring(0, 3);
+        }
+        if (numeros.length > 3) {
+            formateado += '-' + numeros.substring(3, 9);
+        }
+        if (numeros.length > 9) {
+            formateado += '-' + numeros.substring(9, 14);
+        }
+        if (letra) {
+            formateado += letra;
+        }
+
+        setFormData({ ...formData, cedula: formateado });
+    };
+
+    const manejarCambioTelefono = (e) => {
+        let valor = e.target.value;
+        // Solo permitir números
+        valor = valor.replace(/[^0-9]/g, '');
+        // Máximo 8 números
+        if (valor.length > 8) {
+            valor = valor.substring(0, 8);
+        }
+        setFormData({ ...formData, telefono: valor });
+    };
+
+    const validarDatos = () => {
+        // Validar teléfono: máximo 8 números
+        if (formData.telefono && !/^\d{0,8}$/.test(formData.telefono)) {
+            setMensaje({ tipo: 'danger', texto: 'Teléfono: máximo 8 números.' });
+            return false;
+        }
+
+        // Validar cédula: formato XXX-XXXXXX-XXXXX[A-Z]
+        if (formData.cedula && !/^\d{3}-\d{6}-\d{5}[A-Z]$/.test(formData.cedula)) {
+            setMensaje({ tipo: 'danger', texto: 'Cédula debe tener formato: XXX-XXXXXX-XXXXX[A-Z] (ej: 001-121212-9990X).' });
+            return false;
+        }
+
+        return true;
+    };
+
     const guardarRegistro = async (e) => {
         e.preventDefault();
         setCargando(true);
@@ -48,6 +101,12 @@ const RegistroGeneral = () => {
 
         if (!formData.email.trim() || !formData.password.trim()) {
             setMensaje({ tipo: 'danger', texto: 'Debe ingresar email y contraseña.' });
+            setCargando(false);
+            return;
+        }
+
+        // Validar datos específicos
+        if (!validarDatos()) {
             setCargando(false);
             return;
         }
@@ -118,7 +177,7 @@ const RegistroGeneral = () => {
         <Container className="py-5" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
             <div className="text-center mb-5">
                 <h2 className="fw-bold" style={{ color: '#A4841C' }}>Registro General</h2>
-                <p className="text-muted">Seleccione el tipo de perfil que desea dar de alta en el sistema.</p>
+                <p style={{ color: '#ffffff' }}>Seleccione el tipo de perfil que desea dar de alta en el sistema.</p>
             </div>
 
             {/* Alerta de mensajes */}
@@ -144,7 +203,7 @@ const RegistroGeneral = () => {
                             <Card.Body>
                                 <i className="bi bi-person-badge display-3" style={{ color: '#A4841C' }}></i>
                                 <h4 className="mt-3 fw-bold">Cliente</h4>
-                                <p className="text-muted small">Registrar nuevo dueño de vehículo para historial y citas.</p>
+                                <p className="text-white-50 small">Registrar nuevo dueño de vehículo para historial y citas.</p>
                                 <Button variant="outline-warning" className="mt-2" style={{ borderColor: '#A4841C', color: '#A4841C' }}>
                                     Seleccionar
                                 </Button>
@@ -160,7 +219,7 @@ const RegistroGeneral = () => {
                             <Card.Body>
                                 <i className="bi bi-wrench-adjustable display-3" style={{ color: '#A4841C' }}></i>
                                 <h4 className="mt-3 fw-bold">Mecánico</h4>
-                                <p className="text-muted small">Dar de alta a un técnico para asignación de reparaciones.</p>
+                                <p className="text-white-50 small">Dar de alta a un técnico para asignación de reparaciones.</p>
                                 <Button variant="outline-warning" className="mt-2" style={{ borderColor: '#A4841C', color: '#A4841C' }}>
                                     Seleccionar
                                 </Button>
@@ -179,7 +238,7 @@ const RegistroGeneral = () => {
                                 <h4 className="fw-bold mb-0" style={{ color: '#A4841C' }}>
                                     Nuevo {tipoRegistro === 'cliente' ? 'Cliente' : 'Mecánico'}
                                 </h4>
-                                <Button variant="link" className="text-muted p-0" onClick={() => setTipoRegistro(null)}>
+                                <Button variant="link" className="text-white-50 p-0" onClick={() => setTipoRegistro(null)}>
                                     <i className="bi bi-x-lg"></i> Cancelar
                                 </Button>
                             </Card.Header>
@@ -188,51 +247,54 @@ const RegistroGeneral = () => {
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label className="small fw-bold">Nombres</Form.Label>
-                                                <Form.Control name="nombres" value={formData.nombres} onChange={manejarCambio} required />
+                                                <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Nombres</Form.Label>
+                                                <Form.Control name="nombres" value={formData.nombres} onChange={manejarCambio} className="bg-secondary text-white border-0" required />
                                             </Form.Group>
                                         </Col>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label className="small fw-bold">Apellidos</Form.Label>
-                                                <Form.Control name="apellidos" value={formData.apellidos} onChange={manejarCambio} required />
+                                                <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Apellidos</Form.Label>
+                                                <Form.Control name="apellidos" value={formData.apellidos} onChange={manejarCambio} className="bg-secondary text-white border-0" required />
                                             </Form.Group>
                                         </Col>
                                     </Row>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold">Cédula de Identidad</Form.Label>
-                                        <Form.Control name="cedula" value={formData.cedula} placeholder="000-000000-0000X" onChange={manejarCambio} required />
+                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Cédula de Identidad</Form.Label>
+                                        <Form.Control name="cedula" value={formData.cedula} placeholder="XXX-XXXXXX-XXXXX[A-Z]" onChange={manejarCambioCedula} className="bg-secondary text-white border-0" required />
+                                        <Form.Text className="text-white-50 small">Ej: 001-121212-9990X</Form.Text>
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold">Teléfono</Form.Label>
-                                        <Form.Control name="telefono" value={formData.telefono} onChange={manejarCambio} />
+                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Teléfono</Form.Label>
+                                        <Form.Control name="telefono" value={formData.telefono} onChange={manejarCambioTelefono} className="bg-secondary text-white border-0" placeholder="Máx. 8 números" maxLength="8" />
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold">Dirección</Form.Label>
-                                        <Form.Control as="textarea" rows={2} name="direccion" value={formData.direccion} onChange={manejarCambio} />
+                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Dirección</Form.Label>
+                                        <Form.Control as="textarea" rows={2} name="direccion" value={formData.direccion} onChange={manejarCambio} className="bg-secondary text-white border-0" />
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold">Correo electrónico</Form.Label>
+                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Correo electrónico</Form.Label>
                                         <Form.Control
                                             type="email"
                                             name="email"
                                             value={formData.email}
                                             onChange={manejarCambio}
+                                            className="bg-secondary text-white border-0"
                                             required
                                         />
                                     </Form.Group>
 
                                     <Form.Group className="mb-4">
-                                        <Form.Label className="small fw-bold">Contraseña</Form.Label>
+                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Contraseña</Form.Label>
                                         <Form.Control
                                             type="password"
                                             name="password"
                                             value={formData.password}
                                             onChange={manejarCambio}
+                                            className="bg-secondary text-white border-0"
                                             required
                                         />
                                     </Form.Group>

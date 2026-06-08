@@ -26,31 +26,33 @@ const ModalRegistroCategoria = ({
       centered
       contentClassName="bg-dark text-white"
     >
-      <Modal.Header closeButton>
-        <Modal.Title>Agregar Categoria</Modal.Title>
+      <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
+        <Modal.Title style={{ color: '#A4841C' }} className="fw-bold">Agregar Categoría</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group className="mb-3">
-            <Form.Label>Nombre</Form.Label>
+            <Form.Label className="small fw-bold">Nombre</Form.Label>
             <Form.Control
               type="text"
               name="nombrecat"
               value={nuevaCategoria.nombrecat}
               onChange={manejoCambioInput}
+              className="input-premium"
               placeholder="Ingresa el nombre de la categoría"
             />
           </Form.Group>
         </Form>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className="border-top border-secondary">
         <Button variant="secondary" onClick={() => setMostrarModal(false)}>
           Cancelar
         </Button>
         <Button
-          variant="primary"
           onClick={handelRegistrar}
           disabled={nuevaCategoria.nombrecat.trim() === "" || deshabilitado}
+          className="fw-bold text-white border-0"
+          style={{ backgroundColor: '#A4841C' }}
         >
           Guardar
         </Button>

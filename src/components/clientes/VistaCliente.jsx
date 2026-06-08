@@ -168,7 +168,7 @@ const VistaCliente = () => {
         >
             <Container 
                 className="py-5" 
-                style={{ color: '#e0e0e0', marginTop: '20px' }}
+                style={{ color: '#e0e0e0', marginTop: '60px' }}
             >
             <style>
                 {`

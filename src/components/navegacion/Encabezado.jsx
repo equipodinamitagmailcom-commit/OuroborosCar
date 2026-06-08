@@ -235,6 +235,15 @@ const Encabezado = () => {
               </Nav.Link>
 
               <Nav.Link
+                onClick={() => manejarNavegacion("/clientes")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-people-fill me-2"></i> : null}
+                <strong>Clientes</strong>
+              </Nav.Link>
+
+              <Nav.Link
                 onClick={() => manejarNavegacion("/repuestos")}
                 className="text-white"
                 style={mostrarMenu ? { color: '#A4841C' } : {}}
@@ -361,7 +370,7 @@ const Encabezado = () => {
             alt=""
             src={Logo}
             className="d-inline-block me-2"
-            style={{ height: "110px", width: "auto", marginTop: "-15px", marginBottom: "-15px" }}
+            style={{ height: "70px", width: "auto", marginTop: "-5px", marginBottom: "-5px" }}
           />
         </Navbar.Brand>
 
@@ -469,7 +478,7 @@ const Encabezado = () => {
             variant="danger"
             className="px-4 py-2"
             style={{ minWidth: '120px', borderRadius: '8px' }}
-            onClick={() => { setMostrarModalCerrarSesion(false); cerrarSesion(); }}
+            onClick={cerrarSesion}
           >
             <i className="bi bi-box-arrow-right me-2"></i>
             Sí, cerrar sesión

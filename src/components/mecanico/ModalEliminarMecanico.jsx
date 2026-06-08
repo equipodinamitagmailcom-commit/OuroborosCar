@@ -29,8 +29,15 @@ const ModalEliminarMecanico = ({ show, onHide, mecanico, onConfirmar }) => {
     };
 
     return (
-        <Modal show={show} onHide={onHide} centered backdrop="static">
-            <Modal.Header closeButton className="border-0">
+        <Modal 
+            show={show} 
+            onHide={onHide} 
+            centered 
+            backdrop="static"
+            contentClassName="bg-dark text-white"
+            style={{ border: '1px solid rgba(164, 132, 28, 0.5)' }}
+        >
+            <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
                 <Modal.Title className="fw-bold text-danger">
                     <i className="bi bi-exclamation-octagon-fill me-2"></i>
                     Confirmar Eliminación
@@ -41,17 +48,17 @@ const ModalEliminarMecanico = ({ show, onHide, mecanico, onConfirmar }) => {
                 
                 <div className="mb-4">
                     <p className="fs-5 mb-1">¿Estás seguro de que deseas eliminar a:</p>
-                    <h4 className="fw-bold color-texto-marca">
+                    <h4 className="fw-bold" style={{ color: '#A4841C' }}>
                         {mecanico?.nombres} {mecanico?.apellidos}
                     </h4>
-                    <p className="text-muted mt-3">
+                    <p className="text-white-50 mt-3">
                         Esta acción es permanente y eliminará al técnico de los registros del taller.
                     </p>
                 </div>
             </Modal.Body>
-            <Modal.Footer className="border-0 d-flex justify-content-center pb-4">
+            <Modal.Footer className="border-top border-secondary d-flex justify-content-center py-3">
                 <Button 
-                    variant="outline-secondary" 
+                    variant="secondary" 
                     onClick={onHide} 
                     disabled={cargando}
                     className="px-4"
@@ -64,7 +71,7 @@ const ModalEliminarMecanico = ({ show, onHide, mecanico, onConfirmar }) => {
                     disabled={cargando}
                     className="px-4 d-flex align-items-center"
                 >
-                    {cargando && <Spinner size="sm" className="me-2" animation="border" />}
+                    {cargando && <Spinner size="sm" className="me-2" animation="border" variant="warning" />}
                     {cargando ? 'Eliminando...' : 'Eliminar Técnico'}
                 </Button>
             </Modal.Footer>

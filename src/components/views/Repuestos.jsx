@@ -139,7 +139,7 @@ const Repuestos = () => {
                 <Col md={8}>
                     <InputGroup className="shadow-sm">
                         <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
-                            <i className="bi bi-search text-secondary"></i>
+                            <i className="bi bi-search" style={{ color: '#A4841C' }}></i>
                         </InputGroup.Text>
                         <Form.Control
                             placeholder="Buscar por nombre o categoría..."
@@ -158,7 +158,7 @@ const Repuestos = () => {
                     <Spinner animation="border" variant="warning" role="status">
                         <span className="visually-hidden">Cargando repuestos...</span>
                     </Spinner>
-                    <p className="mt-2 text-muted">Sincronizando con la base de datos...</p>
+                    <p className="mt-2 text-white-50">Sincronizando con la base de datos...</p>
                 </div>
             ) : repuestosFiltrados.length > 0 ? (
                 <>
@@ -180,7 +180,7 @@ const Repuestos = () => {
             ) : (
                 <div className="text-center py-5">
                     <i className="bi bi-tools display-1 text-light"></i>
-                    <p className="mt-3 text-muted">No se encontraron piezas en el inventario.</p>
+                    <p className="mt-3 text-white">No se encontraron piezas en el inventario.</p>
                 </div>
             )}
 

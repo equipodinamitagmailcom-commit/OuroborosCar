@@ -26,8 +26,9 @@ const ModalRegistroVehiculos = ({
       backdrop="static"
       centered
       size="lg"
+      contentClassName="bg-dark text-white"
     >
-      <Modal.Header closeButton>
+      <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
         <Modal.Title>Nuevo vehiculo</Modal.Title>
       </Modal.Header>
 
@@ -36,11 +37,12 @@ const ModalRegistroVehiculos = ({
           <Row>
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Categoría *</Form.Label>
+                <Form.Label className="text-white">Categoría *</Form.Label>
                 <Form.Select
                   name="id_categoria"
                   value={nuevoVehiculo.id_categoria || ""}
                   onChange={manejoCambioInput}
+                  className="bg-secondary text-white border-0"
                   required
                 >
                   <option value="">Seleccione...</option>
@@ -55,13 +57,14 @@ const ModalRegistroVehiculos = ({
 
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Marca *</Form.Label>
+                <Form.Label className="text-white">Marca *</Form.Label>
                 <Form.Control
                   type="text"
                   name="marca"
                   value={nuevoVehiculo.marca || ""}
                   onChange={manejoCambioInput}
                   placeholder="Marca"
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>
@@ -69,27 +72,14 @@ const ModalRegistroVehiculos = ({
 
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Modelo *</Form.Label>
+                <Form.Label className="text-white">Modelo *</Form.Label>
                 <Form.Control
                   type="text"
                   name="modelo"
                   value={nuevoVehiculo.modelo || ""}
                   onChange={manejoCambioInput}
                   placeholder="Modelo"
-                  required
-                />
-              </Form.Group>
-            </Col>
-
-            <Col xs={12} md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Patente *</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="patente"
-                  value={nuevoVehiculo.patente || ""}
-                  onChange={manejoCambioInput}
-                  placeholder="Patente"
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>
@@ -97,13 +87,14 @@ const ModalRegistroVehiculos = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Año *</Form.Label>
+                <Form.Label className="text-white">Año *</Form.Label>
                 <Form.Control
                   type="number"
                   name="anio"
                   value={nuevoVehiculo.anio || ""}
                   onChange={manejoCambioInput}
                   placeholder="Año"
+                  className="bg-secondary text-white border-0"
                   min="1900"
                   required
                 />
@@ -112,13 +103,14 @@ const ModalRegistroVehiculos = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Color *</Form.Label>
+                <Form.Label className="text-white">Color *</Form.Label>
                 <Form.Control
                   type="text"
                   name="color"
                   value={nuevoVehiculo.color || ""}
                   onChange={manejoCambioInput}
                   placeholder="Color"
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>
@@ -126,13 +118,14 @@ const ModalRegistroVehiculos = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Estado *</Form.Label>
+                <Form.Label className="text-white">Estado *</Form.Label>
                 <Form.Control
                   type="text"
                   name="estado"
                   value={nuevoVehiculo.estado || ""}
                   onChange={manejoCambioInput}
                   placeholder="Estado"
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>
@@ -140,7 +133,7 @@ const ModalRegistroVehiculos = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Precio *</Form.Label>
+                <Form.Label className="text-white">Precio *</Form.Label>
                 <Form.Control
                   type="number"
                   step="0.01"
@@ -149,6 +142,7 @@ const ModalRegistroVehiculos = ({
                   value={nuevoVehiculo.precio || ""}
                   onChange={manejoCambioInput}
                   placeholder="Precio"
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>
@@ -156,13 +150,14 @@ const ModalRegistroVehiculos = ({
 
             <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Stock *</Form.Label>
+                <Form.Label className="text-white">Stock *</Form.Label>
                 <Form.Control
                   type="number"
                   name="stock"
                   value={nuevoVehiculo.stock || ""}
                   onChange={manejoCambioInput}
                   placeholder="Stock"
+                  className="bg-secondary text-white border-0"
                   min="0"
                   required
                 />
@@ -171,11 +166,12 @@ const ModalRegistroVehiculos = ({
 
             <Col xs={12}>
               <Form.Group className="mb-3">
-                <Form.Label>Imagen *</Form.Label>
+                <Form.Label className="text-white">Imagen *</Form.Label>
                 <Form.Control
                   type="file"
                   accept="image/*"
                   onChange={manejoCambioArchivo}
+                  className="bg-secondary text-white border-0"
                   required
                 />
               </Form.Group>

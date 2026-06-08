@@ -14,7 +14,7 @@ const Mecanicos = () => {
             <Row className="mb-4 align-items-center">
                 <Col>
                     <h2 className="fw-bold mb-1" style={{ color: '#A4841C' }}>Panel de Mecánicos</h2>
-                    <p className="text-muted">
+                    <p className="text-white">
                         Gestiona, edita y supervisa el personal técnico de <strong>Ouroboros Car</strong>.
                     </p>
                 </Col>
@@ -30,7 +30,7 @@ const Mecanicos = () => {
             {/* Footer de la vista con información de ayuda */}
             <Row className="mt-5">
                 <Col className="text-center">
-                    <p className="text-muted small">
+                    <p className="text-white-50 small">
                         <i className="bi bi-info-circle me-1"></i>
                         Los cambios realizados en esta sección afectan directamente la asignación de trabajos en el taller.
                     </p>

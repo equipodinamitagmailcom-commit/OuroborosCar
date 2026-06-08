@@ -25,14 +25,14 @@ const ModalEliminarCategoria = ({ mostrar, manejarCierre, categoria, alEliminar 
 
     return (
         <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
-            <Modal.Header closeButton>
-                <Modal.Title>Confirmar Eliminación</Modal.Title>
+            <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
+                <Modal.Title className="fw-bold text-danger">Confirmar Eliminación</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <p>¿Estás seguro de eliminar la categoría <strong>{categoria?.nombre}</strong>?</p>
                 <p className="text-danger small">Esta acción fallará si existen repuestos usando esta categoría.</p>
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer className="border-top border-secondary">
                 <Button variant="secondary" onClick={manejarCierre}>Cancelar</Button>
                 <Button variant="danger" onClick={eliminarCategoria} disabled={cargando}>
                     {cargando ? 'Eliminando...' : 'Eliminar'}

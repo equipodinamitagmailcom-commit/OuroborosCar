@@ -68,17 +68,18 @@ const TablaMecanicos = () => {
     };
 
     return (
-        <Card className="shadow-sm border-0">
-            <Card.Header className="bg-white py-3">
+        <Card className="shadow-sm border-0 text-white" style={{ backgroundColor: '#1e1e1e', border: '1px solid rgba(164, 132, 28, 0.3)' }}>
+            <Card.Header className="py-3" style={{ backgroundColor: '#1e1e1e', borderBottom: '1px solid rgba(164, 132, 28, 0.3)' }}>
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <h5 className="fw-bold mb-0 color-texto-marca">Personal Técnico</h5>
-                    <InputGroup style={{ maxWidth: '300px' }}>
-                        <InputGroup.Text className="bg-white border-end-0">
-                            <i className="bi bi-search text-muted"></i>
+                    <h5 className="fw-bold mb-0" style={{ color: '#A4841C' }}>Personal Técnico</h5>
+                    <InputGroup style={{ maxWidth: '300px' }} className="shadow-sm">
+                        <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+                            <i className="bi bi-search"></i>
                         </InputGroup.Text>
                         <Form.Control
                             placeholder="Buscar por nombre o cédula..."
-                            className="border-start-0 ps-0"
+                            className="border-start-0 ps-0 text-white"
+                            style={{ backgroundColor: '#1e1e1e', borderColor: '#A4841C' }}
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
                         />
@@ -87,8 +88,8 @@ const TablaMecanicos = () => {
             </Card.Header>
 
             <Card.Body className="p-0">
-                <Table hover responsive className="mb-0">
-                    <thead className="bg-light text-secondary small">
+                <Table hover variant="dark" responsive className="align-middle mb-0">
+                    <thead style={{ borderBottom: '2px solid rgba(164, 132, 28, 0.3)' }}>
                         <tr>
                             <th className="ps-4">TÉCNICO</th>
                             <th>CÉDULA</th>
@@ -101,27 +102,28 @@ const TablaMecanicos = () => {
                         {cargando ? (
                             <tr>
                                 <td colSpan="5" className="text-center py-5">
-                                    <Spinner animation="border" variant="primary" size="sm" className="me-2" />
+                                    <Spinner animation="border" variant="warning" size="sm" className="me-2" />
                                     Cargando personal...
                                 </td>
                             </tr>
                         ) : mecanicosFiltrados.length > 0 ? (
                             mecanicosPaginados.map((m) => (
-                                <tr key={m.id_mecanico}>
+                                <tr key={m.id_mecanico} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
                                     <td className="ps-4">
                                         <div className="fw-bold">{m.nombres} {m.apellidos}</div>
-                                        <Badge bg="info" className="fw-normal" style={{ fontSize: '10px' }}>Mecánico</Badge>
+                                        <Badge bg="warning" className="text-dark fw-bold" style={{ fontSize: '10px', backgroundColor: '#A4841C' }}>Mecánico</Badge>
                                     </td>
-                                    <td className="text-muted small">{m.cedula}</td>
-                                    <td>{m.telefono || <span className="text-muted italic small">No registrado</span>}</td>
+                                    <td className="text-white-50 small">{m.cedula}</td>
+                                    <td>{m.telefono || <span className="text-white-50 italic small">No registrado</span>}</td>
                                     <td className="small text-truncate" style={{ maxWidth: '200px' }}>
                                         {m.direccion}
                                     </td>
                                     <td>
                                         <div className="d-flex justify-content-center gap-2">
                                             <Button 
-                                                variant="outline-primary" 
+                                                variant="outline-warning" 
                                                 size="sm" 
+                                                style={{ borderColor: '#A4841C', color: '#A4841C' }}
                                                 onClick={() => prepararEdicion(m)}
                                                 title="Editar"
                                             >
@@ -141,7 +143,7 @@ const TablaMecanicos = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className="text-center py-5 text-muted">
+                                <td colSpan="5" className="text-center py-5 text-white">
                                     No se encontraron mecánicos que coincidan con la búsqueda.
                                 </td>
                             </tr>

@@ -33,24 +33,30 @@ const ModalEditarCategoria = ({ mostrar, manejarCierre, categoria, alActualizar 
 
     return (
         <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
-            <Modal.Header closeButton>
-                <Modal.Title className="color-texto-marca">Editar Categoría</Modal.Title>
+            <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
+                <Modal.Title className="fw-bold" style={{ color: '#A4841C' }}>Editar Categoría</Modal.Title>
             </Modal.Header>
             <Form onSubmit={actualizarCategoria}>
                 <Modal.Body>
                     <Form.Group>
-                        <Form.Label>Nombre de la Categoría</Form.Label>
+                        <Form.Label className="small fw-bold">Nombre de la Categoría</Form.Label>
                         <Form.Control 
                             type="text"
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
+                            className="input-premium"
                             required
                         />
                     </Form.Group>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer className="border-top border-secondary">
                     <Button variant="secondary" onClick={manejarCierre}>Cancelar</Button>
-                    <Button type="submit" className="color-navbar" disabled={cargando}>
+                    <Button 
+                        type="submit" 
+                        className="fw-bold text-white border-0" 
+                        style={{ backgroundColor: '#A4841C' }}
+                        disabled={cargando}
+                    >
                         {cargando ? 'Guardando...' : 'Guardar Cambios'}
                     </Button>
                 </Modal.Footer>

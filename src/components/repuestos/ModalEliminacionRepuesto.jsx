@@ -38,13 +38,13 @@ const ModalEliminacionRepuesto = ({ mostrar, manejarCierre, repuesto, alEliminar
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
+        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="text-white" style={{ '--bs-modal-bg': '#000', '--bs-modal-border-color': '#444' }}>
             <Modal.Header closeButton>
                 <Modal.Title>Confirmar Eliminación</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <p>¿Estás seguro de que deseas eliminar permanentemente este repuesto?</p>
-                <div className="p-3 mb-3 bg-light rounded border-start border-danger border-4">
+                <div className="p-3 mb-3 bg-black text-white rounded border-start border-danger border-4" style={{ backgroundColor: '#000', border: '1px solid #333' }}>
                     <strong>Pieza:</strong> {repuesto?.nombre} <br />
                     <strong>ID de Registro:</strong> {repuesto?.id_repuesto} <br />
                     <strong>Precio:</strong> ${repuesto?.precio_repuesto}
