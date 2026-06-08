@@ -8,6 +8,7 @@ import NotificacionOperacion from '../rutas/NotificacionOperacion.jsx';
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [mostrarAcercaDe, setMostrarAcercaDe] = useState(false);
+  const [mostrarModalCerrarSesion, setMostrarModalCerrarSesion] = useState(false);
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
   const navigate = useNavigate();
   const location = useLocation(); // Para detectar la ruta actual
@@ -265,7 +266,7 @@ const Encabezado = () => {
           {/* Ícono cerrar sesión en barra superior (desktop) */}
           {usuarioActivo && !mostrarMenu && (
             <Nav.Link
-              onClick={cerrarSesion}
+              onClick={() => setMostrarModalCerrarSesion(true)}
               className="text-white nav-link-animated"
               title="Cerrar Sesión"
             >
@@ -309,7 +310,7 @@ const Encabezado = () => {
 
             <button
               className="btn btn-outline-danger mt-3 w-100"
-              onClick={cerrarSesion}
+              onClick={() => setMostrarModalCerrarSesion(true)}
             >
               <i className="bi-box-arrow-right me-2"></i>
               Cerrar sesión
@@ -417,6 +418,62 @@ const Encabezado = () => {
         </Modal.Body>
         <Modal.Footer className="border-secondary">
           <Button variant="outline-warning" onClick={() => setMostrarAcercaDe(false)}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      {/* Modal Confirmación Cerrar Sesión */}
+      <Modal
+        show={mostrarModalCerrarSesion}
+        onHide={() => setMostrarModalCerrarSesion(false)}
+        centered
+        contentClassName="border-0"
+      >
+        <Modal.Header
+          closeButton
+          className="border-0"
+          style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)', borderBottom: '1px solid rgba(164,132,28,0.3) !important' }}
+        >
+          <Modal.Title className="d-flex align-items-center gap-2" style={{ color: '#A4841C' }}>
+            <i className="bi bi-box-arrow-right"></i>
+            Cerrar Sesión
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          className="text-center py-4"
+          style={{ background: '#141414', color: '#e0e0e0' }}
+        >
+          <div className="mb-3">
+            <i
+              className="bi bi-exclamation-circle"
+              style={{ fontSize: '3.5rem', color: '#A4841C' }}
+            ></i>
+          </div>
+          <h5 className="fw-bold mb-2" style={{ color: '#ffffff' }}>¿Deseas cerrar sesión?</h5>
+          <p className="mb-0" style={{ color: '#b0b0b0', fontSize: '0.95rem' }}>
+            Se cerrará tu sesión actual en Ouroboros Car.<br />Tendrás que iniciar sesión nuevamente para acceder.
+          </p>
+        </Modal.Body>
+        <Modal.Footer
+          className="border-0 d-flex gap-2 justify-content-center pb-4"
+          style={{ background: '#141414' }}
+        >
+          <Button
+            variant="secondary"
+            className="px-4 py-2"
+            style={{ minWidth: '120px', borderRadius: '8px' }}
+            onClick={() => setMostrarModalCerrarSesion(false)}
+          >
+            <i className="bi bi-x-circle me-2"></i>
+            Cancelar
+          </Button>
+          <Button
+            variant="danger"
+            className="px-4 py-2"
+            style={{ minWidth: '120px', borderRadius: '8px' }}
+            onClick={() => { setMostrarModalCerrarSesion(false); cerrarSesion(); }}
+          >
+            <i className="bi bi-box-arrow-right me-2"></i>
+            Sí, cerrar sesión
+          </Button>
         </Modal.Footer>
       </Modal>
     </>
