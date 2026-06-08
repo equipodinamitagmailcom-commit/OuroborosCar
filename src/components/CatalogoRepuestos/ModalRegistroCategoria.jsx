@@ -29,9 +29,9 @@ const ModalRegistroCategoria = ({ mostrar, manejarCierre, alGuardar }) => {
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
+        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="modal-custom">
             <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
-                <Modal.Title className="fw-bold" style={{ color: '#A4841C' }}>Agregar Categoría</Modal.Title>
+                <Modal.Title className="fw-bold" style={{ color: 'var(--color-primary)' }}>Agregar Categoría</Modal.Title>
             </Modal.Header>
             <Form onSubmit={guardarCategoria}>
                 <Modal.Body>
@@ -57,8 +57,7 @@ const ModalRegistroCategoria = ({ mostrar, manejarCierre, alGuardar }) => {
                     </Button>
                     <Button 
                         type="submit" 
-                        className="fw-bold text-white border-0" 
-                        style={{ backgroundColor: '#A4841C' }}
+                        className="fw-bold btn-primary-custom" 
                         disabled={cargando || !nombre}
                     >
                         {cargando ? 'Guardando...' : 'Guardar Categoría'}

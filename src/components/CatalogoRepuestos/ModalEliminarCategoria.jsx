@@ -24,7 +24,7 @@ const ModalEliminarCategoria = ({ mostrar, manejarCierre, categoria, alEliminar 
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
+        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="modal-custom">
             <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
                 <Modal.Title className="fw-bold text-danger">Confirmar Eliminación</Modal.Title>
             </Modal.Header>

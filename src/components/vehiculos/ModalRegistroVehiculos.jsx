@@ -26,7 +26,7 @@ const ModalRegistroVehiculos = ({
       backdrop="static"
       centered
       size="lg"
-      contentClassName="bg-dark text-white"
+      contentClassName="modal-custom"
     >
       <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
         <Modal.Title>Nuevo vehiculo</Modal.Title>
@@ -164,15 +164,51 @@ const ModalRegistroVehiculos = ({
               </Form.Group>
             </Col>
 
-            <Col xs={12}>
+            <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label className="text-white">Imagen *</Form.Label>
+                <Form.Label className="text-white">Frente del vehículo *</Form.Label>
                 <Form.Control
                   type="file"
                   accept="image/*"
-                  onChange={manejoCambioArchivo}
+                  onChange={(e) => manejoCambioArchivo(e, "archivo")}
                   className="bg-secondary text-white border-0"
                   required
+                />
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-white">Trasero del vehículo</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => manejoCambioArchivo(e, "archivo2")}
+                  className="bg-secondary text-white border-0"
+                />
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-white">Costado del vehículo</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => manejoCambioArchivo(e, "archivo3")}
+                  className="bg-secondary text-white border-0"
+                />
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-white">Interior del vehículo</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => manejoCambioArchivo(e, "archivo4")}
+                  className="bg-secondary text-white border-0"
                 />
               </Form.Group>
             </Col>

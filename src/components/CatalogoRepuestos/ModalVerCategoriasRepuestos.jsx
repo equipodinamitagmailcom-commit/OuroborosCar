@@ -107,7 +107,7 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable contentClassName="bg-dark text-white">
+        <Modal show={mostrar} onHide={manejarCierre} size="xl" centered scrollable contentClassName="modal-custom">
             <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
                 <div className="d-flex flex-column flex-md-row w-100 justify-content-between align-items-start align-items-md-center gap-3 pe-2">
                     <div>
@@ -121,8 +121,7 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
                     </div>
                     <Button
                         type="button"
-                        className="border-0 shadow-sm flex-shrink-0 text-white"
-                        style={{ backgroundColor: '#A4841C' }}
+                        className="btn-primary-custom shadow-sm flex-shrink-0"
                         onClick={() => setMostrarRegistro(true)}
                     >
                         <i className="bi bi-plus-circle-fill me-2"></i>
@@ -135,12 +134,12 @@ const ModalVerCategoriasRepuestos = ({ mostrar, manejarCierre, onCategoriasActua
                 <Row className="mb-4 align-items-center">
                     <Col md={8}>
                         <InputGroup className="shadow-sm">
-                            <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+                            <InputGroup.Text className="border-end-0" style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
                                 <i className="bi bi-search"></i>
                             </InputGroup.Text>
                             <Form.Control
                                 placeholder="Buscar por nombre..."
-                                className="border-start-0 ps-0 text-white input-premium"
+                                className="border-start-0 ps-0 text-white form-control-custom"
                                 value={busqueda}
                                 onChange={(e) => setBusqueda(e.target.value)}
                                 disabled={cargando}

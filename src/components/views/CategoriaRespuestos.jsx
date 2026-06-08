@@ -80,8 +80,7 @@ const Categorias = () => {
                 </Col>
                 <Col xs={12} md={6} className="text-md-end">
                     <Button 
-                        className="border-0 px-4 shadow-sm" 
-                        style={{ backgroundColor: '#A4841C' }}
+                        className="btn-primary-custom px-4 shadow-sm"
                         onClick={() => setMostrarRegistro(true)}
                     >
                         <i className="bi bi-plus-circle me-2"></i>Nueva Categoría
@@ -91,13 +90,13 @@ const Categorias = () => {
 
             {/* Buscador */}
             <InputGroup className="mb-4 shadow-sm">
-                <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
-                    <i className="bi bi-search" style={{ color: '#A4841C' }}></i>
+                <InputGroup.Text className="border-end-0" style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
+                    <i className="bi bi-search" style={{ color: 'var(--color-primary)' }}></i>
                 </InputGroup.Text>
                 <Form.Control
                     placeholder="Buscar categoría..."
-                    className="border-start-0 ps-0 text-white"
-                    style={{ backgroundColor: '#2b2b2b', borderColor: '#A4841C' }}
+                    className="border-start-0 ps-0 text-white form-control-custom"
+                    style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-primary)' }}
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                 />

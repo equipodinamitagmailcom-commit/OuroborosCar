@@ -1,3 +1,86 @@
+/*
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    🎨 SISTEMA DE COLORES CENTRALIZADO                         ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+DESCRIPCIÓN:
+Este sistema permite cambiar todos los colores de la aplicación desde un solo
+lugar (el bloque :root debajo). Todos los botones, modales, inputs y elementos
+están configurados para usar estas variables CSS.
+
+CÓMO CAMBIAR COLORES:
+1. Edita las variables en el bloque :root{}
+2. Todos los elementos se actualizarán automáticamente
+
+VARIABLES PRINCIPALES:
+- --color-primary: Color principal de botones y acentos (#A4841C)
+- --color-primary-dark: Versión oscura del color principal
+- --color-bg-input: Color de fondo de inputs (#2b2b2b)
+- --color-text-primary: Color del texto principal (#e0e0e0)
+- --color-danger: Color rojo para acciones peligrosas
+
+CLASES CSS REUTILIZABLES:
+- .btn-primary-custom : Botones principales
+- .form-control-custom : Inputs personalizados
+- .card-custom : Tarjetas personalizadas
+- .modal-custom : Modales personalizados
+- .table-custom : Tablas personalizadas
+- .badge-custom : Badges principales
+- .badge-danger-custom : Badges de peligro
+
+EJEMPLO DE USO EN COMPONENTES:
+// Botón
+<Button className="btn-primary-custom">Guardar</Button>
+
+// Input
+<Form.Control className="form-control-custom" />
+
+// Card
+<Card className="card-custom">...</Card>
+
+Para estilos específicos, usa variables CSS:
+style={{ color: 'var(--color-primary)' }}
+style={{ backgroundColor: 'var(--color-bg-input)' }}
+
+════════════════════════════════════════════════════════════════════════════════
+*/
+
+/* ============================================
+   VARIABLES DE COLOR CENTRALIZADAS
+   ============================================ */
+:root {
+  /* Colores principales */
+  --color-primary: #A4841C;
+  --color-primary-dark: #8c7018;
+  --color-primary-light: #b5941f;
+  
+  /* Colores de fondo */
+  --color-bg-dark: #121212;
+  --color-bg-darker: #0a0a0a;
+  --color-bg-card: #1e1e1e;
+  --color-bg-input: #2b2b2b;
+  
+  /* Colores de texto */
+  --color-text-primary: #e0e0e0;
+  --color-text-white: #ffffff;
+  --color-text-muted: #a0a0a0;
+  
+  /* Colores de borde */
+  --color-border-primary: rgba(164, 132, 28, 0.3);
+  --color-border-primary-strong: rgba(164, 132, 28, 0.5);
+  
+  /* Colores de estado */
+  --color-success: #28a745;
+  --color-danger: #dc3545;
+  --color-warning: #ffc107;
+  --color-info: #17a2b8;
+  
+  /* Colores navbar */
+  --color-navbar: #1068db;
+  --color-navbar-dark: #121b96;
+  --color-navbar-light: #2889b6;
+}
+
 .tarjeta-hover {
     transition: transform 0.2s ease, shadow 0.2s ease;
 }
@@ -12,6 +95,166 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;  
     overflow: hidden;
+}
+
+/* ============================================
+   ESTILOS REUTILIZABLES PARA BOTONES
+   ============================================ */
+.btn-primary-custom {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-text-white) !important;
+  font-weight: bold;
+  border: none !important;
+}
+
+.btn-primary-custom:hover {
+  background-color: var(--color-primary-dark) !important;
+  border-color: var(--color-primary-dark) !important;
+}
+
+.btn-primary-custom:disabled,
+.btn-primary-custom:disabled:hover {
+  background-color: var(--color-primary) !important;
+  opacity: 0.6;
+}
+
+.btn-secondary-custom {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  color: var(--color-text-white) !important;
+  font-weight: bold;
+}
+
+.btn-secondary-custom:hover {
+  background-color: #5a6268 !important;
+  border-color: #5a6268 !important;
+}
+
+.btn-danger-custom {
+  background-color: var(--color-danger) !important;
+  border-color: var(--color-danger) !important;
+  color: var(--color-text-white) !important;
+  font-weight: bold;
+}
+
+.btn-danger-custom:hover {
+  background-color: #c82333 !important;
+  border-color: #c82333 !important;
+}
+
+.btn-success-custom {
+  background-color: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+  color: var(--color-text-white) !important;
+  font-weight: bold;
+}
+
+/* ============================================
+   ESTILOS REUTILIZABLES PARA MODALES
+   ============================================ */
+.modal-custom .modal-content {
+  background-color: var(--color-bg-card) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border-primary) !important;
+}
+
+.modal-custom .modal-header {
+  background-color: var(--color-bg-card) !important;
+  border-bottom: 1px solid var(--color-border-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.modal-custom .modal-header .modal-title {
+  color: var(--color-primary) !important;
+  font-weight: bold;
+}
+
+.modal-custom .modal-footer {
+  background-color: var(--color-bg-card) !important;
+  border-top: 1px solid var(--color-border-primary) !important;
+}
+
+.modal-custom .btn-close {
+  filter: invert(1) !important;
+}
+
+/* ============================================
+   ESTILOS PARA INPUTS
+   ============================================ */
+.input-premium,
+.form-control-custom {
+  background-color: var(--color-bg-input) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border-primary) !important;
+  border: 1px solid var(--color-border-primary) !important;
+}
+
+.input-premium:focus,
+.form-control-custom:focus {
+  background-color: var(--color-bg-input) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(164, 132, 28, 0.25) !important;
+}
+
+.form-label {
+  color: var(--color-text-primary) !important;
+}
+
+/* ============================================
+   ESTILOS PARA TABLAS
+   ============================================ */
+.table-custom {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-primary);
+}
+
+.table-custom thead {
+  background-color: var(--color-bg-input);
+  border-bottom: 2px solid var(--color-border-primary-strong);
+}
+
+.table-custom tbody tr {
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.table-custom tbody tr:hover {
+  background-color: rgba(164, 132, 28, 0.1);
+}
+
+/* ============================================
+   ESTILOS PARA BADGES
+   ============================================ */
+.badge-custom {
+  background-color: var(--color-primary) !important;
+  color: var(--color-text-white) !important;
+  font-weight: bold;
+}
+
+.badge-danger-custom {
+  background-color: var(--color-danger) !important;
+  color: var(--color-text-white) !important;
+}
+
+.badge-success-custom {
+  background-color: var(--color-success) !important;
+  color: var(--color-text-white) !important;
+}
+
+/* ============================================
+   ESTILOS PARA CARDS
+   ============================================ */
+.card-custom {
+  background-color: var(--color-bg-card) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border-primary) !important;
+}
+
+.card-custom .card-header {
+  background-color: var(--color-bg-input) !important;
+  border-bottom: 1px solid var(--color-border-primary) !important;
 }
 
 

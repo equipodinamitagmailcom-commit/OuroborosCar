@@ -137,8 +137,7 @@ const ModalActualizarMecanico = ({ show, onHide, mecanico, onRefrescar }) => {
                     <Button 
                         type="submit" 
                         disabled={cargando}
-                        className="fw-bold text-white d-flex align-items-center border-0"
-                        style={{ backgroundColor: '#A4841C' }}
+                        className="fw-bold btn-primary-custom d-flex align-items-center"
                     >
                         {cargando && <Spinner size="sm" className="me-2" animation="border" variant="warning" />}
                         {cargando ? 'Guardando...' : 'Confirmar Cambios'}

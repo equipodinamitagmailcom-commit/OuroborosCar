@@ -71,7 +71,7 @@ const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar })
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
+        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="modal-custom">
             <Modal.Header closeButton className="border-secondary">
                 <Modal.Title className="color-texto-marca">Registrar Nuevo Repuesto</Modal.Title>
             </Modal.Header>
@@ -139,7 +139,7 @@ const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar })
                     <Button variant="secondary" onClick={manejarCierre}>
                         Cancelar
                     </Button>
-                    <Button type="submit" style={{ backgroundColor: '#A4841C', border: 'none' }} disabled={cargando}>
+                    <Button type="submit" className="btn-primary-custom" disabled={cargando}>
                         {cargando ? 'Guardando...' : 'Guardar Repuesto'}
                     </Button>
                 </Modal.Footer>

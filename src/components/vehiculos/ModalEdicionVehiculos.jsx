@@ -26,7 +26,7 @@ const ModalEdicionVehiculo = ({
       backdrop="static"
       centered
       size="lg"
-      contentClassName="bg-dark text-white"
+      contentClassName="modal-custom"
     >
       <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
         <Modal.Title>Editar Vehículo</Modal.Title>
@@ -163,40 +163,127 @@ const ModalEdicionVehiculo = ({
               </Form.Group>
             </Col>
 
-            <Col xs={12}>
-              <Form.Group className="mb-3 text-center">
-                <Form.Label className="text-white">Imagen actual</Form.Label>
+            {/* Frente del vehículo */}
+            <Col xs={12} md={6} className="mb-3">
+              <Form.Group>
+                <Form.Label className="text-white fw-bold">Frente del vehículo</Form.Label>
                 {vehiculoEditar.url_imagen ? (
                   <div className="mb-2">
                     <img
                       src={vehiculoEditar.url_imagen}
-                      alt="Vehículo actual"
+                      alt="Frente actual"
                       style={{
-                        maxWidth: "120px",
-                        maxHeight: "120px",
+                        width: "100%",
+                        height: "120px",
                         objectFit: "cover",
                         borderRadius: "6px",
+                        border: "1px solid #A4841C"
                       }}
                     />
                   </div>
                 ) : (
-                  <p className="text-muted">Sin imagen</p>
+                  <div className="mb-2 text-center text-white-50 py-4 bg-dark rounded border border-secondary" style={{ height: "120px" }}>Sin imagen</div>
                 )}
-              </Form.Group>
-            </Col>
-
-            <Col xs={12}>
-              <Form.Group className="mb-3">
-                <Form.Label className="text-white">Nueva imagen (opcional)</Form.Label>
                 <Form.Control
                   type="file"
                   accept="image/*"
-                  onChange={manejoCambioArchivoActualizar}
+                  onChange={(e) => manejoCambioArchivoActualizar(e, "archivo")}
                   className="bg-secondary text-white border-0"
                 />
-                <Form.Text className="text-muted">
-                  Si seleccionas una nueva imagen, reemplazará la actual
-                </Form.Text>
+                <Form.Text className="text-white-50">Nueva imagen (opcional)</Form.Text>
+              </Form.Group>
+            </Col>
+
+            {/* Trasero del vehículo */}
+            <Col xs={12} md={6} className="mb-3">
+              <Form.Group>
+                <Form.Label className="text-white fw-bold">Trasero del vehículo</Form.Label>
+                {vehiculoEditar.url_imagen2 ? (
+                  <div className="mb-2">
+                    <img
+                      src={vehiculoEditar.url_imagen2}
+                      alt="Trasero actual"
+                      style={{
+                        width: "100%",
+                        height: "120px",
+                        objectFit: "cover",
+                        borderRadius: "6px",
+                        border: "1px solid #A4841C"
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="mb-2 text-center text-white-50 py-4 bg-dark rounded border border-secondary" style={{ height: "120px" }}>Sin imagen</div>
+                )}
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => manejoCambioArchivoActualizar(e, "archivo2")}
+                  className="bg-secondary text-white border-0"
+                />
+                <Form.Text className="text-white-50">Nueva imagen (opcional)</Form.Text>
+              </Form.Group>
+            </Col>
+
+            {/* Costado del vehículo */}
+            <Col xs={12} md={6} className="mb-3">
+              <Form.Group>
+                <Form.Label className="text-white fw-bold">Costado del vehículo</Form.Label>
+                {vehiculoEditar.url_imagen3 ? (
+                  <div className="mb-2">
+                    <img
+                      src={vehiculoEditar.url_imagen3}
+                      alt="Costado actual"
+                      style={{
+                        width: "100%",
+                        height: "120px",
+                        objectFit: "cover",
+                        borderRadius: "6px",
+                        border: "1px solid #A4841C"
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="mb-2 text-center text-white-50 py-4 bg-dark rounded border border-secondary" style={{ height: "120px" }}>Sin imagen</div>
+                )}
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => manejoCambioArchivoActualizar(e, "archivo3")}
+                  className="bg-secondary text-white border-0"
+                />
+                <Form.Text className="text-white-50">Nueva imagen (opcional)</Form.Text>
+              </Form.Group>
+            </Col>
+
+            {/* Interior del vehículo */}
+            <Col xs={12} md={6} className="mb-3">
+              <Form.Group>
+                <Form.Label className="text-white fw-bold">Interior del vehículo</Form.Label>
+                {vehiculoEditar.url_imagen4 ? (
+                  <div className="mb-2">
+                    <img
+                      src={vehiculoEditar.url_imagen4}
+                      alt="Interior actual"
+                      style={{
+                        width: "100%",
+                        height: "120px",
+                        objectFit: "cover",
+                        borderRadius: "6px",
+                        border: "1px solid #A4841C"
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="mb-2 text-center text-white-50 py-4 bg-dark rounded border border-secondary" style={{ height: "120px" }}>Sin imagen</div>
+                )}
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => manejoCambioArchivoActualizar(e, "archivo4")}
+                  className="bg-secondary text-white border-0"
+                />
+                <Form.Text className="text-white-50">Nueva imagen (opcional)</Form.Text>
               </Form.Group>
             </Col>
           </Row>

@@ -280,19 +280,19 @@ useEffect(() => {
           </h3>
         </Col>
         <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)} size="md" style={{ backgroundColor: '#A4841C', borderColor: '#A4841C' }}>
+          <Button onClick={() => setMostrarModal(true)} size="md" className="btn-primary-custom">
             <i className="bi-plus-lg"></i>
             <span className="d-none d-sm-inline ms-2">Nueva Categoria</span>
           </Button>
         </Col>
       </Row>
 
-      <hr style={{ borderColor: '#A4841C' }} />
+      <hr style={{ borderColor: 'var(--color-primary)' }} />
 
 {/* Cuadro de búsqueda debajo de la línea divisoria */}
 <Row className="mb-4">
   <Col md={6} lg={5}>
-    <div className="p-1 rounded" style={{ border: '1px solid #A4841C', backgroundColor: '#2b2b2b' }}>
+    <div className="p-1 rounded card-custom" style={{ border: '1px solid var(--color-primary)' }}>
       <CuadroBusquedas
         textoBusqueda={textoBusqueda}
         manejarCambioBusqueda={manejarBusqueda}

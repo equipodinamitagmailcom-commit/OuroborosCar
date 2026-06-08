@@ -74,7 +74,7 @@ const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, 
     };
 
     return (
-        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="bg-dark text-white">
+        <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="modal-custom">
             <Modal.Header closeButton>
                 <Modal.Title className="color-texto-marca">Editar Detalles del Repuesto</Modal.Title>
             </Modal.Header>

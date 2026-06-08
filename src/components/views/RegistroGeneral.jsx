@@ -301,8 +301,7 @@ const RegistroGeneral = () => {
 
                                     <Button 
                                         type="submit" 
-                                        className="w-100 border-0 py-2 shadow-sm"
-                                        style={{ backgroundColor: '#A4841C' }}
+                                        className="w-100 py-2 shadow-sm btn-primary-custom"
                                         disabled={cargando}
                                     >
                                         {cargando ? 'Guardando...' : `Registrar ${tipoRegistro}`}

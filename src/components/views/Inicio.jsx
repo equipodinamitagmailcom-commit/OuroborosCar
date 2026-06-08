@@ -3,6 +3,7 @@ import { Container, Row, Col, Button, Card, Carousel, Spinner, InputGroup, Form,
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../database/supabaseconfig.js";
 import NotificacionOperacion from "../rutas/NotificacionOperacion.jsx";
+import CarruselVehiculo from "../vehiculos/CarruselVehiculo";
 
 const Inicio = () => {
   const navegar = useNavigate();
@@ -276,12 +277,13 @@ const Inicio = () => {
         <Row className="mb-4 justify-content-center">
           <Col md={10}>
             <InputGroup className="shadow-lg mb-4">
-              <InputGroup.Text style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+              <InputGroup.Text style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
                 <i className="bi bi-search"></i>
               </InputGroup.Text>
               <Form.Control
                 placeholder="¿Qué vehículo buscas hoy?"
-                style={{ backgroundColor: '#2b2b2b', borderColor: '#A4841C', color: 'white' }}
+                className="form-control-custom"
+                style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-primary)', color: 'white' }}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -313,8 +315,8 @@ const Inicio = () => {
             {vehiculosFiltrados.map((item) => (
               <Col key={item.id_vehiculo} xs={12} sm={6} lg={4} className="mb-4">
                 <Card className="h-100 shadow-sm border-0 text-white card-hover-custom" style={{ backgroundColor: '#1e1e1e' }}>
-                  <div style={{ position: 'relative', overflow: 'hidden' }}>
-                    <Card.Img variant="top" src={item.url_imagen} className="imagen-zoom" style={{ height: "220px", objectFit: "cover", transition: '0.4s' }} />
+                  <div style={{ position: "relative", overflow: "hidden" }}>
+                    <CarruselVehiculo vehiculo={item} height="220px" />
                   </div>
                   <Card.Body className="d-flex flex-column">
                     <Card.Title className="fw-bold">{item.marca} {item.modelo}</Card.Title>
@@ -332,14 +334,16 @@ const Inicio = () => {
       </Container>
 
       {/* Modal de Detalles */}
-      <Modal show={mostrarDetalles} onHide={() => setMostrarDetalles(false)} size="lg" centered contentClassName="bg-dark text-white">
+      <Modal show={mostrarDetalles} onHide={() => setMostrarDetalles(false)} size="lg" centered contentClassName="modal-custom">
         <Modal.Header closeButton className="border-secondary">
           <Modal.Title style={{ color: '#A4841C' }}>{vehiculoSeleccionado?.marca} {vehiculoSeleccionado?.modelo}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Row>
             <Col md={6} className="mb-3">
-              <img src={vehiculoSeleccionado?.url_imagen} className="img-fluid rounded shadow" style={{ height: '300px', width: '100%', objectFit: 'cover' }} />
+              {vehiculoSeleccionado && (
+                <CarruselVehiculo vehiculo={vehiculoSeleccionado} height="300px" />
+              )}
             </Col>
             <Col md={6}>
               <h5 className="border-bottom pb-2" style={{ borderColor: '#A4841C' }}>Especificaciones</h5>

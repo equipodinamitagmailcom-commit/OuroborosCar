@@ -135,8 +135,7 @@ const ModalEditarMecanico = ({ show, onHide, mecanico, onActualizar }) => {
                     </Button>
                     <Button 
                         type="submit" 
-                        className="fw-bold text-white px-4 border-0"
-                        style={{ backgroundColor: '#A4841C' }}
+                        className="fw-bold btn-primary-custom px-4"
                     >
                         Actualizar Datos
                     </Button>

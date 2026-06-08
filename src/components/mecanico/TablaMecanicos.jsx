@@ -68,18 +68,18 @@ const TablaMecanicos = () => {
     };
 
     return (
-        <Card className="shadow-sm border-0 text-white" style={{ backgroundColor: '#1e1e1e', border: '1px solid rgba(164, 132, 28, 0.3)' }}>
-            <Card.Header className="py-3" style={{ backgroundColor: '#1e1e1e', borderBottom: '1px solid rgba(164, 132, 28, 0.3)' }}>
+        <Card className="card-custom shadow-sm border-0 text-white">
+            <Card.Header className="py-3 card-custom">
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <h5 className="fw-bold mb-0" style={{ color: '#A4841C' }}>Personal Técnico</h5>
+                    <h5 className="fw-bold mb-0" style={{ color: 'var(--color-primary)' }}>Personal Técnico</h5>
                     <InputGroup style={{ maxWidth: '300px' }} className="shadow-sm">
-                        <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+                        <InputGroup.Text className="border-end-0" style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
                             <i className="bi bi-search"></i>
                         </InputGroup.Text>
                         <Form.Control
                             placeholder="Buscar por nombre o cédula..."
-                            className="border-start-0 ps-0 text-white"
-                            style={{ backgroundColor: '#1e1e1e', borderColor: '#A4841C' }}
+                            className="border-start-0 ps-0 text-white form-control-custom"
+                            style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-primary)' }}
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
                         />
@@ -88,8 +88,8 @@ const TablaMecanicos = () => {
             </Card.Header>
 
             <Card.Body className="p-0">
-                <Table hover variant="dark" responsive className="align-middle mb-0">
-                    <thead style={{ borderBottom: '2px solid rgba(164, 132, 28, 0.3)' }}>
+                <Table hover variant="dark" responsive className="align-middle mb-0 table-custom">
+                    <thead style={{ borderBottom: '2px solid var(--color-border-primary)' }}>
                         <tr>
                             <th className="ps-4">TÉCNICO</th>
                             <th>CÉDULA</th>
@@ -111,7 +111,7 @@ const TablaMecanicos = () => {
                                 <tr key={m.id_mecanico} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
                                     <td className="ps-4">
                                         <div className="fw-bold">{m.nombres} {m.apellidos}</div>
-                                        <Badge bg="warning" className="text-dark fw-bold" style={{ fontSize: '10px', backgroundColor: '#A4841C' }}>Mecánico</Badge>
+                                        <Badge className="badge-custom">Mecánico</Badge>
                                     </td>
                                     <td className="text-white-50 small">{m.cedula}</td>
                                     <td>{m.telefono || <span className="text-white-50 italic small">No registrado</span>}</td>

@@ -188,8 +188,7 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                     </div>
                     <Button
                         type="button"
-                        className="border-0 shadow-sm flex-shrink-0 text-white"
-                        style={{ backgroundColor: '#A4841C' }}
+                        className="border-0 shadow-sm flex-shrink-0 btn-primary-custom"
                         onClick={() => setMostrarModalRegistro(true)}
                     >
                         <i className="bi bi-plus-circle-fill me-2"></i>
@@ -202,13 +201,13 @@ const ModalVerCategorias = ({ mostrar, manejarCierre, onCategoriasActualizadas }
                 <Row className="mb-4 align-items-center">
                     <Col md={8}>
                         <InputGroup className="shadow-sm">
-                            <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+                            <InputGroup.Text className="border-end-0" style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
                                 <i className="bi bi-search text-white"></i>
                             </InputGroup.Text>
                             <Form.Control
                                 placeholder="Buscar por nombre..."
-                                className="border-start-0 ps-0 text-white"
-                                style={{ backgroundColor: '#2b2b2b', borderColor: '#A4841C' }}
+                                className="border-start-0 ps-0 text-white form-control-custom"
+                                style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-primary)' }}
                                 value={busqueda}
                                 onChange={(e) => setBusqueda(e.target.value)}
                                 disabled={cargando}

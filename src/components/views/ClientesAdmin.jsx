@@ -238,12 +238,12 @@ const ClientesAdmin = () => {
             <Row className="mb-4 align-items-center">
                 <Col md={8}>
                     <InputGroup className="shadow-sm">
-                        <InputGroup.Text className="border-end-0" style={{ backgroundColor: '#2b2b2b', color: '#A4841C', borderColor: '#A4841C' }}>
+                        <InputGroup.Text className="border-end-0" style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
                             <i className="bi bi-search"></i>
                         </InputGroup.Text>
                         <Form.Control
                             placeholder="Buscar por nombre o cédula..."
-                            className="border-start-0 ps-0 text-white input-premium"
+                            className="border-start-0 ps-0 text-white form-control-custom"
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
                         />
@@ -465,8 +465,7 @@ const ClientesAdmin = () => {
 
                                 <Button 
                                     type="submit" 
-                                    className="w-100 border-0 py-2 shadow-sm fw-bold text-white"
-                                    style={{ backgroundColor: '#A4841C' }}
+                                    className="w-100 py-2 shadow-sm fw-bold btn-primary-custom"
                                 >
                                     <i className="bi bi-plus-circle me-2"></i>
                                     Guardar asignación

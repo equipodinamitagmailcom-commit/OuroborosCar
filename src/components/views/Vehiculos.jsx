@@ -7,6 +7,7 @@ import ModalEdicionVehiculos from "../vehiculos/ModalEdicionVehiculos";
 import ModalVerCategorias from "../categorias_vehiculo/ModalVerCategorias";
 import NotificacionOperacion from "../rutas/NotificacionOperacion";
 import Paginacion from "../ordenamiento/Paginacion";
+import CarruselVehiculo from "../vehiculos/CarruselVehiculo";
 
 const Vehiculos = () => {
   const [vehiculos, setVehiculos] = useState([]);
@@ -29,6 +30,9 @@ const Vehiculos = () => {
     precio: "",
     stock: "",
     archivo: null,
+    archivo2: null,
+    archivo3: null,
+    archivo4: null,
   });
 
   const [registrosPorPagina, setRegistrosPorPagina] = useState(5);
@@ -45,7 +49,13 @@ const Vehiculos = () => {
     precio: "",
     stock: "",
     url_imagen: "",
+    url_imagen2: "",
+    url_imagen3: "",
+    url_imagen4: "",
     archivo: null,
+    archivo2: null,
+    archivo3: null,
+    archivo4: null,
   });
 
   const [vehiculoAEliminar, setVehiculoAEliminar] = useState(null);
@@ -56,10 +66,12 @@ const Vehiculos = () => {
     setNuevoVehiculo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const manejoCambioArchivo = (e) => {
+  const manejoCambioArchivo = (e, campo = "archivo") => {
     const archivo = e.target.files[0];
     if (archivo && archivo.type.startsWith("image/")) {
-      setNuevoVehiculo((prev) => ({ ...prev, archivo }));
+      setNuevoVehiculo((prev) => ({ ...prev, [campo]: archivo }));
+    } else if (!archivo) {
+      setNuevoVehiculo((prev) => ({ ...prev, [campo]: null }));
     } else {
       setToast({
         mostrar: true,
@@ -74,10 +86,12 @@ const Vehiculos = () => {
     setVehiculoEditar((prev) => ({ ...prev, [name]: value }));
   };
 
-  const manejoCambioArchivoActualizar = (e) => {
+  const manejoCambioArchivoActualizar = (e, campo = "archivo") => {
     const archivo = e.target.files[0];
     if (archivo && archivo.type.startsWith("image/")) {
-      setVehiculoEditar((prev) => ({ ...prev, archivo }));
+      setVehiculoEditar((prev) => ({ ...prev, [campo]: archivo }));
+    } else if (!archivo) {
+      setVehiculoEditar((prev) => ({ ...prev, [campo]: null }));
     } else {
       setToast({
         mostrar: true,
@@ -211,8 +225,22 @@ const Vehiculos = () => {
     }
   };
 
+  const subirImagen = async (archivo) => {
+    if (!archivo) return null;
+    const nombreArchivo = `${Date.now()}_${archivo.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from("imagenes_vehiculo")
+      .upload(nombreArchivo, archivo);
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = supabase.storage
+      .from("imagenes_vehiculo")
+      .getPublicUrl(nombreArchivo);
+    return { nombreArchivo, urlPublica: urlData.publicUrl };
+  };
+
   const agregarVehiculo = async () => {
-    let nombreArchivoSubido = null;
+    const archivosSubidos = [];
     try {
       if (
         !nuevoVehiculo.marca.trim() ||
@@ -227,25 +255,31 @@ const Vehiculos = () => {
         setToast({
           mostrar: true,
           mensaje:
-            "Completa los campos obligatorios (marca, modelo, año, color, estado, precio, stock e imagen)",
+            "Completa los campos obligatorios (marca, modelo, año, color, estado, precio, stock e imagen frontal)",
           tipo: "advertencia",
         });
         return;
       }
 
-      const nombreArchivo = `${Date.now()}_${nuevoVehiculo.archivo.name}`;
-      nombreArchivoSubido = nombreArchivo;
+      // Subir Frente del vehículo
+      const res1 = await subirImagen(nuevoVehiculo.archivo);
+      if (res1) archivosSubidos.push(res1.nombreArchivo);
+      const url1 = res1?.urlPublica;
 
-      const { error: uploadError } = await supabase.storage
-        .from("imagenes_vehiculo")
-        .upload(nombreArchivo, nuevoVehiculo.archivo);
+      // Subir Trasero del vehículo
+      const res2 = await subirImagen(nuevoVehiculo.archivo2);
+      if (res2) archivosSubidos.push(res2.nombreArchivo);
+      const url2 = res2?.urlPublica || null;
 
-      if (uploadError) throw uploadError;
+      // Subir Costado del vehículo
+      const res3 = await subirImagen(nuevoVehiculo.archivo3);
+      if (res3) archivosSubidos.push(res3.nombreArchivo);
+      const url3 = res3?.urlPublica || null;
 
-      const { data: urlData } = supabase.storage
-        .from("imagenes_vehiculo")
-        .getPublicUrl(nombreArchivo);
-      const urlPublica = urlData.publicUrl;
+      // Subir Interior del vehículo
+      const res4 = await subirImagen(nuevoVehiculo.archivo4);
+      if (res4) archivosSubidos.push(res4.nombreArchivo);
+      const url4 = res4?.urlPublica || null;
 
       const { error } = await supabase.from("vehiculos").insert([
         {
@@ -257,7 +291,10 @@ const Vehiculos = () => {
           estado: nuevoVehiculo.estado,
           precio: parseFloat(nuevoVehiculo.precio),
           stock: parseInt(nuevoVehiculo.stock),
-          url_imagen: urlPublica,
+          url_imagen: url1,
+          url_imagen2: url2,
+          url_imagen3: url3,
+          url_imagen4: url4,
           en_catalogo: false,
         },
       ]);
@@ -277,6 +314,9 @@ const Vehiculos = () => {
         precio: "",
         stock: "",
         archivo: null,
+        archivo2: null,
+        archivo3: null,
+        archivo4: null,
       });
       setToast({
         mostrar: true,
@@ -284,13 +324,12 @@ const Vehiculos = () => {
         tipo: "exito",
       });
       await cargarVehiculos();
-      nombreArchivoSubido = null;
     } catch (err) {
       console.error("Error al agregar vehículo:", err);
-      if (nombreArchivoSubido) {
+      for (const nombre of archivosSubidos) {
         await supabase.storage
           .from("imagenes_vehiculo")
-          .remove([nombreArchivoSubido])
+          .remove([nombre])
           .catch(() => {});
       }
       setToast({
@@ -302,8 +341,8 @@ const Vehiculos = () => {
   };
 
   const actualizarVehiculo = async () => {
-    let nombreNuevoSubido = null;
-    let nombreAnteriorBorrado = null;
+    const archivosSubidos = [];
+    const nombresAnterioresBorrar = [];
     try {
       if (
         !vehiculoEditar.marca.trim() ||
@@ -332,28 +371,64 @@ const Vehiculos = () => {
         precio: parseFloat(vehiculoEditar.precio),
         stock: parseInt(vehiculoEditar.stock),
         url_imagen: vehiculoEditar.url_imagen,
+        url_imagen2: vehiculoEditar.url_imagen2,
+        url_imagen3: vehiculoEditar.url_imagen3,
+        url_imagen4: vehiculoEditar.url_imagen4,
       };
 
+      // 1. Frente del vehículo
       if (vehiculoEditar.archivo) {
-        const nombreArchivo = `${Date.now()}_${vehiculoEditar.archivo.name}`;
-        nombreNuevoSubido = nombreArchivo;
+        const res = await subirImagen(vehiculoEditar.archivo);
+        if (res) {
+          archivosSubidos.push(res.nombreArchivo);
+          datosActualizados.url_imagen = res.urlPublica;
+          if (vehiculoEditar.url_imagen) {
+            nombresAnterioresBorrar.push(
+              vehiculoEditar.url_imagen.split("/").pop().split("?")[0]
+            );
+          }
+        }
+      }
 
-        const { error: uploadError } = await supabase.storage
-          .from("imagenes_vehiculo")
-          .upload(nombreArchivo, vehiculoEditar.archivo);
+      // 2. Trasero del vehículo
+      if (vehiculoEditar.archivo2) {
+        const res = await subirImagen(vehiculoEditar.archivo2);
+        if (res) {
+          archivosSubidos.push(res.nombreArchivo);
+          datosActualizados.url_imagen2 = res.urlPublica;
+          if (vehiculoEditar.url_imagen2) {
+            nombresAnterioresBorrar.push(
+              vehiculoEditar.url_imagen2.split("/").pop().split("?")[0]
+            );
+          }
+        }
+      }
 
-        if (uploadError) throw uploadError;
+      // 3. Costado del vehículo
+      if (vehiculoEditar.archivo3) {
+        const res = await subirImagen(vehiculoEditar.archivo3);
+        if (res) {
+          archivosSubidos.push(res.nombreArchivo);
+          datosActualizados.url_imagen3 = res.urlPublica;
+          if (vehiculoEditar.url_imagen3) {
+            nombresAnterioresBorrar.push(
+              vehiculoEditar.url_imagen3.split("/").pop().split("?")[0]
+            );
+          }
+        }
+      }
 
-        const { data: urlData } = supabase.storage
-          .from("imagenes_vehiculo")
-          .getPublicUrl(nombreArchivo);
-        datosActualizados.url_imagen = urlData.publicUrl;
-
-        if (vehiculoEditar.url_imagen) {
-          nombreAnteriorBorrado = vehiculoEditar.url_imagen
-            .split("/")
-            .pop()
-            .split("?")[0];
+      // 4. Interior del vehículo
+      if (vehiculoEditar.archivo4) {
+        const res = await subirImagen(vehiculoEditar.archivo4);
+        if (res) {
+          archivosSubidos.push(res.nombreArchivo);
+          datosActualizados.url_imagen4 = res.urlPublica;
+          if (vehiculoEditar.url_imagen4) {
+            nombresAnterioresBorrar.push(
+              vehiculoEditar.url_imagen4.split("/").pop().split("?")[0]
+            );
+          }
         }
       }
 
@@ -366,10 +441,11 @@ const Vehiculos = () => {
         throw error;
       }
 
-      if (nombreAnteriorBorrado && vehiculoEditar.archivo) {
+      // Borrar imágenes viejas si se actualizaron con éxito
+      for (const nombre of nombresAnterioresBorrar) {
         await supabase.storage
           .from("imagenes_vehiculo")
-          .remove([nombreAnteriorBorrado])
+          .remove([nombre])
           .catch(() => {});
       }
 
@@ -387,7 +463,13 @@ const Vehiculos = () => {
         precio: "",
         stock: "",
         url_imagen: "",
+        url_imagen2: "",
+        url_imagen3: "",
+        url_imagen4: "",
         archivo: null,
+        archivo2: null,
+        archivo3: null,
+        archivo4: null,
       });
 
       setToast({
@@ -397,8 +479,8 @@ const Vehiculos = () => {
       });
     } catch (err) {
       console.error("Error al actualizar:", err);
-      if (nombreNuevoSubido) {
-        await supabase.storage.from("imagenes_vehiculo").remove([nombreNuevoSubido]).catch(() => {});
+      for (const nombre of archivosSubidos) {
+        await supabase.storage.from("imagenes_vehiculo").remove([nombre]).catch(() => {});
       }
       setToast({
         mostrar: true,
@@ -419,15 +501,21 @@ const Vehiculos = () => {
 
       if (error) throw error;
 
-      if (vehiculoAEliminar.url_imagen) {
-        const nombreArchivo = vehiculoAEliminar.url_imagen
-          .split("/")
-          .pop()
-          .split("?")[0];
-        await supabase.storage
-          .from("imagenes_vehiculo")
-          .remove([nombreArchivo])
-          .catch(() => {});
+      const urls = [
+        vehiculoAEliminar.url_imagen,
+        vehiculoAEliminar.url_imagen2,
+        vehiculoAEliminar.url_imagen3,
+        vehiculoAEliminar.url_imagen4
+      ];
+
+      for (const url of urls) {
+        if (url) {
+          const nombreArchivo = url.split("/").pop().split("?")[0];
+          await supabase.storage
+            .from("imagenes_vehiculo")
+            .remove([nombreArchivo])
+            .catch(() => {});
+        }
       }
 
       await cargarVehiculos();
@@ -482,8 +570,7 @@ const Vehiculos = () => {
             Ver Categorías
           </Button>
           <Button
-            className="border-0 shadow-sm"
-            style={{ backgroundColor: "#A4841C" }}
+            className="btn-primary-custom"
             onClick={() => setMostrarModal(true)}
           >
             <i className="bi bi-plus-circle-fill me-2"></i>
@@ -503,12 +590,12 @@ const Vehiculos = () => {
                 borderColor: "#A4841C",
               }}
             >
-              <i className="bi bi-search" style={{ color: '#A4841C' }}></i>
+              <i className="bi bi-search" style={{ color: 'var(--color-primary)' }}></i>
             </InputGroup.Text>
             <Form.Control
               placeholder="Buscar por marca o modelo..."
-              className="border-start-0 ps-0 text-white"
-              style={{ backgroundColor: "#2b2b2b", borderColor: "#A4841C" }}
+              className="border-start-0 ps-0 text-white form-control-custom"
+              style={{ backgroundColor: "var(--color-bg-input)", borderColor: "var(--color-primary)" }}
               value={textoBusqueda}
               onChange={manejarBusqueda}
             />
@@ -540,16 +627,9 @@ const Vehiculos = () => {
                     style={{ backgroundColor: "#1e1e1e" }}
                   >
                     <div className="card-body d-flex flex-column">
-                      {vehiculo.url_imagen && (
-                        <div style={{ overflow: 'hidden', borderRadius: '4px' }} className="mb-3">
-                          <img
-                            src={vehiculo.url_imagen}
-                            alt={`${vehiculo.marca} ${vehiculo.modelo}`}
-                            className="card-img-top imagen-zoom"
-                            style={{ height: "200px", objectFit: "cover", transition: 'transform 0.4s ease-in-out' }}
-                          />
-                        </div>
-                      )}
+                      <div style={{ overflow: "hidden", borderRadius: "4px" }} className="mb-3">
+                        <CarruselVehiculo vehiculo={vehiculo} height="200px" />
+                      </div>
                       <h5 className="card-title d-flex justify-content-between align-items-center">
                         {vehiculo.marca} {vehiculo.modelo}
                         {vehiculo.en_catalogo && (
