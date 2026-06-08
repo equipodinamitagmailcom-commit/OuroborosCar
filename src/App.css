@@ -378,14 +378,13 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 .inicio-titulo {
   font-size: 3rem;
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--color-primary);
   margin-bottom: 1rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .inicio-subtitulo {
   font-size: 1.2rem;
-  color: #7f8c8d;
+  color: var(--color-text-muted);
   margin-bottom: 2rem;
   max-width: 600px;
 }
@@ -398,10 +397,11 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 }
 
 .estadistica-card {
-  background: white;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-primary);
   padding: 1.5rem;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   text-align: center;
   min-width: 150px;
 }
@@ -409,11 +409,11 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 .estadistica-numero {
   font-size: 2rem;
   font-weight: bold;
-  color: #3498db;
+  color: var(--color-primary);
 }
 
 .estadistica-texto {
-  color: #7f8c8d;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
@@ -422,7 +422,7 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 ---------------------------------*/
 
 .categoria-contenedor {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-bg-dark);
   min-height: 70vh;
   padding: 2rem 0;
 }
@@ -433,14 +433,14 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 }
 
 .categoria-titulo {
-  color: white;
+  color: var(--color-text-white);
   font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
 .categoria-subtitulo {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-muted);
   font-size: 1.1rem;
 }
 
@@ -456,7 +456,7 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 ---------------------------------*/
 
 .vehiculos-contenedor {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: var(--color-bg-dark);
   min-height: 70vh;
   padding: 2rem 0;
 }
@@ -467,14 +467,14 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 }
 
 .vehiculos-titulo {
-  color: white;
+  color: var(--color-text-white);
   font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
 .vehiculos-subtitulo {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-muted);
   font-size: 1.1rem;
 }
 
@@ -491,16 +491,17 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 }
 
 .vehiculo-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-border-primary);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .vehiculo-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 35px rgba(164, 132, 28, 0.25);
 }
 
 .vehiculo-imagen {
@@ -516,23 +517,23 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 .vehiculo-titulo {
   font-size: 1.3rem;
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--color-primary);
   margin-bottom: 0.5rem;
 }
 
 .vehiculo-datos {
-  color: #7f8c8d;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
   line-height: 1.4;
 }
 
 .vehiculo-datos strong {
-  color: #34495e;
+  color: var(--color-text-primary);
 }
 
 .vehiculo-botones {
   padding: 1rem 1.5rem;
-  background: #f8f9fa;
+  background: var(--color-bg-input);
   display: flex;
   justify-content: space-between;
 }
@@ -542,9 +543,10 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 ---------------------------------*/
 
 .login-card {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--color-border-primary);
   padding: 2.5rem;
   max-width: 400px;
   width: 100%;
@@ -552,7 +554,7 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 
 .login-titulo {
   text-align: center;
-  color: #2c3e50;
+  color: var(--color-primary);
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
@@ -560,7 +562,7 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 
 .login-subtitulo {
   text-align: center;
-  color: #7f8c8d;
+  color: var(--color-text-muted);
   margin-bottom: 2rem;
 }
 
@@ -570,7 +572,7 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 
 .login-label {
   display: block;
-  color: #34495e;
+  color: var(--color-text-primary);
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
@@ -578,32 +580,35 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 .login-input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--color-border-primary);
   border-radius: 8px;
   font-size: 1rem;
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
   transition: border-color 0.3s ease;
 }
 
 .login-input:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(164, 132, 28, 0.25);
 }
 
 .login-boton {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-white);
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .login-boton:hover {
+  background: var(--color-primary-dark);
   transform: translateY(-2px);
 }
 
@@ -859,3 +864,157 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 .modal-footer.border-top {
   border-color: rgba(164, 132, 28, 0.3) !important;
 }
+
+/* ============================================
+   UTILIDADES ADICIONALES DEL TEMA OSCURO
+   ============================================ */
+
+/* Clase de texto atenuado del tema oscuro */
+.text-muted-custom {
+  color: var(--color-text-muted) !important;
+}
+
+/* Clase de página/contenedor de fondo oscuro */
+.page-dark {
+  background-color: var(--color-bg-dark) !important;
+  min-height: 100vh;
+  color: var(--color-text-primary) !important;
+}
+
+/* Título dorado principal */
+.titulo-primary {
+  color: var(--color-primary) !important;
+  font-weight: bold;
+}
+
+/* Tarjeta del tema oscuro */
+.card-dark {
+  background-color: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.card-dark .card-header {
+  background-color: var(--color-bg-input) !important;
+  border-bottom: 1px solid var(--color-border-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Botón contorno dorado */
+.btn-outline-gold {
+  border: 1px solid var(--color-primary) !important;
+  color: var(--color-primary) !important;
+  background: transparent !important;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-gold:hover {
+  background-color: var(--color-primary) !important;
+  color: var(--color-text-white) !important;
+}
+
+/* InputGroup addon oscuro */
+.input-group-addon-dark {
+  background-color: var(--color-bg-input) !important;
+  color: var(--color-primary) !important;
+  border: 1px solid var(--color-border-primary) !important;
+}
+
+/* Borde dorado para tablas */
+.table-border-gold thead tr {
+  border-bottom: 2px solid var(--color-border-primary-strong) !important;
+}
+.table-border-gold tbody tr {
+  border-bottom: 1px solid var(--color-border-primary) !important;
+}
+
+/* Override global Bootstrap bg-secondary en formularios del tema */
+.modal-content .bg-secondary,
+.card-dark .bg-secondary,
+.page-dark .bg-secondary {
+  background-color: var(--color-bg-input) !important;
+}
+
+/* Reemplaza bg-secondary global en forms del tema oscuro */
+.form-control.bg-secondary,
+.form-select.bg-secondary {
+  background-color: var(--color-bg-input) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border-primary) !important;
+}
+
+/* text-white-50 normalizado */
+.text-white-50 {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Spinner en variante de color primario */
+.spinner-gold {
+  color: var(--color-primary) !important;
+}
+
+/* Bloque de info del tema oscuro (reemplaza bg-dark en tarjetas) */
+.bg-theme-dark {
+  background-color: var(--color-bg-dark) !important;
+}
+
+.bg-theme-card {
+  background-color: var(--color-bg-card) !important;
+}
+
+.bg-theme-input {
+  background-color: var(--color-bg-input) !important;
+}
+
+/* Bordes del tema */
+.border-gold {
+  border-color: var(--color-border-primary) !important;
+}
+
+.border-gold-strong {
+  border-color: var(--color-border-primary-strong) !important;
+}
+
+/* Divisor horizontal del tema */
+.divider-gold {
+  border-top: 1px solid var(--color-border-primary);
+  margin: 1rem 0;
+}
+
+/* ============================================
+   RESPONSIVO - ACTUALIZACIONES TEMA OSCURO
+   ============================================ */
+
+@media (max-width: 768px) {
+  .inicio-titulo {
+    font-size: 2rem;
+  }
+
+  .categoria-titulo,
+  .vehiculos-titulo,
+  .error-404-numero {
+    font-size: 2rem;
+  }
+
+  .vehiculos-grid,
+  .categoria-grid {
+    grid-template-columns: 1fr;
+    padding: 0 0.5rem;
+  }
+
+  .inicio-estadisticas {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .vehiculo-botones {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .login-card {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}
+

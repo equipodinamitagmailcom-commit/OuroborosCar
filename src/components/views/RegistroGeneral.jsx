@@ -46,10 +46,11 @@ const RegistroGeneral = () => {
         // Eliminar guiones
         valor = valor.replace(/-/g, '');
         // Extraer números y letras por separado
-        let numeros = valor.replace(/[^0-9]/g, '').substring(0, 14);
+        // Formato correcto: XXX-XXXXXX-XXXXC (3-6-4 dígitos + 1 letra)
+        let numeros = valor.replace(/[^0-9]/g, '').substring(0, 13);
         let letra = valor.replace(/[^A-Z]/g, '').substring(0, 1);
         
-        // Construir el formato correcto: XXX-XXXXXX-XXXXX[A-Z]
+        // Construir el formato correcto: XXX-XXXXXX-XXXXC
         let formateado = '';
         if (numeros.length > 0) {
             formateado = numeros.substring(0, 3);
@@ -58,7 +59,7 @@ const RegistroGeneral = () => {
             formateado += '-' + numeros.substring(3, 9);
         }
         if (numeros.length > 9) {
-            formateado += '-' + numeros.substring(9, 14);
+            formateado += '-' + numeros.substring(9, 13);
         }
         if (letra) {
             formateado += letra;
@@ -85,9 +86,9 @@ const RegistroGeneral = () => {
             return false;
         }
 
-        // Validar cédula: formato XXX-XXXXXX-XXXXX[A-Z]
-        if (formData.cedula && !/^\d{3}-\d{6}-\d{5}[A-Z]$/.test(formData.cedula)) {
-            setMensaje({ tipo: 'danger', texto: 'Cédula debe tener formato: XXX-XXXXXX-XXXXX[A-Z] (ej: 001-121212-9990X).' });
+        // Validar cédula: formato XXX-XXXXXX-XXXXC (3-6-4 dígitos + 1 letra)
+        if (formData.cedula && !/^\d{3}-\d{6}-\d{4}[A-Z]$/.test(formData.cedula)) {
+            setMensaje({ tipo: 'danger', texto: 'Cédula debe tener formato: XXX-XXXXXX-XXXXC (ej: 001-121212-9990X).' });
             return false;
         }
 
@@ -174,10 +175,10 @@ const RegistroGeneral = () => {
     };
 
     return (
-        <Container className="py-5" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
+        <Container className="py-5 page-dark">
             <div className="text-center mb-5">
-                <h2 className="fw-bold" style={{ color: '#A4841C' }}>Registro General</h2>
-                <p style={{ color: '#ffffff' }}>Seleccione el tipo de perfil que desea dar de alta en el sistema.</p>
+                <h2 className="fw-bold titulo-primary">Registro General</h2>
+                <p className="text-white">Seleccione el tipo de perfil que desea dar de alta en el sistema.</p>
             </div>
 
             {/* Alerta de mensajes */}
@@ -196,15 +197,15 @@ const RegistroGeneral = () => {
                 <Row className="justify-content-center gap-4">
                     <Col md={4}>
                         <Card 
-                            className="h-100 shadow-sm border-0 text-center p-4 text-white"
+                            className="h-100 shadow-sm border-0 text-center p-4 text-white card-dark"
                             onClick={() => setTipoRegistro('cliente')}
-                            style={{ cursor: 'pointer', backgroundColor: '#1e1e1e' }} 
+                            style={{ cursor: 'pointer' }} 
                         >
                             <Card.Body>
-                                <i className="bi bi-person-badge display-3" style={{ color: '#A4841C' }}></i>
+                                <i className="bi bi-person-badge display-3 titulo-primary"></i>
                                 <h4 className="mt-3 fw-bold">Cliente</h4>
                                 <p className="text-white-50 small">Registrar nuevo dueño de vehículo para historial y citas.</p>
-                                <Button variant="outline-warning" className="mt-2" style={{ borderColor: '#A4841C', color: '#A4841C' }}>
+                                <Button variant="outline-warning" className="mt-2 btn-outline-gold">
                                     Seleccionar
                                 </Button>
                             </Card.Body>
@@ -212,15 +213,15 @@ const RegistroGeneral = () => {
                     </Col>
                     <Col md={4}>
                         <Card 
-                            className="h-100 shadow-sm border-0 text-center p-4 text-white"
+                            className="h-100 shadow-sm border-0 text-center p-4 text-white card-dark"
                             onClick={() => setTipoRegistro('mecanico')}
-                            style={{ cursor: 'pointer', backgroundColor: '#1e1e1e' }}
+                            style={{ cursor: 'pointer' }}
                         >
                             <Card.Body>
-                                <i className="bi bi-wrench-adjustable display-3" style={{ color: '#A4841C' }}></i>
+                                <i className="bi bi-wrench-adjustable display-3 titulo-primary"></i>
                                 <h4 className="mt-3 fw-bold">Mecánico</h4>
                                 <p className="text-white-50 small">Dar de alta a un técnico para asignación de reparaciones.</p>
-                                <Button variant="outline-warning" className="mt-2" style={{ borderColor: '#A4841C', color: '#A4841C' }}>
+                                <Button variant="outline-warning" className="mt-2 btn-outline-gold">
                                     Seleccionar
                                 </Button>
                             </Card.Body>
@@ -233,9 +234,9 @@ const RegistroGeneral = () => {
             {tipoRegistro && (
                 <Row className="justify-content-center">
                     <Col md={8} lg={6}>
-                        <Card className="shadow border-0 text-white" style={{ backgroundColor: '#1e1e1e' }}>
-                            <Card.Header className="border-0 pt-4 px-4 d-flex justify-content-between align-items-center" style={{ backgroundColor: '#1e1e1e' }}>
-                                <h4 className="fw-bold mb-0" style={{ color: '#A4841C' }}>
+                        <Card className="shadow border-0 text-white card-dark">
+                            <Card.Header className="border-0 pt-4 px-4 d-flex justify-content-between align-items-center card-dark">
+                                <h4 className="fw-bold mb-0 titulo-primary">
                                     Nuevo {tipoRegistro === 'cliente' ? 'Cliente' : 'Mecánico'}
                                 </h4>
                                 <Button variant="link" className="text-white-50 p-0" onClick={() => setTipoRegistro(null)}>
@@ -247,36 +248,36 @@ const RegistroGeneral = () => {
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Nombres</Form.Label>
-                                                <Form.Control name="nombres" value={formData.nombres} onChange={manejarCambio} className="bg-secondary text-white border-0" required />
+                                                <Form.Label className="small fw-bold">Nombres</Form.Label>
+                                                <Form.Control name="nombres" value={formData.nombres} onChange={manejarCambio} className="input-premium" required />
                                             </Form.Group>
                                         </Col>
                                         <Col md={6}>
                                             <Form.Group className="mb-3">
-                                                <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Apellidos</Form.Label>
-                                                <Form.Control name="apellidos" value={formData.apellidos} onChange={manejarCambio} className="bg-secondary text-white border-0" required />
+                                                <Form.Label className="small fw-bold">Apellidos</Form.Label>
+                                                <Form.Control name="apellidos" value={formData.apellidos} onChange={manejarCambio} className="input-premium" required />
                                             </Form.Group>
                                         </Col>
                                     </Row>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Cédula de Identidad</Form.Label>
-                                        <Form.Control name="cedula" value={formData.cedula} placeholder="XXX-XXXXXX-XXXXX[A-Z]" onChange={manejarCambioCedula} className="bg-secondary text-white border-0" required />
-                                        <Form.Text className="text-white-50 small">Ej: 001-121212-9990X</Form.Text>
+                                        <Form.Label className="small fw-bold">Cédula de Identidad</Form.Label>
+                                        <Form.Control name="cedula" value={formData.cedula} placeholder="XXX-XXXXXX-XXXXC" onChange={manejarCambioCedula} className="input-premium" required />
+                                        <Form.Text className="text-muted-custom small">Ej: 001-121212-9990X</Form.Text>
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Teléfono</Form.Label>
-                                        <Form.Control name="telefono" value={formData.telefono} onChange={manejarCambioTelefono} className="bg-secondary text-white border-0" placeholder="Máx. 8 números" maxLength="8" />
+                                        <Form.Label className="small fw-bold">Teléfono</Form.Label>
+                                        <Form.Control name="telefono" value={formData.telefono} onChange={manejarCambioTelefono} className="input-premium" placeholder="Máx. 8 números" maxLength="8" />
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Dirección</Form.Label>
-                                        <Form.Control as="textarea" rows={2} name="direccion" value={formData.direccion} onChange={manejarCambio} className="bg-secondary text-white border-0" />
+                                        <Form.Label className="small fw-bold">Dirección</Form.Label>
+                                        <Form.Control as="textarea" rows={2} name="direccion" value={formData.direccion} onChange={manejarCambio} className="input-premium" />
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Correo electrónico</Form.Label>
+                                        <Form.Label className="small fw-bold">Correo electrónico</Form.Label>
                                         <Form.Control
                                             type="email"
                                             name="email"
@@ -288,13 +289,13 @@ const RegistroGeneral = () => {
                                     </Form.Group>
 
                                     <Form.Group className="mb-4">
-                                        <Form.Label className="small fw-bold" style={{ color: '#fff' }}>Contraseña</Form.Label>
+                                        <Form.Label className="small fw-bold">Contraseña</Form.Label>
                                         <Form.Control
                                             type="password"
                                             name="password"
                                             value={formData.password}
                                             onChange={manejarCambio}
-                                            className="bg-secondary text-white border-0"
+                                            className="input-premium"
                                             required
                                         />
                                     </Form.Group>
