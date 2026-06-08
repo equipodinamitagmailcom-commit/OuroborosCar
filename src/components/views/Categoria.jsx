@@ -385,7 +385,7 @@ useEffect(() => {
   mostrar={toast.mostrar}
   mensaje={toast.mensaje}
   tipo={toast.tipo}
-  onCerrar={() => setToast({ ...toast, mostrar: false })}
+  onClose={() => setToast({ ...toast, mostrar: false })}
 />
     </Container>
   );

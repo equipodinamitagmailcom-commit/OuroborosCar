@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Offcanvas, Modal, Button } from "react-bootstrap";
 import Logo from "../../assets/Logo.png";
@@ -11,6 +11,66 @@ const Encabezado = () => {
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
   const navigate = useNavigate();
   const location = useLocation(); // Para detectar la ruta actual
+  const [fotoPerfil, setFotoPerfil] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+
+    const cargarFoto = async () => {
+      const usuarioActivo = localStorage.getItem("usuario-supabase");
+      const rol = localStorage.getItem("rol-supabase")?.toLowerCase();
+
+      if (usuarioActivo && rol === 'cliente') {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && active) {
+            const { data, error } = await supabase
+              .from('clientes')
+              .select('foto_cliente')
+              .eq('profile_id', user.id)
+              .maybeSingle();
+
+            if (active) {
+              if (data && !error) {
+                setFotoPerfil(data.foto_cliente);
+              } else {
+                setFotoPerfil(null);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error al cargar foto de perfil en cabecera:", err);
+          if (active) setFotoPerfil(null);
+        }
+      } else {
+        if (active) setFotoPerfil(null);
+      }
+    };
+
+    cargarFoto();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        cargarFoto();
+      } else if (event === 'SIGNED_OUT') {
+        setFotoPerfil(null);
+      }
+    });
+
+    const manejarActualizacionFoto = (e) => {
+      if (active) setFotoPerfil(e.detail?.foto_cliente || null);
+    };
+
+    window.addEventListener("actualizacion-foto-perfil", manejarActualizacionFoto);
+
+    return () => {
+      active = false;
+      if (subscription && typeof subscription.unsubscribe === 'function') {
+        subscription.unsubscribe();
+      }
+      window.removeEventListener("actualizacion-foto-perfil", manejarActualizacionFoto);
+    };
+  }, [location.pathname]);
 
   const manejarToggle = () => setMostrarMenu(!mostrarMenu);
 
@@ -88,14 +148,7 @@ const Encabezado = () => {
                 className="text-white nav-link-animated"
               >
                 {mostrarMenu ? <i className="bi-clock-history me-2"></i> : null}
-                <strong>Historial</strong>
-              </Nav.Link>
-              <Nav.Link
-                onClick={() => manejarNavegacion("/perfil-cliente")}
-                className="text-white nav-link-animated"
-              >
-                {mostrarMenu ? <i className="bi-person-circle me-2"></i> : null}
-                <strong>Mi Perfil</strong>
+                <strong>Historial de Citas</strong>
               </Nav.Link>
               <Nav.Link
                 onClick={manejarAgendarCita}
@@ -104,6 +157,46 @@ const Encabezado = () => {
               >
                 {mostrarMenu ? <i className="bi-calendar-check-fill me-2"></i> : null}
                 <strong>Agendar Cita</strong>
+              </Nav.Link>
+              <Nav.Link
+                onClick={() => manejarNavegacion("/perfil-cliente")}
+                className="text-white nav-link-animated d-flex align-items-center"
+                style={{ padding: mostrarMenu ? '8px 16px' : '0 10px' }}
+                title="Mi Perfil"
+              >
+                {mostrarMenu ? (
+                  <div className="d-flex align-items-center gap-2">
+                    {fotoPerfil ? (
+                      <img
+                        src={fotoPerfil}
+                        alt="Perfil"
+                        className="rounded-circle border border-warning avatar-hover"
+                        style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <i className="bi-person-circle me-1" style={{ fontSize: '20px' }}></i>
+                    )}
+                    <strong>Mi Perfil</strong>
+                  </div>
+                ) : (
+                  <div className="position-relative">
+                    {fotoPerfil ? (
+                      <img
+                        src={fotoPerfil}
+                        alt="Perfil"
+                        className="rounded-circle border border-warning avatar-hover"
+                        style={{ width: '38px', height: '38px', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div
+                        className="d-flex align-items-center justify-content-center rounded-circle border border-warning bg-secondary text-white avatar-hover"
+                        style={{ width: '38px', height: '38px' }}
+                      >
+                        <i className="bi bi-person-fill" style={{ fontSize: '18px' }}></i>
+                      </div>
+                    )}
+                  </div>
+                )}
               </Nav.Link>
             </>
           )}
@@ -186,11 +279,33 @@ const Encabezado = () => {
         {/* Información de usuario y botón cerrar sesión */}
         {mostrarMenu && usuarioActivo && (
           <div className="mt-3 p-3 rounded" style={{ backgroundColor: '#1a1a1a', border: '1px solid #A4841C', color: '#e0e0e0' }}>
-            <p className="mb-2">
-              <i className="bi-envelope-fill me-2"></i>
-              {localStorage.getItem("usuario-supabase")?.toLowerCase() ||
-                "Usuario"}
-            </p>
+            <div className="d-flex align-items-center gap-3 mb-2">
+              {rol === 'cliente' && (
+                fotoPerfil ? (
+                  <img
+                    src={fotoPerfil}
+                    alt="Perfil"
+                    className="rounded-circle border border-warning"
+                    style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div
+                    className="d-flex align-items-center justify-content-center rounded-circle border border-warning bg-secondary text-white"
+                    style={{ width: '40px', height: '40px' }}
+                  >
+                    <i className="bi bi-person-fill" style={{ fontSize: '20px' }}></i>
+                  </div>
+                )
+              )}
+              <div className="text-truncate">
+                <p className="mb-0 fw-bold" style={{ color: '#A4841C' }}>
+                  {rol === 'cliente' ? 'Cliente' : rol === 'admin' ? 'Administrador' : 'Mecánico'}
+                </p>
+                <p className="mb-0 small text-muted text-truncate">
+                  {localStorage.getItem("usuario-supabase")?.toLowerCase() || "Usuario"}
+                </p>
+              </div>
+            </div>
 
             <button
               className="btn btn-outline-danger mt-3 w-100"
@@ -217,6 +332,14 @@ const Encabezado = () => {
           .nav-link-animated:hover {
             color: #A4841C !important;
             transform: translateY(-2px) scale(1.05);
+          }
+          .avatar-hover {
+            transition: all 0.3s ease;
+          }
+          .avatar-hover:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(164, 132, 28, 0.8) !important;
+            border-color: #ffffff !important;
           }
         `}
       </style>
