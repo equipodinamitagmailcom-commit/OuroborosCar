@@ -76,9 +76,9 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
   --color-info: #17a2b8;
   
   /* Colores navbar */
-  --color-navbar: #1068db;
-  --color-navbar-dark: #121b96;
-  --color-navbar-light: #2889b6;
+  --color-navbar: #000000;
+  --color-navbar-dark: #0a0a0a;
+  --color-navbar-light: #1a1a1a;
 }
 
 .tarjeta-hover {
@@ -95,6 +95,24 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;  
     overflow: hidden;
+}
+
+/* ============================================
+   CONTENEDORES Y FONDOS PRINCIPALES
+   ============================================ */
+.main-page-container {
+  background-color: var(--color-bg-dark) !important;
+  min-height: 100vh;
+  padding-top: 80px; /* Para no quedar debajo del navbar */
+  color: var(--color-text-primary);
+}
+
+.bg-radial-premium {
+  background-image: radial-gradient(circle at 50% 50%, rgba(164, 132, 28, 0.22) 0%, rgba(10, 10, 10, 1) 85%) !important;
+  background-color: #0a0a0a !important;
+  min-height: 100vh;
+  background-attachment: fixed;
+  padding: 40px 20px;
 }
 
 /* ============================================
@@ -147,6 +165,22 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
   background-color: var(--color-success) !important;
   border-color: var(--color-success) !important;
   color: var(--color-text-white) !important;
+  font-weight: bold;
+}
+
+.btn-gold {
+  background-color: var(--color-primary) !important;
+  color: var(--color-text-white) !important;
+  border: 1px solid var(--color-primary) !important;
+  transition: all 0.3s ease !important;
+  font-weight: bold;
+}
+
+.btn-outline-gold {
+  color: var(--color-primary) !important;
+  background-color: transparent !important;
+  border: 1px solid var(--color-primary) !important;
+  transition: all 0.3s ease !important;
   font-weight: bold;
 }
 
@@ -257,6 +291,73 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
   border-bottom: 1px solid var(--color-border-primary) !important;
 }
 
+/* ============================================
+   ESTILOS DE PERFIL (VistaCliente)
+   ============================================ */
+.perfil-card {
+  background: rgba(18, 18, 18, 0.8) !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-primary) !important;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+.perfil-info-block {
+  background: rgba(12, 12, 12, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.perfil-info-block:hover {
+  border-color: var(--color-primary);
+  background: rgba(15, 15, 15, 0.85) !important;
+}
+
+.perfil-icon-wrapper {
+  background: rgba(164, 132, 28, 0.1);
+  color: var(--color-primary);
+  border-radius: 10px;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-primary);
+}
+
+.avatar-img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 0 20px rgba(164, 132, 28, 0.3);
+  border-radius: 50%;
+}
+
+/* ============================================
+   ESTILOS DE LOGIN (Animaciones)
+   ============================================ */
+@keyframes moverDegradado {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+.login-card-animated {
+  background: linear-gradient(to bottom, var(--color-primary) 0%, #121212 70%) !important;
+  background-size: 100% 200% !important;
+  animation: moverDegradado 8s ease infinite;
+  border: 2px solid #000 !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-radius: 15px;
+}
+
+.text-gold {
+  color: var(--color-primary) !important;
+}
+
 
 .margen-superior-main {
   margin-top: 50px;
@@ -264,18 +365,20 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 }
 
 .color-navbar {
-  background-color: #1068db !important;
+  background-color: var(--color-navbar) !important;
   background-image: linear-gradient(
-    90deg,
-    #121b96 0%,
-    #2889b6 50%,
-    #2697cc 100%
-  );
+    180deg,
+    var(--color-navbar-dark) 0%,
+    var(--color-navbar) 100%
+  ) !important;
+  border-bottom: 1px solid var(--color-border-primary) !important;
 }
 
 .color-texto-marca {
-  color: #1e3d87 !important;
-  font-size: 18px;
+  color: var(--color-primary) !important;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 
 .navbar-toggler {
@@ -287,7 +390,8 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 }
 
 .offcanvas {
-  background-color: #002b5b !important;
+  background-color: var(--color-bg-darker) !important;
+  border-left: 1px solid var(--color-border-primary) !important;
   color: white !important;
 }
 
@@ -301,7 +405,7 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 }
 
 .nav-link:hover {
-  color: #ffc107 !important;
+  color: var(--color-primary) !important;
 }
 
 .estilo-contenedor-login {
@@ -785,6 +889,13 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
   color: #ffffff !important;
 }
 
+/* Sobreescribir alertas de Bootstrap para que sean elegantes */
+.alert-info {
+  background-color: var(--color-bg-card) !important;
+  border: 1px solid var(--color-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
 /* =============================================
    MODALES - OVERRIDE NEGRO PURO (Admin Theme)
    Bootstrap 5 usa variables CSS internas que
@@ -845,176 +956,4 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 
 /* text-muted dentro de modales = blanco semitransparente */
 .modal-content .text-muted {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-/* Tablas dentro de modales */
-.modal-body .table {
-  --bs-table-bg: #1e1e1e;
-  --bs-table-hover-bg: #2a2a2a;
-  --bs-table-border-color: rgba(164, 132, 28, 0.2);
-  color: #ffffff !important;
-}
-
-/* Separadores y bordes internos del modal */
-.modal-content hr,
-.modal-body .border-bottom,
-.modal-body .border-start,
-.modal-header.border-bottom,
-.modal-footer.border-top {
-  border-color: rgba(164, 132, 28, 0.3) !important;
-}
-
-/* ============================================
-   UTILIDADES ADICIONALES DEL TEMA OSCURO
-   ============================================ */
-
-/* Clase de texto atenuado del tema oscuro */
-.text-muted-custom {
-  color: var(--color-text-muted) !important;
-}
-
-/* Clase de página/contenedor de fondo oscuro */
-.page-dark {
-  background-color: var(--color-bg-dark) !important;
-  min-height: 100vh;
-  color: var(--color-text-primary) !important;
-}
-
-/* Título dorado principal */
-.titulo-primary {
-  color: var(--color-primary) !important;
-  font-weight: bold;
-}
-
-/* Tarjeta del tema oscuro */
-.card-dark {
-  background-color: var(--color-bg-card) !important;
-  border: 1px solid var(--color-border-primary) !important;
-  color: var(--color-text-primary) !important;
-}
-
-.card-dark .card-header {
-  background-color: var(--color-bg-input) !important;
-  border-bottom: 1px solid var(--color-border-primary) !important;
-  color: var(--color-text-primary) !important;
-}
-
-/* Botón contorno dorado */
-.btn-outline-gold {
-  border: 1px solid var(--color-primary) !important;
-  color: var(--color-primary) !important;
-  background: transparent !important;
-  transition: all 0.2s ease;
-}
-
-.btn-outline-gold:hover {
-  background-color: var(--color-primary) !important;
-  color: var(--color-text-white) !important;
-}
-
-/* InputGroup addon oscuro */
-.input-group-addon-dark {
-  background-color: var(--color-bg-input) !important;
-  color: var(--color-primary) !important;
-  border: 1px solid var(--color-border-primary) !important;
-}
-
-/* Borde dorado para tablas */
-.table-border-gold thead tr {
-  border-bottom: 2px solid var(--color-border-primary-strong) !important;
-}
-.table-border-gold tbody tr {
-  border-bottom: 1px solid var(--color-border-primary) !important;
-}
-
-/* Override global Bootstrap bg-secondary en formularios del tema */
-.modal-content .bg-secondary,
-.card-dark .bg-secondary,
-.page-dark .bg-secondary {
-  background-color: var(--color-bg-input) !important;
-}
-
-/* Reemplaza bg-secondary global en forms del tema oscuro */
-.form-control.bg-secondary,
-.form-select.bg-secondary {
-  background-color: var(--color-bg-input) !important;
-  color: var(--color-text-primary) !important;
-  border-color: var(--color-border-primary) !important;
-}
-
-/* text-white-50 normalizado */
-.text-white-50 {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Spinner en variante de color primario */
-.spinner-gold {
-  color: var(--color-primary) !important;
-}
-
-/* Bloque de info del tema oscuro (reemplaza bg-dark en tarjetas) */
-.bg-theme-dark {
-  background-color: var(--color-bg-dark) !important;
-}
-
-.bg-theme-card {
-  background-color: var(--color-bg-card) !important;
-}
-
-.bg-theme-input {
-  background-color: var(--color-bg-input) !important;
-}
-
-/* Bordes del tema */
-.border-gold {
-  border-color: var(--color-border-primary) !important;
-}
-
-.border-gold-strong {
-  border-color: var(--color-border-primary-strong) !important;
-}
-
-/* Divisor horizontal del tema */
-.divider-gold {
-  border-top: 1px solid var(--color-border-primary);
-  margin: 1rem 0;
-}
-
-/* ============================================
-   RESPONSIVO - ACTUALIZACIONES TEMA OSCURO
-   ============================================ */
-
-@media (max-width: 768px) {
-  .inicio-titulo {
-    font-size: 2rem;
-  }
-
-  .categoria-titulo,
-  .vehiculos-titulo,
-  .error-404-numero {
-    font-size: 2rem;
-  }
-
-  .vehiculos-grid,
-  .categoria-grid {
-    grid-template-columns: 1fr;
-    padding: 0 0.5rem;
-  }
-
-  .inicio-estadisticas {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .vehiculo-botones {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .login-card {
-    margin: 1rem;
-    padding: 1.5rem;
-  }
-}
-
+  color: rgba(255, 255, 

@@ -90,11 +90,6 @@ const categoriasPaginadas = categoriasFiltradas.slice(
 
   // 👉 Ejecutar la carga al montar el componente
   useEffect(() => {
-    document.body.style.backgroundColor = '#121212';
-    return () => { document.body.style.backgroundColor = ''; };
-  }, []);
-
-  useEffect(() => {
     cargarCategorias();
   }, []);
 
@@ -272,10 +267,10 @@ useEffect(() => {
   };
 
   return (
-    <Container className="py-4 mt-5 pt-4" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
+    <Container className="main-page-container pb-4">
       <Row className="align-items-center mb-3">
         <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
-          <h3 className="mb-0 fw-bold" style={{ color: '#A4841C' }}>
+          <h3 className="mb-0 fw-bold text-gold">
             <i className="bi-bookmark-plus-fill me-2"></i>Categorías
           </h3>
         </Col>
@@ -306,7 +301,7 @@ useEffect(() => {
 {!cargando && textoBusqueda.trim() && categoriasFiltradas.length === 0 && (
   <Row className="mb-4">
     <Col>
-      <Alert variant="info" className="text-center">
+      <Alert className="text-center alert-info">
         <i className="bi bi-info-circle me-2"></i>
         No se encontraron categorías que coincidan con "{textoBusqueda}".
       </Alert>
@@ -318,7 +313,7 @@ useEffect(() => {
 {cargando && (
   <Row className="text-center my-5">
     <Col>
-      <Spinner animation="border" variant="warning" size="lg" />
+      <Spinner animation="border" className="text-gold" size="lg" />
       <p className="mt-3 text-muted">Cargando categorías...</p>
     </Col>
   </Row>
