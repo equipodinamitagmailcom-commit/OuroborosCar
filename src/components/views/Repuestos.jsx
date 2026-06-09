@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../database/supabaseconfig.js';
 import { Button, Container, Row, Col, InputGroup, Form, Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 // Importación de Componentes (Features)
 import TablaRepuestos from '../repuestos/TablaRepuestos.jsx';
@@ -12,6 +13,7 @@ import Paginacion from '../ordenamiento/Paginacion';
 import NotificacionOperacion from '../rutas/NotificacionOperacion.jsx';
 
 const Repuestos = () => {
+    const navegar = useNavigate();
     // --- ESTADOS ---
     const [listaRepuestos, setListaRepuestos] = useState([]);
     const [busqueda, setBusqueda] = useState('');
@@ -108,14 +110,21 @@ const Repuestos = () => {
     }, [repuestosFiltrados, registrosPorPagina, paginaActual]);
 
     return (
-        <Container className="py-4 mt-2" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
+        <Container className="main-page-container py-4 mt-2">
             {/* Cabecera Responsiva */}
             <Row className="mb-4 align-items-center">
                 <Col xs={12} md={6}>
-                    <h2 className="fw-bold" style={{ color: '#A4841C' }}>Inventario de Repuestos</h2>
-                
+                    <h2 className="fw-bold text-gold">Inventario de Repuestos</h2>
                 </Col>
                 <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
+                    <Button
+                        variant="outline-light"
+                        className="me-2 shadow-sm btn-sm"
+                        onClick={() => navegar("/perfil-cliente")}
+                    >
+                        <i className="bi bi-person-circle me-2"></i>
+                        Mi Perfil
+                    </Button>
                     <Button
                         variant="outline-warning"
                         style={{ borderColor: '#A4841C', color: '#A4841C' }}
@@ -137,13 +146,12 @@ const Repuestos = () => {
             <Row className="mb-4 align-items-center">
                 <Col md={8}>
                     <InputGroup className="shadow-sm">
-                        <InputGroup.Text className="border-end-0" style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
-                            <i className="bi bi-search" style={{ color: 'var(--color-primary)' }}></i>
+                        <InputGroup.Text className="border-end-0 input-group-text-custom">
+                            <i className="bi bi-search"></i>
                         </InputGroup.Text>
                         <Form.Control
                             placeholder="Buscar por nombre o categoría..."
-                            className="border-start-0 ps-0 text-white form-control-custom"
-                            style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-primary)' }}
+                            className="border-start-0 ps-0 form-control-custom"
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
                         />

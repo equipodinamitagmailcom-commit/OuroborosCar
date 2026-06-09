@@ -3,6 +3,7 @@ import {
 Container,Row, Col, Button,Spinner,InputGroup, Form} from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig.js";
 import ModalRegistroVehiculos from "../vehiculos/ModalRegistroVehiculos";
+import { useNavigate } from "react-router-dom";
 import ModalEdicionVehiculos from "../vehiculos/ModalEdicionVehiculos";
 import ModalVerCategorias from "../categorias_vehiculo/ModalVerCategorias";
 import NotificacionOperacion from "../rutas/NotificacionOperacion";
@@ -10,6 +11,7 @@ import Paginacion from "../ordenamiento/Paginacion";
 import CarruselVehiculo from "../vehiculos/CarruselVehiculo";
 
 const Vehiculos = () => {
+  const navegar = useNavigate();
   const [vehiculos, setVehiculos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [textoBusqueda, setTextoBusqueda] = useState("");
@@ -537,27 +539,10 @@ const Vehiculos = () => {
   };
 
   return (
-    <Container
-      fluid
-      className="py-4 mt-5 pt-4"
-      style={{
-        backgroundColor: "#121212",
-        minHeight: "100vh",
-        color: "#e0e0e0",
-      }}
-    >
-      <style>
-        {`
-          .card-hover-custom:hover .imagen-zoom {
-            transform: scale(1.1);
-          }
-        `}
-      </style>
+    <Container fluid className="main-page-container py-4 mt-2">
       <Row className="mb-4 align-items-center">
         <Col xs={12} md={6}>
-          <h2 className="fw-bold" style={{ color: "#A4841C" }}>
-            Inventario de Vehículos
-          </h2>
+          <h2 className="fw-bold text-gold">Inventario de Vehículos</h2>
         </Col>
         <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
           <Button
@@ -583,21 +568,14 @@ const Vehiculos = () => {
         <Col md={8}>
           <InputGroup className="shadow-sm">
             <InputGroup.Text
-              className="border-end-0"
-              style={{
-                backgroundColor: "#2b2b2b",
-                color: "#A4841C",
-                borderColor: "#A4841C",
-              }}
+              className="border-end-0 input-group-text-custom"
             >
-              <i className="bi bi-search" style={{ color: 'var(--color-primary)' }}></i>
+              <i className="bi bi-search"></i>
             </InputGroup.Text>
             <Form.Control
               placeholder="Buscar por marca o modelo..."
-              className="border-start-0 ps-0 text-white form-control-custom"
-              style={{ backgroundColor: "var(--color-bg-input)", borderColor: "var(--color-primary)" }}
+              className="border-start-0 ps-0 form-control-custom"
               value={textoBusqueda}
-              onChange={manejarBusqueda}
             />
           </InputGroup>
         </Col>
@@ -623,11 +601,10 @@ const Vehiculos = () => {
               {vehiculosPaginados.map((vehiculo) => (
                 <Col key={vehiculo.id_vehiculo} md={6} lg={4} className="mb-4">
                   <div
-                    className="card h-100 shadow-sm text-white card-hover-custom"
-                    style={{ backgroundColor: "#1e1e1e" }}
+                    className="card shadow-sm text-white card-custom card-hover-custom" // Se mantiene el borde de card-custom
                   >
                     <div className="card-body d-flex flex-column">
-                      <div style={{ overflow: "hidden", borderRadius: "4px" }} className="mb-3">
+                      <div style={{ overflow: "hidden", borderRadius: "8px" }} className="mb-2">
                         <CarruselVehiculo vehiculo={vehiculo} height="200px" />
                       </div>
                       <h5 className="card-title d-flex justify-content-between align-items-center">
@@ -636,7 +613,7 @@ const Vehiculos = () => {
                           <span className="badge bg-success" style={{ fontSize: '10px' }}>En Catálogo</span>
                         )}
                       </h5>
-                      <p className="card-text flex-grow-1">
+                      <p className="card-text mb-2" style={{ fontSize: '0.9rem' }}>
                         <strong>Año:</strong> {vehiculo.anio}
                         <br />
                         <strong>Color:</strong> {vehiculo.color}

@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Container, Row, Col, Button, Table, Spinner, Card, InputGroup, Form, Modal, Alert } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
+import { useNavigate } from 'react-router-dom';
 import Paginacion from '../ordenamiento/Paginacion';
 import NotificacionOperacion from '../rutas/NotificacionOperacion';
 
 const ClientesAdmin = () => {
+    const navegar = useNavigate();
     // --- ESTADOS DE CLIENTES ---
     const [clientes, setClientes] = useState([]);
     const [cargandoClientes, setCargandoClientes] = useState(true);
@@ -17,6 +19,10 @@ const ClientesAdmin = () => {
     const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
     const [vehiculosAsignados, setVehiculosAsignados] = useState([]);
     const [cargandoAsignados, setCargandoAsignados] = useState(false);
+
+    // --- ESTADOS DE ELIMINACIÓN ---
+    const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
+    const [clienteAEliminar, setClienteAEliminar] = useState(null);
 
     // --- ESTADOS DE VEHÍCULOS DISPONIBLES ---
     const [todosVehiculos, setTodosVehiculos] = useState([]);
@@ -204,31 +210,49 @@ const ClientesAdmin = () => {
         }
     };
 
-    return (
-        <Container className="py-4 mt-2" style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#e0e0e0' }}>
-            <style>
-                {`
-                    .input-premium {
-                        background-color: #2b2b2b !important;
-                        color: #ffffff !important;
-                        border: 1px solid #A4841C !important;
-                    }
-                    .input-premium:focus {
-                        box-shadow: 0 0 8px rgba(164, 132, 28, 0.5) !important;
-                        border-color: #ffffff !important;
-                    }
-                    .input-premium option {
-                        background-color: #1e1e1e !important;
-                        color: #ffffff !important;
-                    }
-                `}
-            </style>
+    // --- ELIMINAR CLIENTE ---
+    const abrirModalEliminacion = (cliente) => {
+        setClienteAEliminar(cliente);
+        setMostrarModalEliminacion(true);
+    };
+
+    const eliminarCliente = async () => {
+        try {
+            if (!clienteAEliminar) return;
+
+            // 1. Eliminar de la tabla clientes
+            // Se asume que las tablas relacionadas tienen ON DELETE CASCADE en Supabase.
+            const { error } = await supabase
+                .from('clientes')
+                .delete()
+                .eq('id_cliente', clienteAEliminar.id_cliente);
+
+            if (error) throw error;
+
+            // IMPORTANTE: Para eliminar las credenciales (Auth), lo ideal es un 
+            // Trigger en PostgreSQL que borre en 'auth.users' automáticamente.
             
+            setToast({ 
+                mostrar: true, 
+                mensaje: 'Cliente y datos relacionados eliminados correctamente.', 
+                tipo: 'exito' 
+            });
+            await cargarClientes();
+            setMostrarModalEliminacion(false);
+            setClienteAEliminar(null);
+        } catch (err) {
+            console.error('Error al eliminar cliente:', err.message);
+            setToast({ mostrar: true, mensaje: 'Error al eliminar el cliente: ' + err.message, tipo: 'error' });
+        }
+    };
+
+    return (
+        <Container className="main-page-container py-4 mt-2">
             {/* Cabecera */}
             <Row className="mb-4 align-items-center">
                 <Col xs={12} md={6}>
-                    <h2 className="fw-bold mb-1" style={{ color: '#A4841C' }}>Directorio de Clientes</h2>
-                    <p className="text-white" style={{ color: '#ffffff !important' }}>
+                    <h2 className="fw-bold mb-1 text-gold">Directorio de Clientes</h2>
+                    <p className="text-white">
                         Visualiza los clientes registrados y administra las asignaciones de sus vehículos.
                     </p>
                 </Col>
@@ -238,12 +262,12 @@ const ClientesAdmin = () => {
             <Row className="mb-4 align-items-center">
                 <Col md={8}>
                     <InputGroup className="shadow-sm">
-                        <InputGroup.Text className="border-end-0" style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
+                        <InputGroup.Text className="border-end-0 input-group-text-custom">
                             <i className="bi bi-search"></i>
                         </InputGroup.Text>
                         <Form.Control
                             placeholder="Buscar por nombre o cédula..."
-                            className="border-start-0 ps-0 text-white form-control-custom"
+                            className="border-start-0 ps-0 form-control-custom"
                             value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)}
                         />
@@ -254,14 +278,14 @@ const ClientesAdmin = () => {
             {/* Listado principal */}
             <Row>
                 <Col>
-                    <Card className="shadow-sm border-0 text-white" style={{ backgroundColor: '#1e1e1e', border: '1px solid rgba(164, 132, 28, 0.3)' }}>
-                        <Card.Header className="py-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: '#1e1e1e', borderBottom: '1px solid rgba(164, 132, 28, 0.3)' }}>
-                            <h5 className="fw-bold mb-0" style={{ color: '#A4841C' }}>Clientes Registrados</h5>
+                    <Card className="shadow-sm border-0 text-white card-custom">
+                        <Card.Header className="py-3 d-flex justify-content-between align-items-center">
+                            <h5 className="fw-bold mb-0 text-gold">Clientes Registrados</h5>
                         </Card.Header>
                         <Card.Body className="p-0">
-                            <Table hover variant="dark" responsive className="align-middle mb-0">
+                            <Table hover responsive className="align-middle mb-0 table-custom">
                                 <thead>
-                                    <tr style={{ borderBottom: '2px solid rgba(164, 132, 28, 0.3)' }}>
+                                    <tr>
                                         <th className="ps-4">ID</th>
                                         <th>CLIENTE</th>
                                         <th>CÉDULA</th>
@@ -280,7 +304,7 @@ const ClientesAdmin = () => {
                                         </tr>
                                     ) : clientesFiltrados.length > 0 ? (
                                         clientesPaginados.map((c) => (
-                                            <tr key={c.id_cliente} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                            <tr key={c.id_cliente}>
                                                 <td className="ps-4 text-white fw-bold">#{c.id_cliente}</td>
                                                 <td>
                                                     <div className="fw-semibold">{c.nombres} {c.apellidos}</div>
@@ -291,16 +315,24 @@ const ClientesAdmin = () => {
                                                     {c.direccion || <span className="text-white-50 small italic">No registrada</span>}
                                                 </td>
                                                 <td className="text-center">
-                                                    <Button 
-                                                        variant="outline-warning" 
-                                                        size="sm"
-                                                        style={{ borderColor: '#A4841C', color: '#A4841C' }}
-                                                        onClick={() => abrirModalVehiculos(c)}
-                                                        title="Administrar Vehículos"
-                                                    >
-                                                        <i className="bi bi-car-front-fill me-2"></i>
-                                                        Administrar vehículos
-                                                    </Button>
+                                                    <div className="d-flex justify-content-center gap-2">
+                                                        <Button
+                                                            className="btn-outline-gold btn-sm"
+                                                            onClick={() => abrirModalVehiculos(c)}
+                                                            title="Administrar Vehículos"
+                                                        >
+                                                            <i className="bi bi-car-front-fill me-2"></i>
+                                                            Administrar vehículos
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            onClick={() => abrirModalEliminacion(c)}
+                                                            title="Eliminar Cliente"
+                                                        >
+                                                            <i className="bi bi-trash"></i>
+                                                        </Button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -315,7 +347,7 @@ const ClientesAdmin = () => {
                             </Table>
                         </Card.Body>
                         {!cargandoClientes && clientesFiltrados.length > 0 && (
-                            <div className="p-3" style={{ borderTop: '1px solid rgba(164, 132, 28, 0.3)' }}>
+                            <div className="p-3">
                                 <Paginacion
                                     registrosPorPagina={registrosPorPagina}
                                     totalRegistros={clientesFiltrados.length}
@@ -477,6 +509,43 @@ const ClientesAdmin = () => {
                 <Modal.Footer className="border-top border-secondary">
                     <Button variant="secondary" onClick={cerrarModal}>
                         Cerrar Ventana
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* --- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN --- */}
+            <Modal 
+                show={mostrarModalEliminacion} 
+                onHide={() => setMostrarModalEliminacion(false)} 
+                centered
+                contentClassName="bg-dark text-white border-danger"
+            >
+                <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary">
+                    <Modal.Title className="text-danger fw-bold">
+                        <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                        Confirmar Eliminación
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-center py-4">
+                    <p className="fs-5">
+                        ¿Estás seguro de eliminar a <strong>{clienteAEliminar?.nombres} {clienteAEliminar?.apellidos}</strong>?
+                    </p>
+                    <p className="text-white-50 small">
+                        Esto borrará su registro e historial. Esta acción no se puede deshacer.
+                    </p>
+                </Modal.Body>
+                <Modal.Footer className="border-top border-secondary justify-content-center">
+                    <Button 
+                        variant="secondary" 
+                        onClick={() => setMostrarModalEliminacion(false)}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button 
+                        variant="danger" 
+                        onClick={eliminarCliente}
+                    >
+                        Eliminar Definitivamente
                     </Button>
                 </Modal.Footer>
             </Modal>

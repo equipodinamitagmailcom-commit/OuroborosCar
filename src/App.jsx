@@ -16,6 +16,7 @@ import HistorialCitas from "./components/views/HistorialCitas";
 import RutaProtegida from "./components/rutas/RutaProtegida";
 import Pagina404 from "./components/views/Pagina404";
 import NoAutorizado from "./components/views/NoAutorizado";
+import InicioAdmin from "./components/views/InicioAdmin";
 
 import "./App.css";
 
@@ -47,6 +48,8 @@ const App = () => {
 
           {/* Rutas Administrativas y Técnicas */}
           <Route path="/vehiculos" element={<RutaProtegida allowedRoles={['admin']}><Vehiculos /></RutaProtegida>} />
+          <Route path="/inicio-admin" element={<InicioAdmin />} />
+
           <Route path="/clientes" element={<RutaProtegida allowedRoles={['admin']}><ClientesAdmin /></RutaProtegida>} />
           <Route
             path="/categorias-vehiculo"

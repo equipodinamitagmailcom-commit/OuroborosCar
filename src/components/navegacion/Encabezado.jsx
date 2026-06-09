@@ -109,6 +109,8 @@ const Encabezado = () => {
 
   // Detectar rutas especiales
   const esLogin = location.pathname === "/login";
+  const rol = localStorage.getItem("rol-supabase")?.toLowerCase();
+  const usuarioActivo = localStorage.getItem("usuario-supabase");
 
   // Contenido del menú
   let contenidoMenu;
@@ -127,19 +129,16 @@ const Encabezado = () => {
       </Nav>
     );
   } else {
-    const rol = localStorage.getItem("rol-supabase")?.toLowerCase();
-    const usuarioActivo = localStorage.getItem("usuario-supabase");
-
     contenidoMenu = (
       <>
         <Nav className="ms-auto pe-2 align-items-center">
           <Nav.Link
-            onClick={() => manejarNavegacion("/")}
+            onClick={() => manejarNavegacion(rol === 'admin' ? "/inicio-admin" : "/")}
             className="text-white nav-link-animated"
             style={mostrarMenu ? { color: '#A4841C' } : {}}
           >
             {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
-            <strong>Inicio</strong>
+            <strong>{rol === 'admin' ? 'Panel de Control' : 'Inicio'}</strong>
           </Nav.Link>
 
           {rol === 'cliente' && (
@@ -231,7 +230,7 @@ const Encabezado = () => {
                 style={mostrarMenu ? { color: '#A4841C' } : {}}
               >
                 {mostrarMenu ? <i className="bi-car-front-fill me-2"></i> : null}
-                <strong>Vehículos</strong>
+                <strong>Inventario</strong>
               </Nav.Link>
 
               <Nav.Link
@@ -362,7 +361,7 @@ const Encabezado = () => {
     >
       <Container>
         <Navbar.Brand
-          onClick={() => manejarNavegacion("/")}
+          onClick={() => manejarNavegacion(rol === 'admin' ? "/inicio-admin" : "/")}
           className="text-white fw-bold d-flex align-items-center"
           style={{ cursor: "pointer" }}
         >

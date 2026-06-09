@@ -53,6 +53,13 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
   --color-primary: #A4841C;
   --color-primary-dark: #8c7018;
   --color-primary-light: #b5941f;
+
+  /* Colores de fondo */
+  --color-bg-dark: #121212;
+
+  --color-primary: #A4841C;
+  --color-primary-dark: #8c7018;
+  --color-primary-light: #b5941f;
   
   /* Colores de fondo */
   --color-bg-dark: #121212;
@@ -79,8 +86,74 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
   --color-navbar: #000000;
   --color-navbar-dark: #0a0a0a;
   --color-navbar-light: #1a1a1a;
+
+  /* Variables de Bootstrap para compatibilidad global con el tema oscuro */
+  --bs-card-bg: #1e1e1e;
+  --bs-card-color: #e0e0e0;
+  --bs-card-border-color: rgba(164, 132, 28, 0.3);
 }
 
+/* 1. Reset Global: Asegurar fondo oscuro absoluto para evitar espacios blancos */
+html, body {
+  background-color: var(--color-bg-dark) !important;
+  color: var(--color-text-primary) !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Forzar Títulos Dorados (Solución robusta para Registro General y encabezados) */
+h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5, .text-gold, .modal-title {
+  color: var(--color-primary) !important;
+}
+
+/* Refuerzo específico para contenedores de página y textos en negrita */
+.main-page-container h1, 
+.main-page-container h2, 
+.main-page-container h3,
+.main-page-container .fw-bold {
+  color: var(--color-primary) !important;
+}
+
+/* Estilos específicos para la vista de Registro y componentes oscuros */
+.page-dark {
+  background-color: var(--color-bg-dark) !important;
+  min-height: 100vh;
+}
+
+.titulo-primary {
+  color: var(--color-primary) !important;
+}
+
+.card-dark {
+  background-color: var(--color-bg-card) !important;
+  border: 1px solid var(--color-border-primary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.text-muted-custom {
+  color: var(--color-text-muted) !important;
+}
+
+/* 3. Forzar Cuadros/Cards Oscuros (Soluciona Registro en blanco y cuadros de clientes) */
+.card, .bg-white, .bg-light {
+  background-color: var(--color-bg-card) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border-primary) !important;
+}
+
+/* 4. Estilos de Inputs para Registro (Fondo oscuro, texto claro) */
+.form-control, .form-select, .input-group-text, .input-group-text-custom {
+  background-color: var(--color-bg-input) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border-primary) !important;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--color-bg-input) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-text-primary) !important;
+  box-shadow: 0 0 0 0.25rem rgba(164, 132, 28, 0.25) !important;
+}
 .tarjeta-hover {
     transition: transform 0.2s ease, shadow 0.2s ease;
 }
@@ -172,16 +245,37 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
   background-color: var(--color-primary) !important;
   color: var(--color-text-white) !important;
   border: 1px solid var(--color-primary) !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.2s ease !important;
   font-weight: bold;
+}
+
+.btn-gold:hover {
+  background-color: var(--color-primary-dark) !important;
+  transform: translateY(-1px);
 }
 
 .btn-outline-gold {
   color: var(--color-primary) !important;
   background-color: transparent !important;
   border: 1px solid var(--color-primary) !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.2s ease !important;
   font-weight: bold;
+}
+
+.btn-outline-gold:hover {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+.btn-outline-danger-custom {
+  color: var(--color-danger) !important;
+  border: 1px solid var(--color-danger) !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-danger-custom:hover {
+  background-color: var(--color-danger) !important;
+  color: white !important;
 }
 
 /* ============================================
@@ -240,9 +334,13 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
    ESTILOS PARA TABLAS
    ============================================ */
 .table-custom {
-  background-color: var(--color-bg-card);
-  color: var(--color-text-primary);
-  border-color: var(--color-border-primary);
+  --bs-table-bg: var(--color-bg-card) !important;
+  --bs-table-color: var(--color-text-primary) !important;
+  --bs-table-border-color: var(--color-border-primary) !important;
+  --bs-table-hover-bg: rgba(164, 132, 28, 0.1) !important;
+  background-color: var(--color-bg-card) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border-primary) !important;
 }
 
 .table-custom thead {
@@ -256,6 +354,13 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 
 .table-custom tbody tr:hover {
   background-color: rgba(164, 132, 28, 0.1);
+}
+
+/* Helper para Input Groups */
+.input-group-text-custom {
+  background-color: var(--color-bg-input) !important;
+  color: var(--color-primary) !important;
+  border: 1px solid var(--color-border-primary) !important;
 }
 
 /* ============================================
@@ -283,7 +388,7 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
 .card-custom {
   background-color: var(--color-bg-card) !important;
   color: var(--color-text-primary) !important;
-  border: 1px solid var(--color-border-primary) !important;
+  border: 1px solid #000000 !important; /* Borde negro para eliminar el efecto blanco */
 }
 
 .card-custom .card-header {
@@ -598,37 +703,75 @@ style={{ backgroundColor: 'var(--color-bg-input)' }}
   background: var(--color-bg-card);
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--color-border-primary);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .vehiculo-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 35px rgba(164, 132, 28, 0.25);
+  box-shadow: 0 8px 25px rgba(164, 132, 28, 0.2);
 }
 
-.vehiculo-imagen {
-  height: 200px;
-  object-fit: cover;
-  width: 100%;
+.admin-img-wrapper {
+  height: 240px; /* Altura fija para el contenedor de la imagen */
+  width: 100%; /* Ancho completo */
+  overflow: hidden; /* Oculta cualquier parte de la imagen que se desborde */
+  background-color: #000; /* Fondo negro para el contenedor */
+  border: none !important; /* Eliminar cualquier borde residual */
+}
+
+/* Corregimos el carrusel para que las imágenes llenen el cuadro sin romper el funcionamiento de las diapositivas */
+.admin-img-wrapper .carousel,
+.admin-img-wrapper .carousel-inner {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.admin-img-wrapper .carousel-item {
+  height: 100% !important;
+  /* Eliminamos display: block !important para permitir la animación de Bootstrap */
+}
+
+.vehiculo-imagen, 
+.admin-img-wrapper img,
+.admin-img-wrapper .carousel-item img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+  background-color: #000; /* Asegura que el fondo de la imagen sea negro si hay espacios */
+  min-height: 240px; /* Evita colapsos de altura */
+}
+
+/* Mejoramos la visibilidad de los controles del carrusel en el tema oscuro */
+.admin-img-wrapper .carousel-control-prev-icon,
+.admin-img-wrapper .carousel-control-next-icon {
+  filter: drop-shadow(0px 0px 3px rgba(164, 132, 28, 0.8));
+  width: 2rem;
+  height: 2rem;
+}
+
+.vehiculo-card .card-body {
+  padding: 1rem !important;
 }
 
 .vehiculo-info {
-  padding: 1.5rem;
+  padding: 0.5rem 0;
 }
 
 .vehiculo-titulo {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: bold;
   color: var(--color-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .vehiculo-datos {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   line-height: 1.4;
+  margin-bottom: 0.5rem;
 }
 
 .vehiculo-datos strong {

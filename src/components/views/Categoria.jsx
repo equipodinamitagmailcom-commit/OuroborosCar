@@ -282,12 +282,12 @@ useEffect(() => {
         </Col>
       </Row>
 
-      <hr style={{ borderColor: 'var(--color-primary)' }} />
+      <hr className="border-primary opacity-50" />
 
 {/* Cuadro de búsqueda debajo de la línea divisoria */}
 <Row className="mb-4">
   <Col md={6} lg={5}>
-    <div className="p-1 rounded card-custom" style={{ border: '1px solid var(--color-primary)' }}>
+    <div className="p-1 rounded card-custom">
       <CuadroBusquedas
         textoBusqueda={textoBusqueda}
         manejarCambioBusqueda={manejarBusqueda}

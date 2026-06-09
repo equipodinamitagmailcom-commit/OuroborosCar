@@ -66,8 +66,13 @@ const Login = () => {
 
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario-supabase");
+    const rolGuardado = localStorage.getItem("rol-supabase")?.toLowerCase();
+
     if (usuarioGuardado) {
-      navegar("/");
+      if (rolGuardado === 'admin') navegar("/inicio-admin");
+      else if (rolGuardado === 'mecanico') navegar("/repuestos");
+      else if (rolGuardado === 'cliente') navegar("/perfil-cliente");
+      else navegar("/");
     }
   }, [navegar]);
 
@@ -110,7 +115,7 @@ const Login = () => {
         console.log("💾 Datos guardados en localStorage");
         
         // Redirección por Rol
-        if (rol === 'admin') navegar("/vehiculos");
+        if (rol === 'admin') navegar("/inicio-admin");
         else if (rol === 'mecanico') navegar("/repuestos");
         else if (rol === 'cliente') navegar("/perfil-cliente");
         else navegar("/");
