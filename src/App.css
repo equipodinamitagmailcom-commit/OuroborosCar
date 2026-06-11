@@ -1099,4 +1099,5 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5, 
 
 /* text-muted dentro de modales = blanco semitransparente */
 .modal-content .text-muted {
-  color: rgba(255, 255, 
+  color: rgba(255, 255, 255, 0.6) !important;
+}

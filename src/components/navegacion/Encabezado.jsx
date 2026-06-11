@@ -271,6 +271,17 @@ const Encabezado = () => {
             </>
           )}
 
+          {rol === 'admin' && (
+            <Nav.Link
+              onClick={() => manejarNavegacion("/servicios-mantenimiento")}
+              className="text-white"
+              style={mostrarMenu ? { color: '#A4841C' } : {}}
+            >
+              {mostrarMenu ? <i className="bi-gear-fill me-2"></i> : null}
+              <strong>Servicios</strong>
+            </Nav.Link>
+          )}
+
           {/* Ícono cerrar sesión en barra superior (desktop) */}
           {usuarioActivo && !mostrarMenu && (
             <Nav.Link
