@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Spinner, Button, Form, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Button, Form, Alert, Badge } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
 import NotificacionOperacion from '../rutas/NotificacionOperacion.jsx'; // Asumiendo que tienes este componente
 
 const VistaCliente = () => {
     const [perfil, setPerfil] = useState(null);
     const [cargando, setCargando] = useState(true);
+    const [citasActivas, setCitasActivas] = useState([]);
     const [archivoFoto, setArchivoFoto] = useState(null);
     const [editandoFoto, setEditandoFoto] = useState(false);
     const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
@@ -37,6 +38,15 @@ const VistaCliente = () => {
             } else {
                 setPerfil(data);
                 setPerfilMensaje('');
+
+                // Cargar citas activas
+                const { data: citas } = await supabase
+                    .from('cita')
+                    .select('*, mecanicos(nombres, apellidos)')
+                    .eq('id_cliente', data.id_cliente)
+                    .in('estado', ['Pendiente', 'En Progreso', 'Aceptada'])
+                    .order('fecha_inicio', { ascending: true });
+                setCitasActivas(citas || []);
             }
         } catch (err) {
             console.error("Error al cargar perfil:", err.message);
@@ -233,8 +243,8 @@ const VistaCliente = () => {
                 </Col>
 
                 {/* Columna Derecha: Detalles del Cliente */}
-                <Col lg={8}>
-                    <Card className="perfil-card text-white p-4 h-100">
+                <Col lg={8} className="d-flex flex-column gap-4">
+                    <Card className="perfil-card text-white p-4">
                         <Card.Body>
                             <div className="d-flex align-items-center gap-3 mb-4">
                                 <i className="bi bi-person-lines-fill text-gold" style={{ fontSize: '1.8rem' }}></i>
@@ -314,6 +324,44 @@ const VistaCliente = () => {
                                     </div>
                                 </Col>
                             </Row>
+                        </Card.Body>
+                    </Card>
+
+                    {/* Mantenimiento en Progreso */}
+                    <Card className="perfil-card text-white p-4">
+                        <Card.Body>
+                            <div className="d-flex align-items-center gap-3 mb-4">
+                                <i className="bi bi-tools text-gold" style={{ fontSize: '1.8rem' }}></i>
+                                <h3 className="fw-bold mb-0 text-gold">Mantenimiento en Progreso</h3>
+                            </div>
+                            
+                            {citasActivas.length === 0 ? (
+                                <div className="text-center py-4 text-white-50">
+                                    <i className="bi bi-calendar-check display-4 mb-3 d-block"></i>
+                                    <p>No tienes citas de mantenimiento en curso.</p>
+                                </div>
+                            ) : (
+                                <Row className="g-3">
+                                    {citasActivas.map((cita) => (
+                                        <Col xs={12} key={cita.id_cita || cita.id}>
+                                            <div className="perfil-info-block p-3">
+                                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <span className="text-gold fw-bold d-block">{cita.fecha_inicio} | {cita.hora_inicio?.substring(0, 5)}</span>
+                                                        <span className="text-white-50 small">Mecánico: {cita.mecanicos ? `${cita.mecanicos.nombres} ${cita.mecanicos.apellidos}` : 'No asignado'}</span>
+                                                    </div>
+                                                    <Badge bg={cita.estado === 'En Progreso' ? 'primary' : 'warning'} className="px-3 py-2 rounded-pill">
+                                                        {cita.estado}
+                                                    </Badge>
+                                                </div>
+                                                <div className="mt-2 text-white">
+                                                    <strong>Motivo:</strong> {cita.motivo}
+                                                </div>
+                                            </div>
+                                        </Col>
+                                    ))}
+                                </Row>
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>
