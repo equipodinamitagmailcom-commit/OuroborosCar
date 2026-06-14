@@ -30,12 +30,11 @@ const AgendarCita = () => {
   const [toast, setToast] = useState({ mostrar: false, mensaje: '', tipo: '' });
 
   const [formulario, setFormulario] = useState({
-    id_vehiculo: '',
+    id_registro: '',
     id_servicio: '',
     id_mecanico: '',
     fecha: '',
     hora_inicio: '',
-    hora_fin: '',
     observaciones: '',
   });
 
@@ -69,6 +68,7 @@ const AgendarCita = () => {
         supabase
           .from('vehiculoclientes')
           .select(`
+            id_registro,
             id_vehiculo,
             vehiculos (
               id_vehiculo,
@@ -100,10 +100,10 @@ const AgendarCita = () => {
       setVehiculos(listaVehiculos);
       setMecanicos(resMecanicos.data || []);
 
-      if (listaVehiculos.length === 1 && listaVehiculos[0]?.id_vehiculo) {
+      if (listaVehiculos.length === 1 && listaVehiculos[0]?.id_registro) {
         setFormulario((prev) => ({
           ...prev,
-          id_vehiculo: String(listaVehiculos[0].id_vehiculo),
+          id_registro: String(listaVehiculos[0].id_registro),
         }));
       }
 
@@ -122,18 +122,13 @@ const AgendarCita = () => {
     const { name, value } = e.target;
     setFormulario((prev) => {
       const actualizado = { ...prev, [name]: value };
-
-      if (name === 'hora_inicio' && value) {
-        actualizado.hora_fin = calcularHoraFin(value);
-      }
-
       return actualizado;
     });
     setErrorFormulario('');
   };
 
-  const seleccionarVehiculo = (idVehiculo) => {
-    setFormulario((prev) => ({ ...prev, id_vehiculo: String(idVehiculo) }));
+  const seleccionarVehiculo = (idRegistro) => {
+    setFormulario((prev) => ({ ...prev, id_registro: String(idRegistro) }));
     setErrorFormulario('');
   };
 
@@ -146,7 +141,7 @@ const AgendarCita = () => {
 
   const obtenerVehiculoSeleccionado = () => {
     const registro = vehiculos.find(
-      (v) => String(v.id_vehiculo) === String(formulario.id_vehiculo)
+      (v) => String(v.id_registro) === String(formulario.id_registro)
     );
     return registro?.vehiculos ?? null;
   };
@@ -169,9 +164,9 @@ const AgendarCita = () => {
   };
 
   const validarFormulario = () => {
-    const { id_vehiculo, id_mecanico, fecha, hora_inicio, hora_fin } = formulario;
+    const { id_registro, id_mecanico, fecha, hora_inicio } = formulario;
 
-    if (!id_vehiculo) {
+    if (!id_registro) {
       setErrorFormulario('Selecciona el vehículo que deseas llevar a mantenimiento.');
       return false;
     }
@@ -194,8 +189,8 @@ const AgendarCita = () => {
       return false;
     }
 
-    if (!hora_inicio || !hora_fin) {
-      setErrorFormulario('Indica el horario de inicio y fin de la cita.');
+    if (!hora_inicio) {
+      setErrorFormulario('Indica el horario de inicio de la cita.');
       return false;
     }
 
@@ -204,13 +199,10 @@ const AgendarCita = () => {
       return false;
     }
 
-    if (aMinutos(hora_fin) > aMinutos(HORARIO_TALLER.fin)) {
-      setErrorFormulario(`El horario de fin no puede superar las ${HORARIO_TALLER.fin}.`);
-      return false;
-    }
-
-    if (aMinutos(hora_fin) <= aMinutos(hora_inicio)) {
-      setErrorFormulario('La hora de fin debe ser posterior a la hora de inicio.');
+    // Validar que la cita estimada (1 hora) no supere el cierre del taller
+    const finEstimado = calcularHoraFin(hora_inicio);
+    if (aMinutos(finEstimado) > aMinutos(HORARIO_TALLER.fin)) {
+      setErrorFormulario(`La cita estimada superaría el horario de cierre (${HORARIO_TALLER.fin}).`);
       return false;
     }
 
@@ -228,12 +220,16 @@ const AgendarCita = () => {
     if (error) throw error;
 
     const inicioNuevo = aMinutos(formulario.hora_inicio);
-    const finNuevo = aMinutos(formulario.hora_fin);
+    const finNuevo = aMinutos(calcularHoraFin(formulario.hora_inicio));
 
     const hayConflicto = (citasExistentes || []).some((cita) => {
       const inicioExistente = aMinutos(cita.hora_inicio?.substring(0, 5) || '00:00');
-      const finExistente = aMinutos(cita.hora_fin?.substring(0, 5) || '00:00');
-      return inicioNuevo < finExistente && finNuevo > inicioExistente;
+      // Si la cita no tiene hora_fin en la DB, asumimos duración de 1 hora para evitar solapamientos
+      const finExistente = cita.hora_fin 
+        ? aMinutos(cita.hora_fin.substring(0, 5)) 
+        : inicioExistente + 60;
+
+      return (inicioNuevo < finExistente && finNuevo > inicioExistente);
     });
 
     if (hayConflicto) {
@@ -276,10 +272,11 @@ const AgendarCita = () => {
       const nuevaCita = {
         id_cliente: cliente.id_cliente,
         id_mecanico: parseInt(formulario.id_mecanico),
+        id_registro: parseInt(formulario.id_registro),
         fecha_inicio: formulario.fecha,
         hora_inicio: `${formulario.hora_inicio}:00`,
         fecha_fin: formulario.fecha,
-        hora_fin: `${formulario.hora_fin}:00`,
+        hora_fin: null, // El mecánico establecerá la hora final al concluir el servicio
         estado: 'Pendiente',
         motivo: construirMotivo(),
       };
@@ -294,12 +291,11 @@ const AgendarCita = () => {
       });
 
       setFormulario({
-        id_vehiculo: vehiculos.length === 1 ? String(vehiculos[0].id_vehiculo) : '',
+        id_registro: vehiculos.length === 1 ? String(vehiculos[0].id_registro) : '',
         id_servicio: '',
         id_mecanico: '',
         fecha: '',
         hora_inicio: '',
-        hora_fin: '',
         observaciones: '',
       });
 
@@ -478,13 +474,13 @@ const AgendarCita = () => {
                         {vehiculos.map((registro) => {
                           const v = registro.vehiculos;
                           if (!v) return null;
-                          const seleccionado = String(registro.id_vehiculo) === String(formulario.id_vehiculo);
+                          const seleccionado = String(registro.id_registro) === String(formulario.id_registro);
 
                           return (
                             <button
-                              key={registro.id_vehiculo}
+                              key={registro.id_registro}
                               type="button"
-                              onClick={() => seleccionarVehiculo(registro.id_vehiculo)}
+                              onClick={() => seleccionarVehiculo(registro.id_registro)}
                               className="d-flex align-items-center gap-3 p-2 rounded border-0 text-start w-100"
                               style={{
                                 background: seleccionado ? 'rgba(164, 132, 28, 0.18)' : 'rgba(255,255,255,0.04)',
@@ -630,25 +626,6 @@ const AgendarCita = () => {
                     </Form.Group>
                   </Col>
 
-                  <Col xs={6} md={4} xl={2}>
-                    <Form.Group>
-                      <Form.Label className="small fw-bold text-white">
-                        <i className="bi bi-clock-history me-2 text-gold"></i>
-                        Fin *
-                      </Form.Label>
-                      <Form.Control
-                        type="time"
-                        name="hora_fin"
-                        value={formulario.hora_fin}
-                        onChange={manejarCambio}
-                        min={HORARIO_TALLER.inicio}
-                        max={HORARIO_TALLER.fin}
-                        className="input-premium"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-
                   <Col xs={12}>
                     <Form.Group>
                       <Form.Label className="small fw-bold text-white">
@@ -713,8 +690,8 @@ const AgendarCita = () => {
                         <div className="perfil-info-block p-3 h-100">
                           <span className="text-white-50 small text-uppercase d-block fw-bold mb-1">Fecha y hora</span>
                           <span className="text-white small fw-semibold">
-                            {formulario.fecha && formulario.hora_inicio
-                              ? `${formulario.fecha} · ${formulario.hora_inicio} – ${formulario.hora_fin || '—'}`
+                            {formulario.fecha && formulario.hora_inicio 
+                              ? `${formulario.fecha} · ${formulario.hora_inicio}` 
                               : '—'}
                           </span>
                           {mecanicoActivo && (

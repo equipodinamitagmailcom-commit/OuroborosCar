@@ -96,7 +96,10 @@ const HistorialCitas = () => {
                     <tr key={cita.id_cita || cita.id} style={{ borderBottomColor: 'rgba(255,255,255,0.1)' }}>
                       <td className="bg-transparent py-3 px-4">
                         <div className="fw-bold">{cita.fecha_inicio}</div>
-                        <div className="text-white-50 small">{cita.hora_inicio?.substring(0, 5)} - {cita.hora_fin?.substring(0, 5)}</div>
+                        <div className="text-white-50 small">
+                          {cita.hora_inicio?.substring(0, 5)} - 
+                          {cita.hora_fin ? ` ${cita.hora_fin.substring(0, 5)}` : ' Pendiente'}
+                        </div>
                       </td>
                       <td className="bg-transparent py-3 px-4">
                         <div className="text-wrap" style={{ maxWidth: '300px' }}>
