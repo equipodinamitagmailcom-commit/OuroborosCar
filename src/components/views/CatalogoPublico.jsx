@@ -84,49 +84,94 @@ const CatalogoPublico = () => {
     <Container className="py-5 mt-5">
       <style>
         {`
-          .card-hover-custom:hover .imagen-zoom { transform: scale(1.1); }
+          .card-hover-custom {
+            transition: all 0.3s ease;
+            background-color: transparent !important;
+          }
+          .card-hover-custom:hover {
+            transform: translateY(-5px);
+          }
+          .card-hover-custom .imagen-zoom { 
+            transition: transform 0.5s ease;
+          }
+          .card-hover-custom:hover .imagen-zoom { 
+            transform: scale(1.05); 
+          }
           .btn-categoria {
             transition: 0.3s;
-            border-color: #A4841C;
+            border: none;
+            color: #ccc;
+            font-weight: 500;
+            padding: 8px 16px;
+          }
+          .btn-categoria:hover {
             color: #A4841C;
+            background-color: transparent;
           }
           .btn-categoria.active {
-            background-color: #A4841C !important;
+            background-color: transparent !important;
+            color: #A4841C !important;
+            border-bottom: 2px solid #A4841C;
+            border-radius: 0;
+          }
+          .search-input-custom {
+            background-color: transparent !important;
+            border: none !important;
+            border-bottom: 1px solid #555 !important;
             color: white !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+          }
+          .search-input-custom:focus {
+            border-bottom: 1px solid #A4841C !important;
+            box-shadow: none !important;
+          }
+          .btn-outline-gold {
+            background-color: transparent;
+            border: 1px solid #A4841C;
+            color: #A4841C;
+            transition: all 0.3s ease;
+          }
+          .btn-outline-gold:hover {
+            background-color: #A4841C;
+            color: white;
           }
         `}
       </style>
-      <h2 className="text-center mb-5 fw-bold text-white">
-        <i className="bi bi-stars text-gold me-3"></i>Catálogo de Autos
-      </h2>
-      
-      <Row className="mb-4 justify-content-center">
-        <Col md={10}>
-          <InputGroup className="shadow-lg mb-4">
-            <InputGroup.Text style={{ backgroundColor: 'var(--color-bg-input)', color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}>
+      <Row className="mb-4 align-items-center">
+        <Col md={6}>
+          <h2 className="fw-bold text-white mb-0">
+            <i className="bi bi-stars text-gold me-2"></i>Catálogo de Autos
+          </h2>
+        </Col>
+        <Col md={6}>
+          <InputGroup>
+            <InputGroup.Text style={{ backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid #555', color: '#A4841C', borderRadius: '0' }}>
               <i className="bi bi-search"></i>
             </InputGroup.Text>
             <Form.Control
               placeholder="¿Qué vehículo estás buscando hoy?"
-              className="form-control-custom"
-              style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-primary)', color: 'white' }}
+              className="search-input-custom"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </InputGroup>
         </Col>
-        <Col md={10} className="text-center mb-5">
-          <div className="d-flex flex-wrap justify-content-center gap-2">
+      </Row>
+
+      <Row className="mb-4 justify-content-center">
+        <Col md={12} className="text-center">
+          <div className="d-flex flex-wrap justify-content-center gap-3">
             <Button 
-              variant={categoriaActiva === "Todos" ? "warning" : "outline-warning"}
-              className={`btn-categoria rounded-pill ${categoriaActiva === "Todos" ? 'active' : ''}`}
+              variant="link"
+              className={`btn-categoria ${categoriaActiva === "Todos" ? 'active' : ''} text-decoration-none`}
               onClick={() => setCategoriaActiva("Todos")}
             >Todos</Button>
             {categorias.map(cat => (
               <Button 
                 key={cat.id_categoria}
-                variant={categoriaActiva === cat.id_categoria.toString() ? "warning" : "outline-warning"}
-                className={`btn-categoria rounded-pill ${categoriaActiva === cat.id_categoria.toString() ? 'active' : ''}`}
+                variant="link"
+                className={`btn-categoria ${categoriaActiva === cat.id_categoria.toString() ? 'active' : ''} text-decoration-none`}
                 onClick={() => setCategoriaActiva(cat.id_categoria.toString())}
               >{cat.nombrecat}</Button>
             ))}
@@ -140,24 +185,32 @@ const CatalogoPublico = () => {
         <Row>
           {vehiculosFiltrados.map((item) => (
             <Col key={item.id_vehiculo} xs={12} sm={6} lg={4} className="mb-4">
-              <Card className="h-100 shadow-sm border-0 text-white card-hover-custom" style={{ backgroundColor: '#1e1e1e' }}>
-                <div style={{ position: 'relative', overflow: 'hidden' }}>
-                  <CarruselVehiculo vehiculo={item} height="220px" />
-                  <div className="position-absolute top-0 end-0 m-2">
-                    <span className="badge" style={{ backgroundColor: item.stock > 0 ? '#A4841C' : '#dc3545' }}>
+              <Card className="h-100 border-0 text-white card-hover-custom">
+                <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px' }}>
+                  <div className="imagen-zoom" style={{ height: '260px' }}>
+                    <CarruselVehiculo vehiculo={item} height="100%" />
+                  </div>
+                  <div className="position-absolute top-0 end-0 m-3">
+                    <span className="badge px-3 py-2 shadow-sm" style={{ backgroundColor: item.stock > 0 ? 'rgba(164, 132, 28, 0.9)' : 'rgba(220, 53, 69, 0.9)', backdropFilter: 'blur(4px)' }}>
                       {item.stock > 0 ? 'Disponible' : 'Agotado'}
                     </span>
                   </div>
                 </div>
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title className="fw-bold">{item.marca} {item.modelo}</Card.Title>
-                  <p className="text-muted small mb-3">{item.anio} | {item.color}</p>
-                  <Card.Text className="flex-grow-1">Condición: {item.estado}</Card.Text>
-                  <div className="d-flex justify-content-between align-items-center mt-3 border-top pt-3">
-                    <span className="h4 mb-0 fw-bold" style={{ color: '#A4841C' }}>${item.precio.toLocaleString()}</span>
+                <Card.Body className="d-flex flex-column px-1 pt-4 pb-2">
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <Card.Title className="fw-bold mb-0 fs-4">{item.marca} {item.modelo}</Card.Title>
+                    <span className="h5 mb-0 fw-bold" style={{ color: '#A4841C' }}>${item.precio.toLocaleString()}</span>
+                  </div>
+                  <div className="d-flex gap-2 text-white-50 small mb-4 flex-wrap">
+                    <span><i className="bi bi-calendar3 me-1"></i>{item.anio}</span>
+                    <span>&bull;</span>
+                    <span><i className="bi bi-palette me-1"></i>{item.color}</span>
+                    <span>&bull;</span>
+                    <span>{item.estado}</span>
+                  </div>
+                  <div className="mt-auto">
                     <Button 
-                      variant="outline-warning" 
-                      size="sm" 
+                      className="btn-outline-gold w-100 py-2 fw-bold text-uppercase rounded-1"
                       onClick={() => manejarVerDetalles(item)}
                     >Ver Detalles</Button>
                   </div>
