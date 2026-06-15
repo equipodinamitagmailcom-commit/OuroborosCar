@@ -163,7 +163,7 @@ const VistaCliente = () => {
                 <Col lg={4}>
                     <Card className="perfil-card text-white text-center p-4">
                         <Card.Body>
-                            <div className="avatar-container mb-3">
+                            <div className="avatar-container d-flex justify-content-center mb-3">
                                 {perfil?.foto_cliente ? (
                                     <img
                                         src={perfil.foto_cliente}

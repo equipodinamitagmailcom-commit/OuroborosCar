@@ -20,6 +20,7 @@ import InicioAdmin from "./components/views/InicioAdmin";
 import ConfirmacionCitas from "./components/views/ConfirmacionCitas";
 import RetiroRepuestos from "./components/views/RetiroRepuestos";
 import ServiciosMantenimientoAdmin from "./components/views/ServiciosMantenimientoAdmin";
+import MisVehiculos from "./components/views/MisVehiculos";
 
 import "./App.css";
 
@@ -48,6 +49,7 @@ const App = () => {
           <Route path="/perfil-cliente" element={<RutaProtegida allowedRoles={['cliente']}><VistaCliente /></RutaProtegida>} />
           <Route path="/agendar-cita" element={<RutaProtegida allowedRoles={['cliente']}><AgendarCita /></RutaProtegida>} />
           <Route path="/historial-citas" element={<RutaProtegida allowedRoles={['cliente']}><HistorialCitas /></RutaProtegida>} />
+          <Route path="/Mis-vehiculos" element={<RutaProtegida allowedRoles={['cliente']}><MisVehiculos /></RutaProtegida>} />
 
           {/* Rutas Administrativas y Técnicas */}
           <Route path="/vehiculos" element={<RutaProtegida allowedRoles={['admin']}><Vehiculos /></RutaProtegida>} />

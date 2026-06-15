@@ -23,7 +23,6 @@ const AgendarCita = () => {
   const [enviando, setEnviando] = useState(false);
   const [cliente, setCliente] = useState(null);
   const [vehiculos, setVehiculos] = useState([]);
-  const [mecanicos, setMecanicos] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [errorCarga, setErrorCarga] = useState('');
   const [errorFormulario, setErrorFormulario] = useState('');
@@ -32,7 +31,6 @@ const AgendarCita = () => {
   const [formulario, setFormulario] = useState({
     id_registro: '',
     id_servicio: '',
-    id_mecanico: '',
     fecha: '',
     hora_inicio: '',
     observaciones: '',
@@ -64,7 +62,7 @@ const AgendarCita = () => {
       if (errorCliente) throw errorCliente;
       setCliente(datosCliente);
 
-      const [resVehiculos, resMecanicos, resServicios] = await Promise.all([
+      const [resVehiculos, resServicios] = await Promise.all([
         supabase
           .from('vehiculoclientes')
           .select(`
@@ -84,21 +82,15 @@ const AgendarCita = () => {
           `)
           .eq('id_cliente', datosCliente.id_cliente),
         supabase
-          .from('mecanicos')
-          .select('id_mecanico, nombres, apellidos')
-          .order('nombres', { ascending: true }),
-        supabase
           .from('mantenimientoservicio')
           .select('id_servicio, tipo_servicio, precio_servicio')
           .order('tipo_servicio', { ascending: true }),
       ]);
 
       if (resVehiculos.error) throw resVehiculos.error;
-      if (resMecanicos.error) throw resMecanicos.error;
 
       const listaVehiculos = resVehiculos.data || [];
       setVehiculos(listaVehiculos);
-      setMecanicos(resMecanicos.data || []);
 
       if (listaVehiculos.length === 1 && listaVehiculos[0]?.id_registro) {
         setFormulario((prev) => ({
@@ -152,27 +144,25 @@ const AgendarCita = () => {
     );
   };
 
-  const obtenerMecanicoSeleccionado = () => {
-    return mecanicos.find(
-      (m) => String(m.id_mecanico) === String(formulario.id_mecanico)
-    );
-  };
-
   const aMinutos = (hora) => {
     const [h, m] = hora.split(':').map(Number);
     return h * 60 + m;
   };
 
+  const formatearHoraResumen = (hora) => {
+    if (!hora) return '';
+    const [h, m] = hora.split(':');
+    let horas = parseInt(h, 10);
+    const periodo = horas >= 12 ? 'PM' : 'AM';
+    horas = horas % 12 || 12;
+    return `${String(horas).padStart(2, '0')}:${m} ${periodo}`;
+  };
+
   const validarFormulario = () => {
-    const { id_registro, id_mecanico, fecha, hora_inicio } = formulario;
+    const { id_registro, fecha, hora_inicio } = formulario;
 
     if (!id_registro) {
       setErrorFormulario('Selecciona el vehículo que deseas llevar a mantenimiento.');
-      return false;
-    }
-
-    if (!id_mecanico) {
-      setErrorFormulario('Selecciona un mecánico para tu cita.');
       return false;
     }
 
@@ -209,34 +199,6 @@ const AgendarCita = () => {
     return true;
   };
 
-  const verificarDisponibilidadMecanico = async () => {
-    const { data: citasExistentes, error } = await supabase
-      .from('cita')
-      .select('hora_inicio, hora_fin, estado')
-      .eq('id_mecanico', parseInt(formulario.id_mecanico))
-      .eq('fecha_inicio', formulario.fecha)
-      .neq('estado', 'Cancelada');
-
-    if (error) throw error;
-
-    const inicioNuevo = aMinutos(formulario.hora_inicio);
-    const finNuevo = aMinutos(calcularHoraFin(formulario.hora_inicio));
-
-    const hayConflicto = (citasExistentes || []).some((cita) => {
-      const inicioExistente = aMinutos(cita.hora_inicio?.substring(0, 5) || '00:00');
-      // Si la cita no tiene hora_fin en la DB, asumimos duración de 1 hora para evitar solapamientos
-      const finExistente = cita.hora_fin 
-        ? aMinutos(cita.hora_fin.substring(0, 5)) 
-        : inicioExistente + 60;
-
-      return (inicioNuevo < finExistente && finNuevo > inicioExistente);
-    });
-
-    if (hayConflicto) {
-      throw new Error('El mecánico seleccionado ya tiene una cita en ese horario. Elige otra hora o mecánico.');
-    }
-  };
-
   const construirMotivo = () => {
     const vehiculo = obtenerVehiculoSeleccionado();
     const servicio = obtenerServicioSeleccionado();
@@ -267,11 +229,9 @@ const AgendarCita = () => {
     setEnviando(true);
 
     try {
-      await verificarDisponibilidadMecanico();
-
       const nuevaCita = {
         id_cliente: cliente.id_cliente,
-        id_mecanico: parseInt(formulario.id_mecanico),
+        id_mecanico: null,
         id_registro: parseInt(formulario.id_registro),
         fecha_inicio: formulario.fecha,
         hora_inicio: `${formulario.hora_inicio}:00`,
@@ -293,7 +253,6 @@ const AgendarCita = () => {
       setFormulario({
         id_registro: vehiculos.length === 1 ? String(vehiculos[0].id_registro) : '',
         id_servicio: '',
-        id_mecanico: '',
         fecha: '',
         hora_inicio: '',
         observaciones: '',
@@ -311,7 +270,6 @@ const AgendarCita = () => {
   const fechaMinima = new Date().toISOString().substring(0, 10);
   const vehiculoActivo = obtenerVehiculoSeleccionado();
   const servicioActivo = obtenerServicioSeleccionado();
-  const mecanicoActivo = obtenerMecanicoSeleccionado();
 
   if (cargando) {
     return (
@@ -377,371 +335,153 @@ const AgendarCita = () => {
               </Alert>
             )}
 
-            {/* Franja superior: cliente + vehículo a lo largo */}
-            <Card className="perfil-card text-white mb-4 overflow-hidden">
-              <Card.Body className="p-0">
-                <Row className="g-0 align-items-stretch">
-
-                  {/* Cliente con foto */}
-                  <Col xs={12} lg={3} className="border-end border-secondary border-opacity-25">
-                    <div className="p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center">
-                      <div className="avatar-container mb-3">
+            <Row className="g-4 align-items-stretch">
+              {/* Columna Izquierda: Datos del Cliente y Carro */}
+              <Col lg={5}>
+                <Card className="perfil-card text-white h-100 shadow border-0">
+                  <Card.Body className="p-4 d-flex flex-column">
+                    <div className="text-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+                      <div className="avatar-container d-flex justify-content-center mb-3">
                         {cliente?.foto_cliente ? (
-                          <img
-                            src={cliente.foto_cliente}
-                            alt="Foto de perfil"
-                            className="avatar-img"
-                          />
+                          <img src={cliente.foto_cliente} alt="Perfil" className="avatar-img" />
                         ) : (
-                          <div
-                            className="avatar-img d-flex align-items-center justify-content-center"
-                            style={{ backgroundColor: '#1a1a1a' }}
-                          >
-                            <i className="bi bi-person-fill text-white" style={{ fontSize: '70px' }}></i>
+                          <div className="avatar-img d-flex align-items-center justify-content-center bg-dark">
+                            <i className="bi bi-person-fill text-white" style={{ fontSize: '60px' }}></i>
                           </div>
                         )}
                       </div>
-                      <h5 className="fw-bold text-gold mb-1">
-                        {cliente?.nombres} {cliente?.apellidos}
-                      </h5>
-                      <span className="badge rounded-pill badge-custom px-3 py-1 small mb-3">
-                        Cliente Ouroboros
-                      </span>
-                      <div className="w-100">
-                        <div className="perfil-info-block d-flex align-items-center gap-3 mb-2">
-                          <div className="perfil-icon-wrapper">
-                            <i className="bi bi-telephone"></i>
-                          </div>
-                          <div className="text-start">
-                            <span className="text-white-50 small text-uppercase d-block fw-bold">Teléfono</span>
-                            <span className="text-white small">{cliente?.telefono || 'No registrado'}</span>
-                          </div>
-                        </div>
+                      <h5 className="fw-bold text-gold mb-1">{cliente?.nombres} {cliente?.apellidos}</h5>
+                      <span className="badge rounded-pill badge-custom px-3 py-1 small">Cliente Ouroboros</span>
+                      <div className="mt-2 text-white-50 small">
+                        <i className="bi bi-telephone me-2 text-gold"></i>{cliente?.telefono || 'Sin teléfono'}
                       </div>
                     </div>
-                  </Col>
 
-                  {/* Imagen del vehículo seleccionado */}
-                  <Col xs={12} lg={5} className="border-end border-secondary border-opacity-25">
-                    <div className="p-4 h-100 d-flex flex-column">
+                    <div className="flex-grow-1">
                       <div className="d-flex align-items-center gap-2 mb-3">
                         <i className="bi bi-car-front-fill text-gold"></i>
-                        <h6 className="fw-bold text-gold mb-0 text-uppercase small">Vehículo seleccionado</h6>
+                        <h6 className="fw-bold text-gold mb-0 text-uppercase small">Vehículo Seleccionado</h6>
                       </div>
 
                       {vehiculoActivo ? (
-                        <>
-                          <div className="rounded overflow-hidden flex-grow-1" style={{ minHeight: '220px' }}>
-                            <CarruselVehiculo vehiculo={vehiculoActivo} height="220px" />
+                        <div className="p-0">
+                          <div className="rounded overflow-hidden shadow-sm mb-3">
+                            <CarruselVehiculo vehiculo={vehiculoActivo} height="200px" />
                           </div>
-                          <div className="mt-3 d-flex flex-wrap gap-2 align-items-center justify-content-between">
-                            <div>
-                              <h5 className="fw-bold text-white mb-0">
-                                {vehiculoActivo.marca} {vehiculoActivo.modelo}
-                              </h5>
-                              <span className="text-white-50 small">
-                                {vehiculoActivo.anio}
-                                {vehiculoActivo.color ? ` · ${vehiculoActivo.color}` : ''}
-                              </span>
-                            </div>
-                            <span className="badge rounded-pill badge-custom px-3 py-2">
-                              <i className="bi bi-check-circle me-1"></i>
-                              Listo para cita
-                            </span>
+                          <div className="px-1">
+                            <h5 className="fw-bold text-white mb-0">{vehiculoActivo.marca} {vehiculoActivo.modelo}</h5>
+                            <p className="text-white-50 small mb-0">{vehiculoActivo.anio} · {vehiculoActivo.color}</p>
                           </div>
-                        </>
+                        </div>
                       ) : (
-                        <div
-                          className="flex-grow-1 d-flex flex-column align-items-center justify-content-center rounded border border-secondary border-opacity-50"
-                          style={{ minHeight: '220px', background: 'rgba(0,0,0,0.3)' }}
-                        >
-                          <i className="bi bi-car-front text-gold display-4 mb-2 opacity-50"></i>
-                          <p className="text-white-50 mb-0 small">Selecciona un vehículo de la lista</p>
+                        <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center rounded border border-secondary border-opacity-25 py-5 opacity-50">
+                          <i className="bi bi-car-front text-gold display-4 mb-2"></i>
+                          <p className="text-white-50 mb-0 small">Selecciona un auto</p>
                         </div>
                       )}
                     </div>
-                  </Col>
 
-                  {/* Selector de vehículos */}
-                  <Col xs={12} lg={4}>
-                    <div className="p-4 h-100">
-                      <div className="d-flex align-items-center gap-2 mb-3">
-                        <i className="bi bi-list-ul text-gold"></i>
-                        <h6 className="fw-bold text-gold mb-0 text-uppercase small">Tus vehículos</h6>
-                      </div>
-
-                      <div className="d-flex flex-column gap-2" style={{ maxHeight: '320px', overflowY: 'auto' }}>
-                        {vehiculos.map((registro) => {
-                          const v = registro.vehiculos;
-                          if (!v) return null;
-                          const seleccionado = String(registro.id_registro) === String(formulario.id_registro);
-
-                          return (
-                            <button
-                              key={registro.id_registro}
-                              type="button"
-                              onClick={() => seleccionarVehiculo(registro.id_registro)}
-                              className="d-flex align-items-center gap-3 p-2 rounded border-0 text-start w-100"
-                              style={{
-                                background: seleccionado ? 'rgba(164, 132, 28, 0.18)' : 'rgba(255,255,255,0.04)',
-                                border: seleccionado ? '2px solid #A4841C' : '2px solid transparent',
-                                transition: 'all 0.2s ease',
-                                cursor: 'pointer',
-                              }}
-                            >
-                              <div
-                                className="flex-shrink-0 rounded overflow-hidden"
-                                style={{ width: '72px', height: '52px', background: '#1a1a1a' }}
-                              >
-                                {v.url_imagen ? (
-                                  <img
-                                    src={v.url_imagen}
-                                    alt={`${v.marca} ${v.modelo}`}
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                  />
-                                ) : (
-                                  <div className="w-100 h-100 d-flex align-items-center justify-content-center">
-                                    <i className="bi bi-car-front text-white-50"></i>
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex-grow-1 min-w-0">
-                                <div className="fw-semibold text-white text-truncate">
-                                  {v.marca} {v.modelo}
+                    {vehiculos.length > 1 && (
+                      <div className="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                        <h6 className="fw-bold text-gold mb-3 text-uppercase small">Tus otros vehículos</h6>
+                        <div className="d-flex flex-column gap-2" style={{ maxHeight: '180px', overflowY: 'auto' }}>
+                          {vehiculos.map((reg) => {
+                            const v = reg.vehiculos;
+                            if (!v) return null;
+                            const sel = String(reg.id_registro) === String(formulario.id_registro);
+                            return (
+                              <button key={reg.id_registro} type="button" onClick={() => seleccionarVehiculo(reg.id_registro)}
+                                className="d-flex align-items-center gap-3 p-2 rounded border-0 text-start w-100"
+                                style={{ background: sel ? 'rgba(164, 132, 28, 0.15)' : 'rgba(255,255,255,0.03)', border: sel ? '1px solid #A4841C' : '1px solid transparent' }}>
+                                <div className="flex-shrink-0 rounded overflow-hidden bg-dark" style={{ width: '50px', height: '35px' }}>
+                                  {v.url_imagen && <img src={v.url_imagen} alt={v.marca} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 </div>
-                                <div className="text-white-50 small">
-                                  {v.anio}{v.color ? ` · ${v.color}` : ''}
-                                </div>
-                              </div>
-                              {seleccionado && (
-                                <i className="bi bi-check-circle-fill text-gold flex-shrink-0"></i>
-                              )}
-                            </button>
-                          );
-                        })}
+                                <div className="flex-grow-1 min-w-0 fw-semibold text-white text-truncate small">{v.marca} {v.modelo}</div>
+                                {sel && <i className="bi bi-check-circle-fill text-gold small"></i>}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
+                    )}
+                  </Card.Body>
+                </Card>
+              </Col>
 
-                      <div className="perfil-welcome-banner mt-3">
-                        <p className="mb-0 small text-white-50">
-                          Las citas quedan en estado <strong className="text-gold">Pendiente</strong> hasta confirmación del taller.
-                        </p>
-                      </div>
+              {/* Columna Derecha: Formulario de Cita */}
+              <Col lg={7}>
+                <Card className="perfil-card text-white h-100 shadow border-0">
+                  <Card.Body className="p-4 d-flex flex-column">
+                    <div className="d-flex align-items-center gap-2 mb-4">
+                      <i className="bi bi-calendar2-plus text-gold" style={{ fontSize: '1.4rem' }}></i>
+                      <h5 className="fw-bold text-gold mb-0">Datos de la Cita</h5>
                     </div>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
 
-            {/* Formulario a lo largo de la página */}
-            <Card className="perfil-card text-white mb-4">
-              <Card.Body className="p-4">
-                <div className="d-flex align-items-center gap-2 mb-4">
-                  <i className="bi bi-clipboard2-check text-gold" style={{ fontSize: '1.4rem' }}></i>
-                  <h5 className="fw-bold text-gold mb-0">Detalles de la cita</h5>
-                </div>
-
-                <Row className="g-3">
-                  <Col xs={12} md={6} xl={3}>
-                    <Form.Group>
-                      <Form.Label className="small fw-bold text-white">
-                        <i className="bi bi-wrench me-2 text-gold"></i>
-                        Tipo de mantenimiento
-                      </Form.Label>
-                      <Form.Select
-                        name="id_servicio"
-                        value={formulario.id_servicio}
-                        onChange={manejarCambio}
-                        className="input-premium"
-                      >
-                        <option value="">Mantenimiento general</option>
-                        {servicios.map((servicio) => (
-                          <option key={servicio.id_servicio} value={servicio.id_servicio}>
-                            {servicio.tipo_servicio}
-                            {servicio.precio_servicio != null
-                              ? ` — $${Number(servicio.precio_servicio).toFixed(2)}`
-                              : ''}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12} md={6} xl={3}>
-                    <Form.Group>
-                      <Form.Label className="small fw-bold text-white">
-                        <i className="bi bi-person-gear me-2 text-gold"></i>
-                        Mecánico *
-                      </Form.Label>
-                      <Form.Select
-                        name="id_mecanico"
-                        value={formulario.id_mecanico}
-                        onChange={manejarCambio}
-                        className="input-premium"
-                        required
-                      >
-                        <option value="">Selecciona un mecánico...</option>
-                        {mecanicos.map((mecanico) => (
-                          <option key={mecanico.id_mecanico} value={mecanico.id_mecanico}>
-                            {mecanico.nombres} {mecanico.apellidos}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12} md={4} xl={2}>
-                    <Form.Group>
-                      <Form.Label className="small fw-bold text-white">
-                        <i className="bi bi-calendar-event me-2 text-gold"></i>
-                        Fecha *
-                      </Form.Label>
-                      <Form.Control
-                        type="date"
-                        name="fecha"
-                        value={formulario.fecha}
-                        onChange={manejarCambio}
-                        min={fechaMinima}
-                        className="input-premium"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={6} md={4} xl={2}>
-                    <Form.Group>
-                      <Form.Label className="small fw-bold text-white">
-                        <i className="bi bi-clock me-2 text-gold"></i>
-                        Inicio *
-                      </Form.Label>
-                      <Form.Control
-                        type="time"
-                        name="hora_inicio"
-                        value={formulario.hora_inicio}
-                        onChange={manejarCambio}
-                        min={HORARIO_TALLER.inicio}
-                        max={HORARIO_TALLER.fin}
-                        className="input-premium"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-
-                  <Col xs={12}>
-                    <Form.Group>
-                      <Form.Label className="small fw-bold text-white">
-                        <i className="bi bi-chat-left-text me-2 text-gold"></i>
-                        Observaciones adicionales
-                      </Form.Label>
-                      <Form.Control
-                        as="textarea"
-                        rows={2}
-                        name="observaciones"
-                        value={formulario.observaciones}
-                        onChange={manejarCambio}
-                        placeholder="Ej: Cambio de aceite, revisión de frenos, ruido en el motor..."
-                        className="input-premium"
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-
-            {/* Resumen + acciones a lo largo */}
-            <Card className="perfil-card text-white">
-              <Card.Body className="p-4">
-                <Row className="align-items-center g-4">
-                  <Col xs={12} xl={8}>
-                    <div className="d-flex align-items-center gap-2 mb-3">
-                      <i className="bi bi-card-checklist text-gold"></i>
-                      <h6 className="fw-bold text-gold mb-0 text-uppercase small">Resumen de la cita</h6>
-                    </div>
                     <Row className="g-3">
-                      <Col sm={6} md={3}>
-                        <div className="perfil-info-block p-3 h-100">
-                          <span className="text-white-50 small text-uppercase d-block fw-bold mb-1">Cliente</span>
-                          <span className="text-white small fw-semibold">
-                            {cliente?.nombres} {cliente?.apellidos}
-                          </span>
-                        </div>
+                      <Col md={12}>
+                        <Form.Group>
+                          <Form.Label className="small fw-bold text-white"><i className="bi bi-wrench me-2 text-gold"></i>Servicio</Form.Label>
+                          <Form.Select name="id_servicio" value={formulario.id_servicio} onChange={manejarCambio} className="input-premium">
+                            <option value="">Mantenimiento General</option>
+                            {servicios.map((s) => (
+                              <option key={s.id_servicio} value={s.id_servicio}>{s.tipo_servicio} {s.precio_servicio ? `($${Number(s.precio_servicio).toFixed(0)})` : ''}</option>
+                            ))}
+                          </Form.Select>
+                        </Form.Group>
                       </Col>
-                      <Col sm={6} md={3}>
-                        <div className="perfil-info-block p-3 h-100">
-                          <span className="text-white-50 small text-uppercase d-block fw-bold mb-1">Vehículo</span>
-                          <span className="text-white small fw-semibold">
-                            {vehiculoActivo
-                              ? `${vehiculoActivo.marca} ${vehiculoActivo.modelo} ${vehiculoActivo.anio}`
-                              : '—'}
-                          </span>
-                        </div>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small fw-bold text-white"><i className="bi bi-calendar-event me-2 text-gold"></i>Fecha *</Form.Label>
+                          <Form.Control type="date" name="fecha" value={formulario.fecha} onChange={manejarCambio} min={fechaMinima} className="input-premium" required />
+                        </Form.Group>
                       </Col>
-                      <Col sm={6} md={3}>
-                        <div className="perfil-info-block p-3 h-100">
-                          <span className="text-white-50 small text-uppercase d-block fw-bold mb-1">Servicio</span>
-                          <span className="text-white small fw-semibold">
-                            {servicioActivo?.tipo_servicio || 'Mantenimiento general'}
-                            {servicioActivo?.precio_servicio != null && (
-                              <span className="text-gold"> · ${Number(servicioActivo.precio_servicio).toFixed(2)}</span>
-                            )}
-                          </span>
-                        </div>
-                      </Col>
-                      <Col sm={6} md={3}>
-                        <div className="perfil-info-block p-3 h-100">
-                          <span className="text-white-50 small text-uppercase d-block fw-bold mb-1">Fecha y hora</span>
-                          <span className="text-white small fw-semibold">
-                            {formulario.fecha && formulario.hora_inicio 
-                              ? `${formulario.fecha} · ${formulario.hora_inicio}` 
-                              : '—'}
-                          </span>
-                          {mecanicoActivo && (
-                            <span className="text-white-50 d-block mt-1" style={{ fontSize: '0.75rem' }}>
-                              {mecanicoActivo.nombres} {mecanicoActivo.apellidos}
-                            </span>
-                          )}
-                        </div>
+                      <Col md={6}>
+                        <Form.Group>
+                          <Form.Label className="small fw-bold text-white"><i className="bi bi-clock me-2 text-gold"></i>Hora *</Form.Label>
+                          <Form.Control 
+                            type="time" 
+                            name="hora_inicio" 
+                            value={formulario.hora_inicio} 
+                            onChange={manejarCambio}
+                            min={HORARIO_TALLER.inicio} 
+                            max={HORARIO_TALLER.fin} 
+                            className="input-premium" 
+                            required 
+                          />
+                        </Form.Group>
                       </Col>
                     </Row>
-                  </Col>
 
-                  <Col xs={12} xl={4}>
-                    <div className="d-flex flex-column gap-2">
-                      <Button
-                        type="submit"
-                        className="btn-primary-custom py-3 fw-bold"
-                        disabled={enviando || mecanicos.length === 0}
-                      >
-                        {enviando ? (
-                          <>
-                            <Spinner animation="border" size="sm" className="me-2" />
-                            Agendando...
-                          </>
-                        ) : (
-                          <>
-                            <i className="bi bi-calendar-plus me-2"></i>
-                            Confirmar cita
-                          </>
+                    <Form.Group className="mt-4 mb-4 flex-grow-1">
+                      <Form.Label className="small fw-bold text-white"><i className="bi bi-chat-left-text me-2 text-gold"></i>Observaciones</Form.Label>
+                      <Form.Control as="textarea" rows={5} name="observaciones" value={formulario.observaciones} onChange={manejarCambio} placeholder="¿Qué necesita tu vehículo hoy?" className="input-premium h-100" />
+                    </Form.Group>
+
+                    <div className="mt-auto pt-4 border-top border-secondary border-opacity-25">
+                      <div className="d-flex justify-content-between align-items-center mb-4">
+                        <div className="text-white-50 small">
+                          Confirmando para el <span className="text-white fw-bold">{formulario.fecha || '---'}</span>
+                          {formulario.hora_inicio && (
+                            <> a las <span className="text-white fw-bold">{formatearHoraResumen(formulario.hora_inicio)}</span></>
+                          )}
+                        </div>
+                        {servicioActivo?.precio_servicio && (
+                          <div className="text-end">
+                            <span className="h4 text-gold fw-bold mb-0">${Number(servicioActivo.precio_servicio).toFixed(2)}</span>
+                          </div>
                         )}
-                      </Button>
-                      <Button
-                        type="button"
-                        className="btn-outline-gold py-2"
-                        onClick={() => navegar('/historial-citas')}
-                        disabled={enviando}
-                      >
-                        <i className="bi bi-clock-history me-2"></i>
-                        Ver historial
-                      </Button>
-                      {mecanicos.length === 0 && (
-                        <p className="text-warning small mb-0 text-center">
-                          No hay mecánicos disponibles. Contacta al administrador.
-                        </p>
-                      )}
+                      </div>
+                      <div className="d-grid gap-2">
+                        <Button type="submit" className="btn-primary-custom py-3 fw-bold" disabled={enviando}>
+                          {enviando ? <><Spinner animation="border" size="sm" className="me-2" />Procesando...</> : <><i className="bi bi-calendar-check me-2"></i>Confirmar Cita</>}
+                        </Button>
+                        <Button variant="link" className="text-white-50 text-decoration-none small" onClick={() => navegar('/historial-citas')} disabled={enviando}>Ver Historial</Button>
+                      </div>
                     </div>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
           </Form>
         )}
 

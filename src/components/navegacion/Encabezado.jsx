@@ -221,6 +221,8 @@ const Encabezado = () => {
       localStorage.removeItem("usuario-supabase");
       localStorage.removeItem("rol-supabase");
       setMostrarMenu(false);
+      setMostrarModalCerrarSesion(false);
+      setToast({ mostrar: false, mensaje: "", tipo: "" });
       navigate("/");
     } catch (err) {
       console.error("Error cerrando sesión:", err.message);
@@ -276,6 +278,13 @@ const Encabezado = () => {
 
           {rol === 'cliente' && (
             <>
+              <Nav.Link
+                onClick={() => manejarNavegacion("/mis-vehiculos")}
+                className="text-white nav-link-animated"
+              >
+                {mostrarMenu ? <i className="bi-car-front me-2"></i> : null}
+                <strong>Mis Vehículos</strong>
+              </Nav.Link>
               <Nav.Link
                 onClick={() => manejarNavegacion("/historial-citas")}
                 className="text-white nav-link-animated"
