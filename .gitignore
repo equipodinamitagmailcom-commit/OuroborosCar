@@ -7,13 +7,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Entorno
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
 node_modules
 dist
 dist-ssr
@@ -29,6 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-# Dependencias
-node_modules/
-dist/

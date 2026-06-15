@@ -1,9 +1,41 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Offcanvas, Modal, Button } from "react-bootstrap";
 import Logo from "../../assets/Logo.png";
 import { supabase } from "../database/supabaseconfig.js";
 import NotificacionOperacion from '../rutas/NotificacionOperacion.jsx';
+
+const normalizarEstadoCita = (estado) => {
+  const valor = String(estado || "").toLowerCase().trim();
+
+  if (valor.includes("proceso") || valor.includes("curso") || valor.includes("repar")) {
+    return "En Proceso";
+  }
+
+  if (valor.includes("complet") || valor.includes("finaliz") || valor.includes("entreg")) {
+    return "Completada";
+  }
+
+  return "Pendiente";
+};
+
+const obtenerClaveNotificacionesCliente = (idCliente) => `notificaciones-citas-cliente-${idCliente}`;
+
+const leerCitasNotificadas = (idCliente) => {
+  try {
+    const guardadas = localStorage.getItem(obtenerClaveNotificacionesCliente(idCliente));
+    return new Set(JSON.parse(guardadas || "[]"));
+  } catch {
+    return new Set();
+  }
+};
+
+const guardarCitasNotificadas = (idCliente, citas) => {
+  localStorage.setItem(
+    obtenerClaveNotificacionesCliente(idCliente),
+    JSON.stringify(Array.from(citas))
+  );
+};
 
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
@@ -13,6 +45,7 @@ const Encabezado = () => {
   const navigate = useNavigate();
   const location = useLocation(); // Para detectar la ruta actual
   const [fotoPerfil, setFotoPerfil] = useState(null);
+  const estadosCitasRef = useRef(new Map());
 
   useEffect(() => {
     let active = true;
@@ -50,7 +83,7 @@ const Encabezado = () => {
 
     cargarFoto();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
         cargarFoto();
       } else if (event === 'SIGNED_OUT') {
@@ -70,6 +103,106 @@ const Encabezado = () => {
         subscription.unsubscribe();
       }
       window.removeEventListener("actualizacion-foto-perfil", manejarActualizacionFoto);
+    };
+  }, [location.pathname]);
+
+  useEffect(() => {
+    let activo = true;
+    let canalRealtime = null;
+
+    const suscribirNotificacionesCliente = async () => {
+      const rolActual = localStorage.getItem("rol-supabase")?.toLowerCase();
+      const usuarioActivo = localStorage.getItem("usuario-supabase");
+
+      if (!usuarioActivo || rolActual !== "cliente") {
+        estadosCitasRef.current = new Map();
+        return;
+      }
+
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user || !activo) return;
+
+        const { data: cliente, error: errorCliente } = await supabase
+          .from("clientes")
+          .select("id_cliente")
+          .eq("profile_id", user.id)
+          .maybeSingle();
+
+        if (errorCliente || !cliente || !activo) return;
+
+        const idCliente = cliente.id_cliente;
+        const citasNotificadas = leerCitasNotificadas(idCliente);
+
+        const { data: citasIniciales, error: errorCitas } = await supabase
+          .from("cita")
+          .select("id_cita, estado")
+          .eq("id_cliente", idCliente);
+
+        if (errorCitas || !activo) return;
+
+        const mapaEstados = new Map();
+        (citasIniciales || []).forEach((cita) => {
+          const estadoNormalizado = normalizarEstadoCita(cita.estado);
+          mapaEstados.set(cita.id_cita, estadoNormalizado);
+
+          if (estadoNormalizado === "Completada") {
+            citasNotificadas.add(cita.id_cita);
+          }
+        });
+
+        estadosCitasRef.current = mapaEstados;
+        guardarCitasNotificadas(idCliente, citasNotificadas);
+
+        canalRealtime = supabase
+          .channel(`cliente-citas-${idCliente}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "UPDATE",
+              schema: "public",
+              table: "cita",
+              filter: `id_cliente=eq.${idCliente}`
+            },
+            (payload) => {
+              const idCita = payload.new?.id_cita;
+              if (!idCita) return;
+
+              const estadoAnterior = estadosCitasRef.current.get(idCita);
+              const estadoNuevo = normalizarEstadoCita(payload.new?.estado);
+
+              estadosCitasRef.current.set(idCita, estadoNuevo);
+
+              if (estadoAnterior !== "Completada" && estadoNuevo === "Completada") {
+                const notificadasActuales = leerCitasNotificadas(idCliente);
+
+                if (!notificadasActuales.has(idCita)) {
+                  notificadasActuales.add(idCita);
+                  guardarCitasNotificadas(idCliente, notificadasActuales);
+
+                  setToast({
+                    mostrar: true,
+                    mensaje: `Tu cita #${idCita} ya fue completada. Puedes revisar el detalle en Mis Citas.`,
+                    tipo: "exito",
+                  });
+                }
+              }
+            }
+          )
+          .subscribe();
+      } catch (error) {
+        console.error("Error al suscribir notificaciones de citas:", error);
+      }
+    };
+
+    suscribirNotificacionesCliente();
+
+    return () => {
+      activo = false;
+      if (canalRealtime) {
+        supabase.removeChannel(canalRealtime);
+      }
     };
   }, [location.pathname]);
 
@@ -148,7 +281,7 @@ const Encabezado = () => {
                 className="text-white nav-link-animated"
               >
                 {mostrarMenu ? <i className="bi-clock-history me-2"></i> : null}
-                <strong>Historial de Citas</strong>
+                <strong>Mis Citas</strong>
               </Nav.Link>
               <Nav.Link
                 onClick={manejarAgendarCita}
@@ -268,18 +401,47 @@ const Encabezado = () => {
                 {mostrarMenu ? <i className="bi-journal-plus me-2"></i> : null}
                 <strong>Registro</strong>
               </Nav.Link>
+
+              <Nav.Link
+                onClick={() => manejarNavegacion("/servicios-mantenimiento")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-gear-fill me-2"></i> : null}
+                <strong>Servicios</strong>
+              </Nav.Link>
             </>
           )}
 
-          {rol === 'admin' && (
-            <Nav.Link
-              onClick={() => manejarNavegacion("/servicios-mantenimiento")}
-              className="text-white"
-              style={mostrarMenu ? { color: '#A4841C' } : {}}
-            >
-              {mostrarMenu ? <i className="bi-gear-fill me-2"></i> : null}
-              <strong>Servicios</strong>
-            </Nav.Link>
+          {rol === 'mecanico' && (
+            <>
+              <Nav.Link
+                onClick={() => manejarNavegacion("/citas-mecanico")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-calendar-check-fill me-2"></i> : null}
+                <strong>Mis Citas</strong>
+              </Nav.Link>
+
+              <Nav.Link
+                onClick={() => manejarNavegacion("/retiro-repuestos")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-box-seam me-2"></i> : null}
+                <strong>Retirar Repuestos</strong>
+              </Nav.Link>
+
+              <Nav.Link
+                onClick={() => manejarNavegacion("/repuestos")}
+                className="text-white"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-tools me-2"></i> : null}
+                <strong>Repuestos</strong>
+              </Nav.Link>
+            </>
           )}
 
           {/* Ícono cerrar sesión en barra superior (desktop) */}

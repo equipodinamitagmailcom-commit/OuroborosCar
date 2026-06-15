@@ -352,7 +352,7 @@ const AgendarCita = () => {
             </p>
           </Col>
           <Col xs={12} lg={4} className="text-lg-end mt-3 mt-lg-0">
-            <span className="badge rounded-pill badge-custom px-3 py-2 fw-bold text-uppercase">
+            <span className="badge rounded-pill badge-custom px-3 py-2 text-uppercase">
               <i className="bi bi-clock me-2"></i>
               Taller: {HORARIO_TALLER.inicio} – {HORARIO_TALLER.fin}
             </span>

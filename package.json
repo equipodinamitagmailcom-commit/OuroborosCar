@@ -12,13 +12,16 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.104.1",
+    "@tailwindcss/vite": "^4.3.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
+    "lucide-react": "^1.17.0",
     "react": "^19.2.5",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "recharts": "^3.8.1",
+    "tailwindcss": "^4.3.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
