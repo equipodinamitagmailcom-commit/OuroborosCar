@@ -312,9 +312,6 @@ const HistorialCitas = () => {
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
           <div>
             <h2 className="fw-bold mb-1" style={{ color: "#A4841C" }}>Mis Citas</h2>
-            <p className="mb-0 text-white-50">
-              Revisa el detalle de cada cita y adjunta hasta 5 imágenes como evidencia del trabajo realizado.
-            </p>
           </div>
           <Badge bg="dark" className="border border-warning-subtle px-3 py-2 fs-6">
             {citas.length} cita(s)
@@ -412,7 +409,7 @@ const HistorialCitas = () => {
               </div>
             ) : (
               <Row className="g-4">
-                <Col lg={7}>
+                <Col lg={12}>
                   <Card className="bg-black text-white border border-secondary h-100">
                     <Card.Body>
                       <h5 className="fw-bold mb-3" style={{ color: "#A4841C" }}>Información General</h5>
@@ -483,57 +480,6 @@ const HistorialCitas = () => {
                       )}
                     </Card.Body>
                   </Card>
-                </Col>
-
-                <Col lg={5}>
-                  <Card className="bg-black text-white border border-secondary mb-4">
-                    <Card.Body>
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h5 className="fw-bold mb-0" style={{ color: "#A4841C" }}>Evidencias</h5>
-                        <Badge bg="secondary">{detalleCita.evidencias.length}/5</Badge>
-                      </div>
-                      <Alert variant="light" className="border border-secondary text-dark mb-0">
-                        Las evidencias son de solo lectura para el cliente.
-                      </Alert>
-                    </Card.Body>
-                  </Card>
-
-                  <Row className="g-3">
-                    {detalleCita.evidencias.length ? (
-                      detalleCita.evidencias.map((evidencia, index) => (
-                        <Col xs={12} key={evidencia.campo}>
-                          <Card className="bg-black text-white border border-secondary overflow-hidden">
-                            <img
-                              src={evidencia.url}
-                              alt={`Evidencia ${index + 1}`}
-                              style={{ width: "100%", height: "220px", objectFit: "cover" }}
-                            />
-                            <Card.Body>
-                              <p className="mb-3 fw-bold">Evidencia {index + 1}</p>
-                              <div className="d-flex">
-                                <Button
-                                  as="a"
-                                  href={evidencia.url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  variant="outline-light"
-                                  className="w-100"
-                                >
-                                  Ver imagen
-                                </Button>
-                              </div>
-                            </Card.Body>
-                          </Card>
-                        </Col>
-                      ))
-                    ) : (
-                      <Col xs={12}>
-                        <Alert variant="dark" className="border border-secondary text-white-50 mb-0">
-                          Esta cita todavía no tiene evidencias fotográficas registradas.
-                        </Alert>
-                      </Col>
-                    )}
-                  </Row>
                 </Col>
               </Row>
             )}
