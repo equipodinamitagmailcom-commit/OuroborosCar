@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Card, Form, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Button, Card, Form, Alert, InputGroup } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
 
 const RegistroGeneral = () => {
     const [tipoRegistro, setTipoRegistro] = useState(null); // 'cliente' o 'mecanico'
     const [cargando, setCargando] = useState(false);
+    const [verContrasena, setVerContrasena] = useState(false);
     const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
 
     // Estado inicial basado en tu esquema DDL
@@ -277,7 +278,7 @@ const RegistroGeneral = () => {
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold">Correo electrónico</Form.Label>
+                                        <Form.Label className="small fw-bold text-white">Correo electrónico</Form.Label>
                                         <Form.Control
                                             type="email"
                                             name="email"
@@ -289,15 +290,24 @@ const RegistroGeneral = () => {
                                     </Form.Group>
 
                                     <Form.Group className="mb-4">
-                                        <Form.Label className="small fw-bold">Contraseña</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            name="password"
-                                            value={formData.password}
-                                            onChange={manejarCambio}
-                                            className="input-premium"
-                                            required
-                                        />
+                                        <Form.Label className="small fw-bold text-white">Contraseña</Form.Label>
+                                        <InputGroup>
+                                            <Form.Control
+                                                type={verContrasena ? "text" : "password"}
+                                                name="password"
+                                                value={formData.password}
+                                                onChange={manejarCambio}
+                                                className="input-premium border-end-0"
+                                                required
+                                            />
+                                            <InputGroup.Text 
+                                                className="input-group-text-custom border-start-0"
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => setVerContrasena(!verContrasena)}
+                                            >
+                                                <i className={`bi ${verContrasena ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
+                                            </InputGroup.Text>
+                                        </InputGroup>
                                     </Form.Group>
 
                                     <Button 
