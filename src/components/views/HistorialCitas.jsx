@@ -138,11 +138,8 @@ const HistorialCitas = () => {
   const [citas, setCitas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [cargandoDetalle, setCargandoDetalle] = useState(false);
-  const [subiendoEvidencias, setSubiendoEvidencias] = useState(false);
-  const [eliminandoEvidencia, setEliminandoEvidencia] = useState("");
   const [mostrarDetalle, setMostrarDetalle] = useState(false);
   const [detalleCita, setDetalleCita] = useState(null);
-  const [archivosSeleccionados, setArchivosSeleccionados] = useState([]);
   const [mensajeVista, setMensajeVista] = useState("");
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "exito" });
 
@@ -302,133 +299,11 @@ const HistorialCitas = () => {
 
   const abrirDetalle = async (cita) => {
     setMostrarDetalle(true);
-    setArchivosSeleccionados([]);
     setDetalleCita({
       ...cita,
       historialPago: []
     });
     await cargarDetalleCita(cita.id_cita);
-  };
-
-  const espaciosDisponibles = useMemo(() => {
-    if (!detalleCita) return 5;
-    return Math.max(0, 5 - detalleCita.evidencias.length);
-  }, [detalleCita]);
-
-  const manejarSeleccionArchivos = (event) => {
-    const archivos = Array.from(event.target.files || []);
-
-    if (!archivos.length) {
-      setArchivosSeleccionados([]);
-      return;
-    }
-
-    const archivosNoValidos = archivos.filter((archivo) => !archivo.type.startsWith("image/"));
-    if (archivosNoValidos.length > 0) {
-      mostrarNotificacion("Solo puedes seleccionar archivos de imagen.", "advertencia");
-      event.target.value = "";
-      setArchivosSeleccionados([]);
-      return;
-    }
-
-    if (archivos.length > espaciosDisponibles) {
-      mostrarNotificacion(`Solo puedes subir ${espaciosDisponibles} imagen(es) más para esta cita.`, "advertencia");
-      event.target.value = "";
-      setArchivosSeleccionados([]);
-      return;
-    }
-
-    setArchivosSeleccionados(archivos);
-  };
-
-  const subirEvidencias = async () => {
-    if (!detalleCita) return;
-
-    if (!archivosSeleccionados.length) {
-      mostrarNotificacion("Selecciona al menos una imagen para continuar.", "advertencia");
-      return;
-    }
-
-    if (archivosSeleccionados.length > espaciosDisponibles) {
-      mostrarNotificacion(`Esta cita solo admite ${espaciosDisponibles} imagen(es) adicionales.`, "advertencia");
-      return;
-    }
-
-    setSubiendoEvidencias(true);
-    const archivosSubidos = [];
-
-    try {
-      const siguientesCampos = CAMPOS_EVIDENCIA.filter(
-        (campo) => !detalleCita.evidenciasPorCampo[campo]
-      );
-
-      const actualizacion = {};
-
-      for (let indice = 0; indice < archivosSeleccionados.length; indice += 1) {
-        const archivo = archivosSeleccionados[indice];
-        const nombreArchivo = `citas/${detalleCita.id_cita}/${Date.now()}_${indice}_${sanitizarNombreArchivo(archivo.name)}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from(BUCKET_EVIDENCIAS)
-          .upload(nombreArchivo, archivo);
-
-        if (uploadError) throw uploadError;
-
-        archivosSubidos.push(nombreArchivo);
-
-        const { data: urlData } = supabase.storage
-          .from(BUCKET_EVIDENCIAS)
-          .getPublicUrl(nombreArchivo);
-
-        actualizacion[siguientesCampos[indice]] = urlData.publicUrl;
-      }
-
-      const { error: errorUpdate } = await supabase
-        .from("cita")
-        .update(actualizacion)
-        .eq("id_cita", detalleCita.id_cita);
-
-      if (errorUpdate) throw errorUpdate;
-
-      setArchivosSeleccionados([]);
-      await Promise.all([cargarCitas(), cargarDetalleCita(detalleCita.id_cita)]);
-      mostrarNotificacion("Las evidencias se guardaron correctamente.", "exito");
-    } catch (err) {
-      console.error("Error al subir evidencias:", err.message || err);
-      if (archivosSubidos.length) {
-        await supabase.storage.from(BUCKET_EVIDENCIAS).remove(archivosSubidos).catch(() => {});
-      }
-      mostrarNotificacion("No se pudieron guardar las evidencias de la cita.", "error");
-    } finally {
-      setSubiendoEvidencias(false);
-    }
-  };
-
-  const eliminarEvidencia = async (campo, url) => {
-    if (!detalleCita || !campo) return;
-
-    setEliminandoEvidencia(campo);
-    try {
-      const { error } = await supabase
-        .from("cita")
-        .update({ [campo]: null })
-        .eq("id_cita", detalleCita.id_cita);
-
-      if (error) throw error;
-
-      const rutaArchivo = extraerRutaStorage(url);
-      if (rutaArchivo) {
-        await supabase.storage.from(BUCKET_EVIDENCIAS).remove([rutaArchivo]).catch(() => {});
-      }
-
-      await Promise.all([cargarCitas(), cargarDetalleCita(detalleCita.id_cita)]);
-      mostrarNotificacion("La evidencia fue eliminada.", "exito");
-    } catch (err) {
-      console.error("Error al eliminar evidencia:", err.message || err);
-      mostrarNotificacion("No se pudo eliminar la evidencia seleccionada.", "error");
-    } finally {
-      setEliminandoEvidencia("");
-    }
   };
 
   return (
@@ -519,7 +394,6 @@ const HistorialCitas = () => {
           show={mostrarDetalle}
           onHide={() => {
             setMostrarDetalle(false);
-            setArchivosSeleccionados([]);
           }}
           size="xl"
           centered
@@ -572,8 +446,13 @@ const HistorialCitas = () => {
                       <p className="mb-4 text-white-50">{detalleCita.motivo}</p>
 
                       <h5 className="fw-bold mb-2" style={{ color: "#A4841C" }}>Trabajo Realizado</h5>
-                      <div className="p-3 rounded border border-secondary bg-dark-subtle bg-opacity-10">
-                        <p className="mb-0" style={{ whiteSpace: "pre-line" }}>{detalleCita.detalle}</p>
+                      <div
+                        className="p-3 rounded border border-secondary"
+                        style={{ backgroundColor: "#e9ecef" }}
+                      >
+                        <p className="mb-0" style={{ whiteSpace: "pre-line", color: "#000" }}>
+                          {detalleCita.detalle}
+                        </p>
                       </div>
 
                       <hr className="border-secondary my-4" />
@@ -598,7 +477,7 @@ const HistorialCitas = () => {
                           ))}
                         </div>
                       ) : (
-                        <Alert variant="dark" className="mb-0 border border-secondary text-white-50">
+                        <Alert variant="light" className="mb-0 border border-secondary text-dark">
                           No hay movimientos adicionales registrados para esta cita.
                         </Alert>
                       )}
@@ -613,47 +492,9 @@ const HistorialCitas = () => {
                         <h5 className="fw-bold mb-0" style={{ color: "#A4841C" }}>Evidencias</h5>
                         <Badge bg="secondary">{detalleCita.evidencias.length}/5</Badge>
                       </div>
-
-                      <Alert variant={espaciosDisponibles === 0 ? "warning" : "dark"} className="border border-secondary">
-                        {espaciosDisponibles === 0
-                          ? "Esta cita ya alcanzó el máximo de 5 imágenes."
-                          : `Puedes agregar ${espaciosDisponibles} imagen(es) más a esta cita.`}
+                      <Alert variant="light" className="border border-secondary text-dark mb-0">
+                        Las evidencias son de solo lectura para el cliente.
                       </Alert>
-
-                      <Form.Group className="mb-3">
-                        <Form.Label>Agregar evidencia fotográfica</Form.Label>
-                        <Form.Control
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={manejarSeleccionArchivos}
-                          disabled={subiendoEvidencias || espaciosDisponibles === 0}
-                        />
-                        <Form.Text className="text-white-50">
-                          Máximo 5 imágenes por cita. Solo se aceptan archivos de imagen.
-                        </Form.Text>
-                      </Form.Group>
-
-                      {archivosSeleccionados.length > 0 && (
-                        <div className="mb-3 p-3 rounded border border-secondary">
-                          <p className="fw-bold mb-2">Archivos seleccionados</p>
-                          <ul className="mb-0 ps-3">
-                            {archivosSeleccionados.map((archivo) => (
-                              <li key={`${archivo.name}-${archivo.size}`}>{archivo.name}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      <div className="d-grid">
-                        <Button
-                          variant="warning"
-                          onClick={subirEvidencias}
-                          disabled={subiendoEvidencias || !archivosSeleccionados.length || espaciosDisponibles === 0}
-                        >
-                          {subiendoEvidencias ? "Guardando evidencias..." : "Guardar evidencias"}
-                        </Button>
-                      </div>
                     </Card.Body>
                   </Card>
 
@@ -669,24 +510,16 @@ const HistorialCitas = () => {
                             />
                             <Card.Body>
                               <p className="mb-3 fw-bold">Evidencia {index + 1}</p>
-                              <div className="d-flex gap-2">
+                              <div className="d-flex">
                                 <Button
                                   as="a"
                                   href={evidencia.url}
                                   target="_blank"
                                   rel="noreferrer"
                                   variant="outline-light"
-                                  className="flex-fill"
+                                  className="w-100"
                                 >
                                   Ver imagen
-                                </Button>
-                                <Button
-                                  variant="outline-danger"
-                                  className="flex-fill"
-                                  onClick={() => eliminarEvidencia(evidencia.campo, evidencia.url)}
-                                  disabled={eliminandoEvidencia === evidencia.campo}
-                                >
-                                  {eliminandoEvidencia === evidencia.campo ? "Eliminando..." : "Eliminar"}
                                 </Button>
                               </div>
                             </Card.Body>

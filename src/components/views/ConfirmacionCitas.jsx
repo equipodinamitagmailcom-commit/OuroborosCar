@@ -61,6 +61,11 @@ const formatearFecha = (fecha) => {
   }).format(fechaLocal);
 };
 
+const formatearMonto = (monto) => {
+  if (monto == null || Number.isNaN(Number(monto))) return 'Monto no registrado';
+  return `$${monto}`;
+};
+
 const obtenerFechaHoraActual = () => {
   const ahora = new Date();
   const anio = ahora.getFullYear();
@@ -141,6 +146,8 @@ const ConfirmacionCitas = () => {
   const [detalleCita, setDetalleCita] = useState(null);
   const [cargandoDetalle, setCargandoDetalle] = useState(false);
   const [guardandoDetalle, setGuardandoDetalle] = useState(false);
+  const [textoRegistroRelacionado, setTextoRegistroRelacionado] = useState('');
+  const [guardandoRegistroRelacionado, setGuardandoRegistroRelacionado] = useState(false);
   const [archivosSeleccionados, setArchivosSeleccionados] = useState([]);
   const [subiendoEvidencias, setSubiendoEvidencias] = useState(false);
   const [eliminandoEvidencia, setEliminandoEvidencia] = useState('');
@@ -272,7 +279,19 @@ const ConfirmacionCitas = () => {
 
       if (error) throw error;
 
-      const citaMapeada = mapearCitaDesdeBD(data);
+      const { data: historialPago, error: errorHistorial } = await supabase
+        .from('historial_pago')
+        .select('id_pago, id_cita, tipo_servicio, monto_total, fecha')
+        .eq('id_cita', idCita)
+        .order('fecha', { ascending: false });
+
+      if (errorHistorial) throw errorHistorial;
+
+      const citaMapeada = {
+        ...mapearCitaDesdeBD(data),
+        historialPago: historialPago || []
+      };
+
       setDetalleCita(citaMapeada);
       setCitas(prev =>
         prev.map(cita => (cita.id_cita === citaMapeada.id_cita ? { ...cita, ...citaMapeada } : cita))
@@ -288,7 +307,8 @@ const ConfirmacionCitas = () => {
   const abrirDetalle = async (cita) => {
     setMostrarDetalle(true);
     setArchivosSeleccionados([]);
-    setDetalleCita(cita);
+    setTextoRegistroRelacionado('');
+    setDetalleCita({ ...cita, historialPago: [] });
     await cargarDetalleCita(cita.id_cita);
   };
 
@@ -296,6 +316,43 @@ const ConfirmacionCitas = () => {
     if (!detalleCita) return 5;
     return Math.max(0, 5 - (detalleCita.evidencias?.length || 0));
   }, [detalleCita]);
+
+  const agregarRegistroRelacionado = async () => {
+    if (!detalleCita) return;
+
+    const texto = String(textoRegistroRelacionado || '').trim();
+    if (!texto) {
+      mostrarToast('Escribe un texto para agregar al registro.', 'error');
+      return;
+    }
+
+    setGuardandoRegistroRelacionado(true);
+    try {
+      const { fecha } = obtenerFechaHoraActual();
+
+      const { error } = await supabase
+        .from('historial_pago')
+        .insert([
+          {
+            id_cita: detalleCita.id_cita,
+            tipo_servicio: texto,
+            monto_total: null,
+            fecha
+          }
+        ]);
+
+      if (error) throw error;
+
+      setTextoRegistroRelacionado('');
+      await cargarDetalleCita(detalleCita.id_cita);
+      mostrarToast('Registro relacionado agregado.', 'success');
+    } catch (err) {
+      console.error('Error al agregar registro relacionado:', err.message || err);
+      mostrarToast('No se pudo guardar el registro relacionado.', 'error');
+    } finally {
+      setGuardandoRegistroRelacionado(false);
+    }
+  };
 
   const guardarDetalleTrabajo = async () => {
     if (!detalleCita) return;
@@ -866,6 +923,54 @@ const ConfirmacionCitas = () => {
                         placeholder="Escribe aquí todo lo que se hizo en esta cita..."
                         className="w-full rounded-2xl bg-[#101010] border border-slate-700 focus:border-[#A4841C] focus:outline-none px-4 py-4 text-slate-100 resize-y"
                       />
+                    </div>
+
+                    <div className="bg-[#1b1b1b] border border-[#A4841C]/20 rounded-2xl p-5">
+                      <h3 className="text-xl font-extrabold text-[#A4841C] mb-4">Registro relacionado</h3>
+
+                      {detalleCita.historialPago?.length ? (
+                        <div className="space-y-3">
+                          {detalleCita.historialPago.map((item) => (
+                            <div
+                              key={item.id_pago}
+                              className="rounded-2xl border border-slate-700 bg-[#101010] p-4"
+                            >
+                              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2">
+                                <div>
+                                  <p className="text-white font-extrabold">
+                                    {item.tipo_servicio || 'Servicio registrado'}
+                                  </p>
+                                  <p className="text-slate-400 text-sm">
+                                    Fecha: {item.fecha ? formatearFecha(item.fecha) : 'Sin fecha'}
+                                  </p>
+                                </div>
+                                <p className="text-[#A4841C] font-extrabold text-lg">
+                                  {formatearMonto(item.monto_total)}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <div className="mt-5 border-t border-[#A4841C]/15 pt-5">
+                        <p className="text-slate-300 font-bold mb-2">Agregar nota al registro</p>
+                        <textarea
+                          value={textoRegistroRelacionado}
+                          onChange={(e) => setTextoRegistroRelacionado(e.target.value)}
+                          rows={4}
+                          placeholder="Escribe una nota o detalle adicional (ej: repuesto instalado, observación, etc.)"
+                          className="w-full rounded-2xl bg-[#101010] border border-slate-700 focus:border-[#A4841C] focus:outline-none px-4 py-4 text-slate-100 resize-y"
+                          disabled={guardandoRegistroRelacionado}
+                        />
+                        <button
+                          onClick={agregarRegistroRelacionado}
+                          disabled={guardandoRegistroRelacionado}
+                          className="w-full mt-3 px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-60 border border-[#A4841C]/35 text-white font-extrabold cursor-pointer"
+                        >
+                          {guardandoRegistroRelacionado ? 'Guardando...' : 'Guardar registro'}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
