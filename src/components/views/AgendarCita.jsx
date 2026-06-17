@@ -83,7 +83,7 @@ const AgendarCita = () => {
           .eq('id_cliente', datosCliente.id_cliente),
         supabase
           .from('mantenimientoservicio')
-          .select('id_servicio, tipo_servicio, precio_servicio')
+          .select('id_servicio, tipo_servicio, precio_servicio, foto')
           .order('tipo_servicio', { ascending: true }),
       ]);
 

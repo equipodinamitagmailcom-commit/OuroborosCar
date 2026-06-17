@@ -3,8 +3,8 @@ import { Modal, Button, Form, Alert } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
 import PropTypes from 'prop-types';
 
-const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, notificar }) => {
-    const [repuestoEditado, setRepuestoEditado] = useState({
+const ModalRegistroRepuesto = ({ mostrar, manejarCierre, alGuardar, notificar }) => {
+    const [nuevoRepuesto, setNuevoRepuesto] = useState({
         nombre: '',
         descripcion: '',
         precio_repuesto: '',
@@ -15,17 +15,6 @@ const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, 
     const [error, setError] = useState('');
     const [cargando, setCargando] = useState(false);
     const bucketName = 'repuestos_imagenes';
-
-    useEffect(() => {
-        if (repuesto) {
-            setRepuestoEditado({
-                nombre: repuesto.nombre || '',
-                descripcion: repuesto.descripcion || '',
-                precio_repuesto: repuesto.precio_repuesto != null ? String(repuesto.precio_repuesto) : '',
-                id_categoria: repuesto.id_categoria || '',
-            });
-        }
-    }, [repuesto]);
 
     useEffect(() => {
         const cargarCategorias = async () => {
@@ -40,7 +29,7 @@ const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, 
 
     const manejarCambio = (e) => {
         const { name, value } = e.target;
-        setRepuestoEditado((prev) => ({ ...prev, [name]: value }));
+        setNuevoRepuesto((prev) => ({ ...prev, [name]: value }));
         setError('');
     };
 
@@ -55,15 +44,14 @@ const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, 
         e.preventDefault();
         setError('');
 
-        if (!repuestoEditado.nombre.trim() || !repuestoEditado.id_categoria) {
+        if (!nuevoRepuesto.nombre.trim() || !nuevoRepuesto.id_categoria) {
             setError('El nombre y la categoría son obligatorios.');
             return;
         }
 
         setCargando(true);
         try {
-            let urlFoto = repuesto.foto;
-
+            let urlFoto = null;
             if (archivo) {
                 const nombreArchivo = `${Date.now()}_${archivo.name}`;
                 const { error: uploadError } = await supabase.storage
@@ -75,35 +63,29 @@ const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, 
                 const { data: urlData } = supabase.storage
                     .from(bucketName)
                     .getPublicUrl(nombreArchivo);
-                
-                if (repuesto.foto) {
-                    const oldFileName = repuesto.foto.split('/').pop().split('?')[0];
-                    await supabase.storage.from(bucketName).remove([oldFileName]).catch(e => console.warn(e));
-                }
-                
                 urlFoto = urlData.publicUrl;
             }
 
             const { error: dbError } = await supabase
                 .from('repuestos')
-                .update({
-                    nombre: repuestoEditado.nombre.trim(),
-                    descripcion: repuestoEditado.descripcion.trim(),
-                    precio_repuesto: repuestoEditado.precio_repuesto ? parseFloat(repuestoEditado.precio_repuesto) : null,
-                    id_categoria: parseInt(repuestoEditado.id_categoria),
-                    foto: urlFoto,
-                })
-                .eq('id_repuesto', repuesto.id_repuesto);
+                .insert([{
+                    nombre: nuevoRepuesto.nombre.trim(),
+                    descripcion: nuevoRepuesto.descripcion.trim(),
+                    precio_repuesto: nuevoRepuesto.precio_repuesto ? parseFloat(nuevoRepuesto.precio_repuesto) : null,
+                    id_categoria: parseInt(nuevoRepuesto.id_categoria),
+                    foto: urlFoto
+                }]);
 
             if (dbError) throw dbError;
 
-            notificar('Repuesto actualizado exitosamente.', 'success');
-            alActualizar();
+            notificar('Repuesto registrado correctamente.', 'success');
+            alGuardar();
             manejarCierre();
+            setNuevoRepuesto({ nombre: '', descripcion: '', precio_repuesto: '', id_categoria: '' });
             setArchivo(null);
         } catch (err) {
             setError(err.message);
-            notificar('Error al actualizar repuesto.', 'error');
+            notificar('Error al registrar repuesto.', 'error');
         } finally {
             setCargando(false);
         }
@@ -112,43 +94,36 @@ const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, 
     return (
         <Modal show={mostrar} onHide={manejarCierre} centered contentClassName="modal-custom">
             <Modal.Header closeButton closeVariant="white">
-                <Modal.Title className="text-gold">Editar Repuesto</Modal.Title>
+                <Modal.Title className="text-gold">Registrar Nuevo Repuesto</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {error && <Alert variant="danger">{error}</Alert>}
                 <Form onSubmit={manejarEnvio}>
                     <Form.Group className="mb-3">
                         <Form.Label>Nombre del Repuesto</Form.Label>
-                        <Form.Control type="text" name="nombre" value={repuestoEditado.nombre} onChange={manejarCambio} className="input-premium" required />
+                        <Form.Control type="text" name="nombre" value={nuevoRepuesto.nombre} onChange={manejarCambio} className="input-premium" required />
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Categoría</Form.Label>
-                        <Form.Select name="id_categoria" value={repuestoEditado.id_categoria} onChange={manejarCambio} className="input-premium" required>
+                        <Form.Select name="id_categoria" value={nuevoRepuesto.id_categoria} onChange={manejarCambio} className="input-premium" required>
                             <option value="">Seleccione una categoría</option>
                             {categorias.map(cat => <option key={cat.id_categoria} value={cat.id_categoria}>{cat.nombre}</option>)}
                         </Form.Select>
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Precio</Form.Label>
-                        <Form.Control type="number" step="0.01" name="precio_repuesto" value={repuestoEditado.precio_repuesto} onChange={manejarCambio} className="input-premium" />
+                        <Form.Control type="number" step="0.01" name="precio_repuesto" value={nuevoRepuesto.precio_repuesto} onChange={manejarCambio} className="input-premium" />
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Descripción</Form.Label>
-                        <Form.Control as="textarea" rows={3} name="descripcion" value={repuestoEditado.descripcion} onChange={manejarCambio} className="input-premium" />
+                        <Form.Control as="textarea" rows={3} name="descripcion" value={nuevoRepuesto.descripcion} onChange={manejarCambio} className="input-premium" />
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Imagen del Repuesto</Form.Label>
-                        {repuesto?.foto && (
-                            <div className="mb-2">
-                                <img src={repuesto.foto} alt="Actual" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }} />
-                                <p className="small text-muted mb-0">Imagen actual</p>
-                            </div>
-                        )}
                         <Form.Control type="file" accept="image/*" onChange={manejarCambioArchivo} className="input-premium" />
-                        <Form.Text className="text-muted">Si seleccionas un archivo, reemplazará la imagen actual.</Form.Text>
                     </Form.Group>
                     <Button variant="primary" type="submit" className="btn-primary-custom w-100" disabled={cargando}>
-                        {cargando ? 'Actualizando...' : 'Guardar Cambios'}
+                        {cargando ? 'Guardando...' : 'Guardar Repuesto'}
                     </Button>
                 </Form>
             </Modal.Body>
@@ -156,5 +131,5 @@ const ModalEdicionRepuesto = ({ mostrar, manejarCierre, repuesto, alActualizar, 
     );
 };
 
-ModalEdicionRepuesto.propTypes = { mostrar: PropTypes.bool.isRequired, manejarCierre: PropTypes.func.isRequired, repuesto: PropTypes.object, alActualizar: PropTypes.func.isRequired, notificar: PropTypes.func.isRequired };
-export default ModalEdicionRepuesto;
+ModalRegistroRepuesto.propTypes = { mostrar: PropTypes.bool.isRequired, manejarCierre: PropTypes.func.isRequired, alGuardar: PropTypes.func.isRequired, notificar: PropTypes.func.isRequired };
+export default ModalRegistroRepuesto;

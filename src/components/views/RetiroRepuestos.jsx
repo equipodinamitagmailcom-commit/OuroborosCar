@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../database/supabaseconfig.js';
+import ModalRegistroRepuesto from '../repuestos/ModalRegistroRepuesto.jsx';
+import ModalEdicionRepuesto from '../repuestos/ModalEdicionRepuesto.jsx';
 import { 
   Search, 
   Package, 
@@ -11,7 +13,9 @@ import {
   Minus, 
   Warehouse,
   ShoppingBag,
-  Info
+  Info,
+  PlusCircle,
+  Pencil
 } from 'lucide-react';
 
 const RetiroRepuestos = () => {
@@ -29,6 +33,11 @@ const RetiroRepuestos = () => {
   
   // Estado para notificaciones de transacciones
   const [notificaciones, setNotificaciones] = useState([]);
+
+  // Estados para modales de gestión
+  const [mostrarModalRegistro, setMostrarModalRegistro] = useState(false);
+  const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
+  const [repuestoAEditar, setRepuestoAEditar] = useState(null);
 
   // Datos simulados de la sesión
   const mecanicoActual = "Téc. Ricardo Gómez";
@@ -54,6 +63,7 @@ const RetiroRepuestos = () => {
           nombre,
           descripcion,
           precio_repuesto,
+          foto,
           id_categoria,
           categoriarepuesto (
             nombre
@@ -69,6 +79,9 @@ const RetiroRepuestos = () => {
       const productosMapeados = (data || []).map(item => ({
         id_producto: item.id_repuesto,
         nombre: item.nombre,
+        foto: item.foto,
+        id_categoria: item.id_categoria,
+        precio_repuesto: item.precio_repuesto,
         categoria: item.categoriarepuesto?.nombre || 'General',
         stock: (item.id_repuesto * 4) % 16 + 5, // Genera un stock interactivo entre 5 y 20 basado en su ID
         codigo: `REP-${String(item.id_repuesto).padStart(3, '0')}`,
@@ -102,6 +115,15 @@ const RetiroRepuestos = () => {
       ...prev,
       [id]: nueva
     }));
+  };
+
+  // Abrir modal de edición
+  const abrirEdicion = (repuesto) => {
+    setRepuestoAEditar({
+      ...repuesto,
+      id_repuesto: repuesto.id_producto
+    });
+    setMostrarModalEdicion(true);
   };
 
   // Acción de Retirar Repuesto (Simulación de actualización de Supabase)
@@ -148,15 +170,15 @@ const RetiroRepuestos = () => {
 
   return (
     <div className="vista-mecanico min-h-screen bg-[#121212] text-slate-100 p-4 md:p-6 pb-24">
-      {/* Contenedor centralizado responsive */}
-      <div className="max-w-4xl mx-auto space-y-6">
+      {/* Contenedor responsive fluido */}
+      <div className="container-fluid space-y-6">
         
         {/* Encabezado de la Sección */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b-2 border-[#A4841C]/45 pb-5 gap-4">
           <div>
             <div className="flex items-center gap-2 text-[#A4841C] font-semibold text-lg tracking-wider uppercase mb-1">
               <Warehouse className="w-5 h-5" />
-              <span>Control de Bodega</span>
+              <span>Inventario y Bodega</span>
             </div>
             <h1 className="text-5xl font-extrabold tracking-tight text-[#A4841C]">
               Retiro de Repuestos
@@ -165,6 +187,14 @@ const RetiroRepuestos = () => {
               Solicita materiales de forma directa. Autorizado para: <span className="text-[#A4841C] font-bold">{mecanicoActual}</span>
             </p>
           </div>
+
+          <button
+            onClick={() => setMostrarModalRegistro(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-[#A4841C] hover:bg-[#8c7018] text-white font-bold rounded-xl transition-all shadow-lg cursor-pointer"
+          >
+            <PlusCircle className="w-5 h-5" />
+            <span>Añadir Repuesto</span>
+          </button>
 
           <div className="bg-[#1e1e1e] border border-[#A4841C]/50 rounded-xl px-4 py-2.5 flex items-center gap-2 text-base text-slate-400 font-medium">
             <Info className="w-5 h-5 text-[#A4841C] shrink-0" />
@@ -226,6 +256,21 @@ const RetiroRepuestos = () => {
                       <div className="flex flex-col h-full justify-between gap-4">
                         
                         {/* Sección Superior de la Tarjeta */}
+                        {prod.foto ? (
+                          <div className="relative h-48 w-full overflow-hidden rounded-xl border border-[#A4841C]/20 mb-2">
+                            <img 
+                              src={prod.foto} 
+                              alt={prod.nombre} 
+                              className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                            />
+                          </div>
+                        ) : (
+                          <div className="relative h-48 w-full overflow-hidden rounded-xl border border-dashed border-[#A4841C]/20 mb-2 bg-[#121212] flex flex-col items-center justify-center">
+                            <Package className="w-12 h-12 text-[#A4841C]/30" />
+                            <span className="text-xs text-slate-600 mt-2 font-mono uppercase">Sin imagen técnica</span>
+                          </div>
+                        )}
+
                         <div className="space-y-2.5">
                           <div className="flex justify-between items-start gap-2">
                             <div className="space-y-0.5">
@@ -371,6 +416,22 @@ const RetiroRepuestos = () => {
           </div>
         ))}
       </div>
+
+      {/* Modales de Gestión de Repuestos */}
+      <ModalRegistroRepuesto 
+        mostrar={mostrarModalRegistro}
+        manejarCierre={() => setMostrarModalRegistro(false)}
+        alGuardar={cargarRepuestosDesdeBaseDatos}
+        notificar={mostrarToast}
+      />
+
+      <ModalEdicionRepuesto
+        mostrar={mostrarModalEdicion}
+        manejarCierre={() => { setMostrarModalEdicion(false); setRepuestoAEditar(null); }}
+        repuesto={repuestoAEditar}
+        alActualizar={cargarRepuestosDesdeBaseDatos}
+        notificar={mostrarToast}
+      />
     </div>
   );
 };

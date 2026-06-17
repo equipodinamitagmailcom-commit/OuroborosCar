@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Container, Row, Col, Button, InputGroup, Form, Spinner, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Button, InputGroup, Form, Spinner, Alert, Card, Badge } from 'react-bootstrap';
 import { supabase } from '../database/supabaseconfig.js';
+import { Pencil, Trash2, Wrench, Search, PlusCircle } from 'lucide-react';
 
 // Importación de Componentes (Features)
-import TablaServicios from '../servicios/TablaServicios.jsx';
 import ModalRegistroServicio from '../servicios/ModalRegistroServicio.jsx';
 import ModalEdicionServicio from '../servicios/ModalEdicionServicio.jsx';
 import ModalEliminacionServicio from '../servicios/ModalEliminacionServicio.jsx';
@@ -141,11 +141,56 @@ const ServiciosMantenimientoAdmin = () => {
                 </div>
             ) : serviciosFiltrados.length > 0 ? (
                 <>
-                    <TablaServicios
-                        servicios={serviciosPaginados}
-                        onEditar={abrirEdicion}
-                        onEliminar={abrirEliminacion}
-                    />
+                    <Row className="g-4">
+                        {serviciosPaginados.map((servicio) => (
+                            <Col key={servicio.id_servicio} md={6} lg={4}>
+                                <Card className="card-custom card-hover-custom h-100">
+                                    <div className="admin-img-wrapper" style={{ height: '220px' }}>
+                                        {servicio.foto ? (
+                                            <Card.Img 
+                                                variant="top" 
+                                                src={servicio.foto} 
+                                                className="h-100 w-100 object-cover" 
+                                            />
+                                        ) : (
+                                            <div className="h-100 bg-dark d-flex flex-column align-items-center justify-content-center border-bottom border-secondary border-opacity-25">
+                                                <Wrench size={48} className="text-gold opacity-25" />
+                                                <span className="text-muted small mt-2 uppercase font-mono">Sin imagen técnica</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Card.Body className="d-flex flex-column p-4">
+                                        <div className="mb-3">
+                                            <h5 className="fw-bold text-gold mb-1">{servicio.tipo_servicio}</h5>
+                                            <div className="text-white-50 small mb-2">ID Servicio: #{servicio.id_servicio}</div>
+                                            <h4 className="fw-bold text-white mb-0">
+                                                {servicio.precio_servicio ? `$${Number(servicio.precio_servicio).toFixed(2)}` : 'Consultar Precio'}
+                                            </h4>
+                                        </div>
+                                        
+                                        <div className="d-flex gap-2 mt-auto pt-3 border-top border-secondary border-opacity-25">
+                                            <Button 
+                                                variant="outline-warning" 
+                                                size="sm" 
+                                                className="flex-grow-1 btn-outline-gold"
+                                                onClick={() => abrirEdicion(servicio)}
+                                            >
+                                                <Pencil size={14} className="me-2" /> Editar
+                                            </Button>
+                                            <Button 
+                                                variant="outline-danger" 
+                                                size="sm"
+                                                className="btn-outline-danger-custom"
+                                                onClick={() => abrirEliminacion(servicio)}
+                                            >
+                                                <Trash2 size={14} />
+                                            </Button>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
                     <div className="mt-3">
                         <Paginacion
                             registrosPorPagina={registrosPorPagina}

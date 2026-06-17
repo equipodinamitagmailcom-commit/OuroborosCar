@@ -18,6 +18,12 @@ const ModalEliminacionRepuesto = ({ mostrar, manejarCierre, repuesto, alEliminar
 
             if (error) throw error;
 
+            // Eliminar foto del bucket si existe
+            if (repuesto.foto) {
+                const fileName = repuesto.foto.split('/').pop().split('?')[0];
+                await supabase.storage.from('repuestos_imagenes').remove([fileName]).catch(e => console.warn(e));
+            }
+
             await Promise.resolve(alEliminar?.());
             manejarCierre();
 

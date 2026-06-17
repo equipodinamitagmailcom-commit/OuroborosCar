@@ -8,8 +8,10 @@ const ModalRegistroServicio = ({ mostrar, manejarCierre, alGuardar, notificar })
         tipo_servicio: '',
         precio_servicio: '',
     });
+    const [archivo, setArchivo] = useState(null);
     const [error, setError] = useState('');
     const [cargando, setCargando] = useState(false);
+    const bucketName = 'servicio_imagenes';
 
     const manejarCambio = (e) => {
         const { name, value } = e.target;
@@ -18,6 +20,13 @@ const ModalRegistroServicio = ({ mostrar, manejarCierre, alGuardar, notificar })
             [name]: value,
         }));
         setError('');
+    };
+
+    const manejarCambioArchivo = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            setArchivo(file);
+        }
     };
 
     const manejarEnvio = async (e) => {
@@ -35,12 +44,28 @@ const ModalRegistroServicio = ({ mostrar, manejarCierre, alGuardar, notificar })
 
         setCargando(true);
         try {
+            let urlFoto = null;
+            if (archivo) {
+                const nombreArchivo = `${Date.now()}_${archivo.name}`;
+                const { error: uploadError } = await supabase.storage
+                    .from(bucketName)
+                    .upload(nombreArchivo, archivo);
+
+                if (uploadError) throw uploadError;
+
+                const { data: urlData } = supabase.storage
+                    .from(bucketName)
+                    .getPublicUrl(nombreArchivo);
+                urlFoto = urlData.publicUrl;
+            }
+
             const { error: supabaseError } = await supabase
                 .from('mantenimientoservicio')
                 .insert([
                     {
                         tipo_servicio: nuevoServicio.tipo_servicio.trim(),
                         precio_servicio: nuevoServicio.precio_servicio ? parseFloat(nuevoServicio.precio_servicio) : null,
+                        foto: urlFoto,
                     },
                 ]);
 
@@ -50,6 +75,7 @@ const ModalRegistroServicio = ({ mostrar, manejarCierre, alGuardar, notificar })
             alGuardar();
             manejarCierre();
             setNuevoServicio({ tipo_servicio: '', precio_servicio: '' });
+            setArchivo(null);
         } catch (err) {
             console.error('Error al registrar servicio:', err.message);
             setError('Error al registrar el servicio: ' + err.message);
@@ -74,6 +100,10 @@ const ModalRegistroServicio = ({ mostrar, manejarCierre, alGuardar, notificar })
                     <Form.Group className="mb-3">
                         <Form.Label>Precio (Opcional)</Form.Label>
                         <Form.Control type="number" step="0.01" name="precio_servicio" value={nuevoServicio.precio_servicio} onChange={manejarCambio} className="input-premium" placeholder="Ej: 50.00" />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Imagen del Servicio</Form.Label>
+                        <Form.Control type="file" accept="image/*" onChange={manejarCambioArchivo} className="input-premium" />
                     </Form.Group>
                     <Button variant="primary" type="submit" className="btn-primary-custom w-100" disabled={cargando}>
                         {cargando ? 'Guardando...' : 'Guardar Servicio'}

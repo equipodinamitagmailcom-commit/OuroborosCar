@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../database/supabaseconfig.js';
-import { Button, Container, Row, Col, InputGroup, Form, Spinner } from 'react-bootstrap';
+import { Button, Container, Row, Col, InputGroup, Form, Spinner, Card, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 // Importación de Componentes (Features)
-import TablaRepuestos from '../repuestos/TablaRepuestos.jsx';
 import ModalRegistroRepuesto from '../repuestos/ModaRegistroRepuesto.jsx';
 import ModalEdicionRepuesto from '../repuestos/ModalEdicionRepuesto.jsx';
 import ModalEliminacionRepuesto from '../repuestos/ModalEliminacionRepuesto.jsx';
 import ModalVerCategoriasRepuestos from '../CatalogoRepuestos/ModalVerCategoriasRepuestos.jsx';
 import Paginacion from '../ordenamiento/Paginacion';
 import NotificacionOperacion from '../rutas/NotificacionOperacion.jsx';
+import { Pencil, Trash2, Package, Layers } from 'lucide-react';
 
 const Repuestos = () => {
     const navegar = useNavigate();
@@ -47,6 +47,7 @@ const Repuestos = () => {
                     nombre,
                     descripcion,
                     precio_repuesto,
+                    foto,
                     id_categoria,
                     categoriarepuesto (
                         id_categoria,
@@ -169,11 +170,64 @@ const Repuestos = () => {
                 </div>
             ) : repuestosFiltrados.length > 0 ? (
                 <>
-                    <TablaRepuestos
-                        repuestos={repuestosPaginados}
-                        onEditar={abrirEdicion}
-                        onEliminar={abrirEliminacion}
-                    />
+                    <Row className="g-4">
+                        {repuestosPaginados.map((repuesto) => (
+                            <Col key={repuesto.id_repuesto} md={6} lg={4} xl={3}>
+                                <Card className="card-custom card-hover-custom h-100">
+                                    <div className="admin-img-wrapper" style={{ height: '200px' }}>
+                                        {repuesto.foto ? (
+                                            <Card.Img 
+                                                variant="top" 
+                                                src={repuesto.foto} 
+                                                className="h-100 w-100 object-cover" 
+                                            />
+                                        ) : (
+                                            <div className="h-100 bg-dark d-flex flex-column align-items-center justify-content-center border-bottom border-secondary border-opacity-25">
+                                                <Package size={48} className="text-gold opacity-25" />
+                                                <span className="text-muted small mt-2 uppercase font-mono">Sin imagen</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Card.Body className="d-flex flex-column p-4">
+                                        <div className="mb-3">
+                                            <div className="d-flex justify-content-between align-items-start mb-2">
+                                                <h5 className="fw-bold text-gold mb-0">{repuesto.nombre}</h5>
+                                                <Badge className="badge-custom">
+                                                    ${Number(repuesto.precio_repuesto).toFixed(2)}
+                                                </Badge>
+                                            </div>
+                                            <div className="d-flex align-items-center gap-2 text-white-50 small mb-2">
+                                                <Layers size={14} className="text-gold" />
+                                                <span>{repuesto.categoriarepuesto?.nombre || 'General'}</span>
+                                            </div>
+                                            <p className="text-white-50 small mb-0 line-clamp-2">
+                                                {repuesto.descripcion || 'Sin descripción técnica disponible.'}
+                                            </p>
+                                        </div>
+                                        
+                                        <div className="d-flex gap-2 mt-auto pt-3 border-top border-secondary border-opacity-25">
+                                            <Button 
+                                                variant="outline-warning" 
+                                                size="sm" 
+                                                className="flex-grow-1 btn-outline-gold"
+                                                onClick={() => abrirEdicion(repuesto)}
+                                            >
+                                                <Pencil size={14} className="me-2" /> Editar
+                                            </Button>
+                                            <Button 
+                                                variant="outline-danger" 
+                                                size="sm"
+                                                className="btn-outline-danger-custom"
+                                                onClick={() => abrirEliminacion(repuesto)}
+                                            >
+                                                <Trash2 size={14} />
+                                            </Button>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
                     <div className="mt-3">
                         <Paginacion
                             registrosPorPagina={registrosPorPagina}
