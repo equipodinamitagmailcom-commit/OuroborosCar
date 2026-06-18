@@ -150,7 +150,7 @@ const ServiciosMantenimientoAdmin = () => {
                                             <Card.Img 
                                                 variant="top" 
                                                 src={servicio.foto} 
-                                                className="h-100 w-100 object-cover" 
+                                                className="h-100 w-100 object-cover hover-zoom" 
                                             />
                                         ) : (
                                             <div className="h-100 bg-dark d-flex flex-column align-items-center justify-content-center border-bottom border-secondary border-opacity-25">
