@@ -141,7 +141,11 @@ const CatalogoPublico = () => {
       <Row className="mb-4 align-items-center">
         <Col md={6}>
           <h2 className="fw-bold text-white mb-0">
-            <i className="bi bi-stars text-gold me-2"></i>Catálogo de Autos
+            Catálogo de vehiculos 
+            <i className="bi bi-car-front-fill ms-2"></i>
+          </h2>
+          <h2 className="fw-bold text-white mb-0">
+         Explorá nuestro inventario en línea y encontrá el vehículo perfecto para vos
           </h2>
         </Col>
         <Col md={6}>

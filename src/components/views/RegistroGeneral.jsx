@@ -278,7 +278,7 @@ const RegistroGeneral = () => {
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="small fw-bold text-white">Correo electrónico</Form.Label>
+                                        <Form.Label className="small fw-bold text-black">Correo electrónico</Form.Label>
                                         <Form.Control
                                             type="email"
                                             name="email"
@@ -290,7 +290,7 @@ const RegistroGeneral = () => {
                                     </Form.Group>
 
                                     <Form.Group className="mb-4">
-                                        <Form.Label className="small fw-bold text-white">Contraseña</Form.Label>
+                                        <Form.Label className="small fw-bold text-black">Contraseña</Form.Label>
                                         <InputGroup>
                                             <Form.Control
                                                 type={verContrasena ? "text" : "password"}

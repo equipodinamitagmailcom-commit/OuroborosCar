@@ -10,6 +10,7 @@ const Inicio = () => {
   const [cargando, setCargando] = useState(true);
   const [repuestoSeleccionado, setRepuestoSeleccionado] = useState(null);
   const [mostrarModalRepuesto, setMostrarModalRepuesto] = useState(false);
+  const [mostrarModalLogin, setMostrarModalLogin] = useState(false);
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -33,20 +34,32 @@ const Inicio = () => {
     cargarDatos();
   }, []);
 
+  const manejarAgendarClick = () => {
+    const usuarioActivo = localStorage.getItem("usuario-supabase");
+    if (usuarioActivo) {
+      navegar('/agendar-cita');
+    } else {
+      setMostrarModalLogin(true);
+    }
+  };
+
   return (
     <div className="bg-radial-premium min-vh-100">
       <Container className="py-5">
         {/* Sección de Bienvenida */}
         <Row className="justify-content-center text-center mb-5 mt-5">
           <Col lg={12} className="px-0">
-            <h1 className="display-1 fw-bold text-gold mb-4 animate__animated animate__fadeInDown text-uppercase" style={{ letterSpacing: '12px', textShadow: '0 0 20px rgba(164, 132, 28, 0.3)' }}>
-              Ouroboros Car
+            <h1 
+              className="display-5 fw-bold text-gold mb-4 animate__animated animate__fadeInDown text-uppercase fancy-title" 
+              style={{ letterSpacing: '6px', textShadow: '0 0 20px rgba(164, 132, 28, 0.3)' }}
+            >
+              Bienvenido a Ouroboros Car
             </h1>
             <p className="h3 text-white-50 mb-5 italic fw-light">
               "Excelencia automotriz que trasciende el tiempo."
             </p>
             <p className="fs-4 text-white opacity-75 lh-base mx-auto" style={{ maxWidth: '100%' }}>
-              Bienvenido a <strong className="text-gold">Ouroboros Car</strong>, su aliado integral en el mundo automotriz. 
+              Bienvenido a <strong className="text-gold">Ouroboros Car</strong>, 
               Somos más que un taller; somos un centro de excelencia dedicado al cuidado y comercialización 
               de vehículos de prestigio. Nuestra plataforma le permite gestionar citas de mantenimiento 
               con técnicos certificados y explorar una selección curada de vehículos que definen su estilo. 
@@ -93,6 +106,16 @@ const Inicio = () => {
                         <p className="text-white-50 small mb-0">
                           Ofrecemos mantenimiento de la más alta calidad con estándares premium para asegurar la longevidad y el rendimiento óptimo de su inversión automotriz.
                         </p>
+                        {(s.tipo_servicio.toLowerCase().includes('gestión de citas') || s.tipo_servicio.toLowerCase().includes('gestion de citas')) && (
+                          <Button 
+                            variant="outline-warning" 
+                            size="sm" 
+                            className="mt-3 btn-outline-gold align-self-start"
+                            onClick={manejarAgendarClick}
+                          >
+                            Agenda tu cita ya
+                          </Button>
+                        )}
                       </Card.Body>
                     </Col>
                   </Row>
@@ -108,7 +131,7 @@ const Inicio = () => {
             <Row className="mb-4 mt-5">
               <Col>
                 <h2 className="fw-bold text-gold text-center mb-4">
-                  <i className="bi bi-box-seam me-3"></i>Repuestos de Alta Gama
+                  <i className="bi bi-box-seam me-3"></i>Repuestos de vehiculos
                 </h2>
               </Col>
             </Row>
@@ -167,7 +190,7 @@ const Inicio = () => {
                 onClick={() => navegar('/catalogo')}
               >
                 <i className="bi bi-car-front-fill me-2"></i>
-                Explorar Catálogo Premium
+                Explorar Catálogo 
               </Button>
             </Card>
           </Col>
@@ -213,6 +236,36 @@ const Inicio = () => {
         <Modal.Footer className="border-secondary">
           <Button className="btn-outline-gold" onClick={() => setMostrarModalRepuesto(false)}>
             Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal de aviso para iniciar sesión */}
+      <Modal 
+        show={mostrarModalLogin} 
+        onHide={() => setMostrarModalLogin(false)} 
+        centered 
+        contentClassName="modal-login-notice"
+      >
+        <Modal.Header closeButton className="border-0">
+          <Modal.Title className="text-black fw-bold">
+            <i className="bi bi-wrench-adjustable me-2" style={{ color: '#000' }}></i>
+            Aviso de Sesión
+            <i className="bi bi-screwdriver ms-2" style={{ color: '#000' }}></i>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center py-4">
+          <div className="mb-3">
+            <i className="bi bi-tools display-4" style={{ color: '#000' }}></i>
+          </div>
+          <p className="text-black fw-bold">Para agendar una cita, por favor inicia sesión en la aplicación.</p>
+        </Modal.Body>
+        <Modal.Footer className="border-0 justify-content-center">
+          <Button variant="secondary" onClick={() => setMostrarModalLogin(false)}>
+            Cancelar
+          </Button>
+          <Button className="btn-primary-custom" onClick={() => navegar('/login')}>
+            Iniciar sesión
           </Button>
         </Modal.Footer>
       </Modal>

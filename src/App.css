@@ -195,6 +195,25 @@ h1, h2, h3, h4, h5, .display-1, .display-2, .display-3, .display-4, .display-5, 
   transform: scale(1.1);
 }
 
+.text-black {
+    color: #000000 !important;
+}
+
+.modal-login-notice {
+    background-color: var(--color-primary) !important;
+    border: 2px solid #000 !important;
+    border-radius: 15px !important;
+}
+
+.modal-login-notice .btn-close {
+    filter: none !important;
+}
+
+.fancy-title {
+    font-family: 'Georgia', serif !important;
+    font-style: italic;
+}
+
 /* ============================================
    CONTENEDORES Y FONDOS PRINCIPALES
    ============================================ */

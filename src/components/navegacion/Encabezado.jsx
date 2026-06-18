@@ -255,7 +255,7 @@ const Encabezado = () => {
       <Nav className="ms-auto pe-2">
         <Nav.Link
           onClick={() => manejarNavegacion("/login")}
-          className="text-white nav-link-animated"
+          className="text-black nav-link-animated"
           style={mostrarMenu ? { color: '#A4841C' } : {}}
         >
           <i className="bi-person-fill-lock me-2"></i>
@@ -274,6 +274,14 @@ const Encabezado = () => {
           >
             {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
             <strong>{rol === 'admin' ? 'Panel de Control' : 'Inicio'}</strong>
+          </Nav.Link>
+
+          <Nav.Link
+            onClick={() => manejarNavegacion("/catalogo")}
+            className="text-white nav-link-animated"
+          >
+            {mostrarMenu ? <i className="bi-car-front-fill me-2"></i> : null}
+            <strong>Catálogo</strong>
           </Nav.Link>
 
           {rol === 'cliente' && (
@@ -356,7 +364,7 @@ const Encabezado = () => {
           {!usuarioActivo && (
             <Nav.Link
               onClick={() => manejarNavegacion("/login")}
-              className="text-white nav-link-animated"
+              className="text-black nav-link-animated"
               style={mostrarMenu ? { color: '#A4841C' } : {}}
             >
               {mostrarMenu ? <i className="bi-person-fill-lock me-2"></i> : null}
