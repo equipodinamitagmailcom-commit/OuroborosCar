@@ -87,7 +87,7 @@ const Inicio = () => {
               <Col key={s.id_servicio} md={12} lg={6}>
                 <Card className="card-custom h-100 border-0 shadow-lg overflow-hidden">
                   <Row className="g-0 h-100">
-                    <Col xs={4} className="position-relative overflow-hidden" style={{ minHeight: '160px' }}>
+                    <Col xs={12} sm={4} className="servicio-img-col position-relative overflow-hidden" style={{ minHeight: '160px' }}>
                       {s.foto ? (
                         <Card.Img 
                           src={s.foto} 
@@ -100,7 +100,7 @@ const Inicio = () => {
                         </div>
                       )}
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={12} sm={8}>
                       <Card.Body className="p-4 d-flex flex-column justify-content-center h-100">
                         <h5 className="fw-bold text-gold mb-2">{s.tipo_servicio}</h5>
                         <p className="text-white-50 small mb-0">

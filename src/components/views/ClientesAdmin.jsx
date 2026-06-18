@@ -283,6 +283,7 @@ const ClientesAdmin = () => {
                             <h5 className="fw-bold mb-0 text-gold">Clientes Registrados</h5>
                         </Card.Header>
                         <Card.Body className="p-0">
+                            <div className="table-responsive">
                             <Table hover responsive className="align-middle mb-0 table-custom">
                                 <thead>
                                     <tr>
@@ -345,6 +346,7 @@ const ClientesAdmin = () => {
                                     )}
                                 </tbody>
                             </Table>
+                            </div>
                         </Card.Body>
                         {!cargandoClientes && clientesFiltrados.length > 0 && (
                             <div className="p-3">
