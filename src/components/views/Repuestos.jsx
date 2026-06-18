@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../database/supabaseconfig.js';
 import { Button, Container, Row, Col, InputGroup, Form, Spinner, Card, Badge } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 
 // Importación de Componentes (Features)
 import ModalRegistroRepuesto from '../repuestos/ModaRegistroRepuesto.jsx';
@@ -13,7 +12,6 @@ import NotificacionOperacion from '../rutas/NotificacionOperacion.jsx';
 import { Pencil, Trash2, Package, Layers } from 'lucide-react';
 
 const Repuestos = () => {
-    const navegar = useNavigate();
     // --- ESTADOS ---
     const [listaRepuestos, setListaRepuestos] = useState([]);
     const [busqueda, setBusqueda] = useState('');
@@ -118,14 +116,6 @@ const Repuestos = () => {
                     <h2 className="fw-bold text-gold">Inventario de Repuestos</h2>
                 </Col>
                 <Col xs={12} md={6} className="text-md-end mt-2 mt-md-0">
-                    <Button
-                        variant="outline-light"
-                        className="me-2 shadow-sm btn-sm"
-                        onClick={() => navegar("/perfil-cliente")}
-                    >
-                        <i className="bi bi-person-circle me-2"></i>
-                        Mi Perfil
-                    </Button>
                     <Button
                         variant="outline-warning"
                         style={{ borderColor: '#A4841C', color: '#A4841C' }}
