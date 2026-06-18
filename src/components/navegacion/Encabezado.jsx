@@ -269,22 +269,26 @@ const Encabezado = () => {
     contenidoMenu = (
       <>
         <Nav className="ms-auto pe-2 align-items-center">
-          <Nav.Link
-            onClick={() => manejarNavegacion(rol === 'admin' ? "/inicio-admin" : "/")}
-            className="text-white nav-link-animated"
-            style={mostrarMenu ? { color: '#A4841C' } : {}}
-          >
-            {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
-            <strong>{rol === 'admin' ? 'Panel de Control' : 'Inicio'}</strong>
-          </Nav.Link>
+          {(rol === 'admin' || !usuarioActivo) && (
+            <Nav.Link
+              onClick={() => manejarNavegacion(rol === 'admin' ? "/inicio-admin" : "/")}
+              className="text-white nav-link-animated"
+              style={mostrarMenu ? { color: '#A4841C' } : {}}
+            >
+              {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
+              <strong>{rol === 'admin' ? 'Panel de Control' : 'Inicio'}</strong>
+            </Nav.Link>
+          )}
 
-          <Nav.Link
-            onClick={() => manejarNavegacion("/catalogo")}
-            className="text-white nav-link-animated"
-          >
-            {mostrarMenu ? <i className="bi-car-front-fill me-2"></i> : null}
-            <strong>Catálogo</strong>
-          </Nav.Link>
+          {(rol === 'cliente' || !usuarioActivo) && (
+            <Nav.Link
+              onClick={() => manejarNavegacion("/catalogo")}
+              className="text-white nav-link-animated"
+            >
+              {mostrarMenu ? <i className="bi-car-front-fill me-2"></i> : null}
+              <strong>Catálogo</strong>
+            </Nav.Link>
+          )}
 
           {rol === 'cliente' && (
             <>
