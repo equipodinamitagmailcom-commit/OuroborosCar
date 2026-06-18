@@ -381,6 +381,15 @@ const Encabezado = () => {
           {rol === 'admin' && (
             <>
               <Nav.Link
+                onClick={() => manejarNavegacion("/dashboards")}
+                className="text-white nav-link-animated"
+                style={mostrarMenu ? { color: '#A4841C' } : {}}
+              >
+                {mostrarMenu ? <i className="bi-speedometer2 me-2"></i> : null}
+                <strong>Dashboards</strong>
+              </Nav.Link>
+
+              <Nav.Link
                 onClick={() => manejarNavegacion("/vehiculos")}
                 className="text-white"
                 style={mostrarMenu ? { color: '#A4841C' } : {}}

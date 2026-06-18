@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import Encabezado from "./components/navegacion/Encabezado";
@@ -24,6 +25,8 @@ import ServiciosMantenimientoAdmin from "./components/views/ServiciosMantenimien
 import MisVehiculos from "./components/views/MisVehiculos";
 
 import "./App.css";
+
+const Dashboards = lazy(() => import("./components/views/Dashboards"));
 
 const App = () => {
   return (
@@ -54,6 +57,13 @@ const App = () => {
 
           {/* Rutas Administrativas y Técnicas */}
           <Route path="/vehiculos" element={<RutaProtegida allowedRoles={['admin']}><Vehiculos /></RutaProtegida>} />
+          <Route path="/dashboards" element={
+            <RutaProtegida allowedRoles={['admin']}>
+              <Suspense fallback={<div className="text-center py-5"><div className="spinner-border text-warning" role="status"></div></div>}>
+                <Dashboards />
+              </Suspense>
+            </RutaProtegida>
+          } />
           <Route path="/inicio-admin" element={<InicioAdmin />} />
           <Route path="/servicios-mantenimiento" element={<RutaProtegida allowedRoles={['admin']}><ServiciosMantenimientoAdmin /></RutaProtegida>} />
 
