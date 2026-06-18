@@ -54,19 +54,21 @@ const Encabezado = () => {
       const usuarioActivo = localStorage.getItem("usuario-supabase");
       const rol = localStorage.getItem("rol-supabase")?.toLowerCase();
 
-      if (usuarioActivo && rol === 'cliente') {
+      if (usuarioActivo && (rol === 'cliente' || rol === 'mecanico')) {
         try {
           const { data: { user } } = await supabase.auth.getUser();
           if (user && active) {
+            const tabla = rol === 'cliente' ? 'clientes' : 'mecanicos';
+            const campo = rol === 'cliente' ? 'foto_cliente' : 'foto_mecanico';
             const { data, error } = await supabase
-              .from('clientes')
-              .select('foto_cliente')
+              .from(tabla)
+              .select(campo)
               .eq('profile_id', user.id)
               .maybeSingle();
 
             if (active) {
               if (data && !error) {
-                setFotoPerfil(data.foto_cliente);
+                setFotoPerfil(data[campo]);
               } else {
                 setFotoPerfil(null);
               }
@@ -92,7 +94,7 @@ const Encabezado = () => {
     });
 
     const manejarActualizacionFoto = (e) => {
-      if (active) setFotoPerfil(e.detail?.foto_cliente || null);
+      if (active) setFotoPerfil(e.detail?.foto_cliente || e.detail?.foto_mecanico || null);
     };
 
     window.addEventListener("actualizacion-foto-perfil", manejarActualizacionFoto);
@@ -458,6 +460,47 @@ const Encabezado = () => {
                 {mostrarMenu ? <i className="bi-tools me-2"></i> : null}
                 <strong>Repuestos</strong>
               </Nav.Link>
+
+              <Nav.Link
+                onClick={() => manejarNavegacion("/perfil-mecanico")}
+                className="text-white nav-link-animated d-flex align-items-center"
+                style={{ padding: mostrarMenu ? '8px 16px' : '0 10px' }}
+                title="Mi Perfil"
+              >
+                {mostrarMenu ? (
+                  <div className="d-flex align-items-center gap-2">
+                    {fotoPerfil ? (
+                      <img
+                        src={fotoPerfil}
+                        alt="Perfil"
+                        className="rounded-circle border border-warning avatar-hover"
+                        style={{ width: '30px', height: '30px', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <i className="bi-person-circle me-1" style={{ fontSize: '20px' }}></i>
+                    )}
+                    <strong>Mi Perfil</strong>
+                  </div>
+                ) : (
+                  <div className="position-relative">
+                    {fotoPerfil ? (
+                      <img
+                        src={fotoPerfil}
+                        alt="Perfil"
+                        className="rounded-circle border border-warning avatar-hover"
+                        style={{ width: '38px', height: '38px', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div
+                        className="d-flex align-items-center justify-content-center rounded-circle border border-warning bg-secondary text-white avatar-hover"
+                        style={{ width: '38px', height: '38px' }}
+                      >
+                        <i className="bi bi-person-fill" style={{ fontSize: '18px' }}></i>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Nav.Link>
             </>
           )}
 
@@ -479,7 +522,7 @@ const Encabezado = () => {
         {mostrarMenu && usuarioActivo && (
           <div className="mt-3 p-3 rounded" style={{ backgroundColor: '#1a1a1a', border: '1px solid #A4841C', color: '#e0e0e0' }}>
             <div className="d-flex align-items-center gap-3 mb-2">
-              {rol === 'cliente' && (
+              {(rol === 'cliente' || rol === 'mecanico') && (
                 fotoPerfil ? (
                   <img
                     src={fotoPerfil}

@@ -11,6 +11,7 @@ import Mecanicos from "./components/views/Mecanicos";
 import RegistroGeneral from "./components/views/RegistroGeneral";
 import Login from "./components/views/Login";
 import VistaCliente from "./components/clientes/VistaCliente";
+import VistaMecanicoPerfil from "./components/mecanico/VistaMecanicoPerfil";
 import AgendarCita from "./components/views/AgendarCita";
 import HistorialCitas from "./components/views/HistorialCitas";
 import RutaProtegida from "./components/rutas/RutaProtegida";
@@ -64,6 +65,7 @@ const App = () => {
           <Route path="/repuestos" element={<RutaProtegida allowedRoles={['admin', 'mecanico']}><Repuestos /></RutaProtegida>} />
           <Route path="/mecanicos" element={<RutaProtegida allowedRoles={['admin', 'mecanico']}><Mecanicos /></RutaProtegida>} />
           <Route path="/citas-mecanico" element={<RutaProtegida allowedRoles={['mecanico']}><ConfirmacionCitas /></RutaProtegida>} />
+          <Route path="/perfil-mecanico" element={<RutaProtegida allowedRoles={['mecanico']}><VistaMecanicoPerfil /></RutaProtegida>} />
           <Route path="/retiro-repuestos" element={<RutaProtegida allowedRoles={['mecanico']}><RetiroRepuestos /></RutaProtegida>} />
           <Route path="/registro" element={<RutaProtegida allowedRoles={['admin']}><RegistroGeneral /></RutaProtegida>} />
           <Route path="*" element={<Pagina404 />} />
