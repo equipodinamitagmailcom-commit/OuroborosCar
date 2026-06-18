@@ -599,40 +599,39 @@ const Vehiculos = () => {
           <>
             <Row>
               {vehiculosPaginados.map((vehiculo) => (
-                <Col key={vehiculo.id_vehiculo} md={6} lg={4} className="mb-4">
+                <Col key={vehiculo.id_vehiculo} sm={6} md={4} lg={3} className="mb-4">
                   <div
-                    className="card shadow-sm text-white card-custom card-hover-custom" // Se mantiene el borde de card-custom
+                    className="card shadow-sm text-white card-custom card-hover-custom"
                   >
-                    <div className="card-body d-flex flex-column">
+                    <div className="card-body d-flex flex-column p-3">
                       <div style={{ overflow: "hidden", borderRadius: "8px" }} className="mb-2">
-                        <CarruselVehiculo vehiculo={vehiculo} height="200px" />
+                        <CarruselVehiculo vehiculo={vehiculo} height="150px" />
                       </div>
-                      <h5 className="card-title d-flex justify-content-between align-items-center">
+                      <h6 className="card-title d-flex justify-content-between align-items-center text-truncate" style={{ fontSize: '1rem' }}>
                         {vehiculo.marca} {vehiculo.modelo}
                         {vehiculo.en_catalogo && (
-                          <span className="badge bg-success" style={{ fontSize: '10px' }}>En Catálogo</span>
+                          <span className="badge bg-success ms-1" style={{ fontSize: '9px' }}>En Catálogo</span>
                         )}
-                      </h5>
-                      <p className="card-text mb-2" style={{ fontSize: '0.9rem' }}>
+                      </h6>
+                      <p className="card-text mb-2" style={{ fontSize: '0.8rem', lineHeight: '1.4' }}>
                         <strong>Año:</strong> {vehiculo.anio}
                         <br />
-                        <strong>Color:</strong> {vehiculo.color}
+                        <strong>Color:</strong> {vehiculo.color} | <strong>Stock:</strong> {vehiculo.stock}
                         <br />
                         <strong>Estado:</strong> {vehiculo.estado}
                         <br />
                         <strong style={{ color: "#A4841C" }}>Precio:</strong> $
                         {vehiculo.precio}
-                        <br />
-                        <strong>Stock:</strong> {vehiculo.stock}
                       </p>
-                      <div className="d-flex justify-content-center gap-2 mt-auto">
+                      <div className="d-flex justify-content-center gap-1 mt-auto">
                         <Button
                           variant={vehiculo.en_catalogo ? "success" : "outline-warning"}
                           size="sm"
-                          title={vehiculo.en_catalogo ? "Quitar del catálogo" : "Publicar auto"}
+                          style={{ fontSize: '0.75rem' }}
+                          title={vehiculo.en_catalogo ? "Quitar del catálogo" : "Publicar"}
                           onClick={() => toggleEstadoCatalogo(vehiculo)}
                         >
-                          {vehiculo.en_catalogo ? 'Publicado' : 'Publicar auto'}
+                          {vehiculo.en_catalogo ? 'Publicado' : 'Publicar'}
                         </Button>
                         <Button
                           variant="outline-primary"
